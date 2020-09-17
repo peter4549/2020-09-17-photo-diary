@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#6200EE</color>
+    <color name="colorPrimaryDark">#3700B3</color>
+    <color name="colorAccent">#03DAC5</color>
+
+    <color name="colorDefaultThemeDark">#B39DDB</color>
+    <color name="colorDefaultThemeLight">#EDE7F6</color>
+
+    <color name="colorBottomNavigationViewBackground">@color/colorDefaultThemeDark</color>
+    <color name="colorIconTint">@color/colorGhostWhite</color>
+    <color name="colorTextViewBackground">@color/colorGhostWhite</color>
+    <color name="colorToolbarBackground">@color/colorGhostWhite</color>
+
+    <color name="colorGhostWhite">#F8F8FF</color>
+    <color name="colorSilver">#C0C0C0</color>
+</resources>

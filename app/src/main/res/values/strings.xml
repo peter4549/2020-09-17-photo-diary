@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">포토 다이어리</string>
+
+    <!-- Common -->
+    <string name="photo">사진</string>
+
+    <!-- DiaryWritingFragment -->
+    <string name="new_diary">새 다이어리</string>
+    <string name="title">제목</string>
+    <string name="today_story">오늘의 이야기</string>
+    <string name="video">비디오</string>
+    <string name="audio">오디오</string>
+    <string name="drawing">그리기</string>
+    <string name="text">텍스트</string>
+    <string name="tag">태그</string>
+
+    <!-- TabFragment -->
+    <string name="diary">다이어리</string>
+</resources>
