@@ -8,13 +8,16 @@
     <fragment
         android:id="@+id/tabFragment"
         android:name="com.duke.elliot.kim.kotlin.photodiary.tab.TabFragment"
-        android:label="TabFragment" >
+        android:label="TabFragment"
+        tools:layout="@layout/fragment_tab_layout">
         <action
             android:id="@+id/action_tabFragment_to_diaryWritingFragment"
-            app:destination="@id/diaryWritingFragment" />
+            app:destination="@id/diaryWritingFragment"
+            app:popUpToInclusive="false" />
     </fragment>
     <fragment
         android:id="@+id/diaryWritingFragment"
         android:name="com.duke.elliot.kim.kotlin.photodiary.diary.DiaryWritingFragment"
-        android:label="DiaryWritingFragment" />
+        android:label="DiaryWritingFragment"
+        tools:layout="@layout/fragment_diary_writing"/>
 </navigation>

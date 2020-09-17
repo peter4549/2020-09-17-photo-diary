@@ -1,6 +1,5 @@
 package com.duke.elliot.kim.kotlin.photodiary.tab
 
-import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,6 +7,7 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import androidx.navigation.findNavController
 import androidx.viewpager2.widget.ViewPager2
 import com.duke.elliot.kim.kotlin.photodiary.R
 import com.google.android.material.tabs.TabLayout
@@ -29,6 +29,11 @@ class TabFragment: Fragment() {
         tabIcons = arrayOf(R.drawable.ic_sharp_library_books_24, R.drawable.ic_sharp_photo_library_24)
         tabTexts = arrayOf(getString(R.string.diary), getString(R.string.photo))
         initializeTabLayoutViewPager(view.tab_layout, view.view_pager)
+
+        view.fab_write_diary.setOnClickListener {
+            view.findNavController().navigate(TabFragmentDirections.actionTabFragmentToDiaryWritingFragment())
+        }
+
         return view
     }
 
