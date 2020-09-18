@@ -9,7 +9,7 @@ import com.duke.elliot.kim.kotlin.photodiary.diary.DiaryModel
 
 @Dao
 interface DiaryDao {
-    @Query("SELECT * FROM diarymodel")
+    @Query("SELECT * FROM diary")
     fun getAll(): LiveData<MutableList<DiaryModel>>
 
     @Insert
@@ -18,6 +18,6 @@ interface DiaryDao {
     @Delete
     fun delete(note: DiaryModel)
 
-    @Query("DELETE FROM diarymodel")
+    @Query("DELETE FROM diary")
     fun nukeTable()
 }

@@ -3,7 +3,7 @@ package com.duke.elliot.kim.kotlin.photodiary.diary
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity
+@Entity(tableName = "diary")
 data class DiaryModel(@PrimaryKey(autoGenerate = true)
                       val id: Int = 0,
                       val date: String,

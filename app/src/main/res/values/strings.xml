@@ -5,15 +5,25 @@
     <string name="photo">사진</string>
 
     <!-- DiaryWritingFragment -->
+    <string name="album">앨범</string>
+    <string name="camera">카메라</string>
+    <string name="google_photos">Google 포토</string>
+    <string name="music">음악</string>
     <string name="new_diary">새 다이어리</string>
+    <string name="photo_shoot">사진 촬영</string>
     <string name="title">제목</string>
     <string name="today_story">오늘의 이야기</string>
-    <string name="video">비디오</string>
+    <string name="video">동영상</string>
     <string name="audio">오디오</string>
     <string name="drawing">그리기</string>
     <string name="text">텍스트</string>
     <string name="tag">태그</string>
+    <string name="dropdown">Dropdown</string>
+    <string name="voice_recording">음성 녹음</string>
+    <string name="mic">마이크</string>
 
     <!-- TabFragment -->
     <string name="diary">다이어리</string>
+
+
 </resources>
