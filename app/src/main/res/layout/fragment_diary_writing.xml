@@ -120,7 +120,7 @@
         <LinearLayout
             android:id="@+id/linear_layout_options"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/dimen_bottom_navigation_view_height"
+            android:layout_height="@dimen/dimen_linear_layout_options_height"
             android:layout_gravity="center_vertical"
             android:orientation="horizontal">
 
@@ -176,7 +176,7 @@
     <LinearLayout
         android:id="@+id/linear_layout_options_menu"
         android:layout_width="match_parent"
-        android:layout_height="112dp"
+        android:layout_height="@dimen/dimen_linear_layout_options_menu_height"
         android:background="@color/colorBottomNavigationViewBackground"
         android:orientation="horizontal"
         android:visibility="gone"
@@ -188,7 +188,7 @@
         <LinearLayout
             android:id="@+id/linear_layout_photo_options_menu"
             android:layout_width="match_parent"
-            android:layout_height="112dp"
+            android:layout_height="@dimen/dimen_linear_layout_options_menu_height"
             android:gravity="center"
             android:orientation="horizontal"
             android:visibility="visible">
@@ -199,6 +199,7 @@
                 android:layout_weight="1" />
 
             <LinearLayout
+                android:id="@+id/linear_layout_photo_shoot"
                 android:layout_width="80dp"
                 android:layout_height="80dp"
                 android:gravity="center"
@@ -211,7 +212,6 @@
                     android:contentDescription="@string/camera"
                     android:src="@drawable/ic_sharp_photo_camera_32"
                     app:tint="@color/colorDefaultThemeDark" />
-
 
                 <TextView
                     android:layout_width="80dp"
@@ -226,6 +226,7 @@
                 android:layout_weight="1"/>
 
             <LinearLayout
+                android:id="@+id/linear_layout_photo_album"
                 android:layout_width="80dp"
                 android:layout_height="80dp"
                 android:gravity="center"
@@ -253,6 +254,7 @@
                 android:layout_weight="1" />
 
             <LinearLayout
+                android:id="@+id/linear_layout_google_photos"
                 android:layout_width="80dp"
                 android:layout_height="80dp"
                 android:gravity="center"
@@ -291,6 +293,7 @@
                 android:layout_weight="1"/>
 
             <LinearLayout
+                android:id="@+id/linear_layout_video_album"
                 android:layout_width="80dp"
                 android:layout_height="80dp"
                 android:gravity="center"
@@ -331,6 +334,7 @@
                 android:layout_weight="1"/>
 
             <LinearLayout
+                android:id="@+id/linear_layout_voice_recording"
                 android:layout_width="80dp"
                 android:layout_height="80dp"
                 android:gravity="center"
@@ -358,6 +362,7 @@
                 android:layout_weight="1"/>
 
             <LinearLayout
+                android:id="@+id/linear_layout_music"
                 android:layout_width="80dp"
                 android:layout_height="80dp"
                 android:gravity="center"

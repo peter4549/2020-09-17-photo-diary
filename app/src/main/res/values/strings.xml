@@ -21,9 +21,8 @@
     <string name="dropdown">Dropdown</string>
     <string name="voice_recording">음성 녹음</string>
     <string name="mic">마이크</string>
+    <string name="media">Media</string>
 
     <!-- TabFragment -->
     <string name="diary">다이어리</string>
-
-
 </resources>
