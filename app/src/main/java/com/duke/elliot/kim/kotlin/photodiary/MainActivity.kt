@@ -1,29 +1,33 @@
 package com.duke.elliot.kim.kotlin.photodiary
 
-import androidx.appcompat.app.AppCompatActivity
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.item_diary.view.*
+
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var viewModel: MainViewModel
+    // TODO must be private, provide fun as interface.
+    lateinit var viewModel: MainViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        /*
+
+        /** 데이터만 관리하는 존재, 각 프래그먼트는 여기의 데이터를 참조한다. ABC, 가 있고, write frag에서 D를 추가.
+         * 그 때, 각 탭 맴버 프래그먼트의 리사이클ㄹ러뷰가 올바르게 동작하는가.
+         * */
         val viewModelFactory = ViewModelProvider.AndroidViewModelFactory.getInstance(application)
         viewModel = ViewModelProvider(this, viewModelFactory)[MainViewModel::class.java]
 
+        /*
         viewModel.diaries.observe(this, { diaries ->
             when(viewModel.action) {
                 MainViewModel.Action.INITIALIZE -> {
@@ -48,15 +52,21 @@ class MainActivity : AppCompatActivity() {
         inner class ViewHolder(val view: View): RecyclerView.ViewHolder(view)
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
-            = ViewHolder(LayoutInflater.from(parent.context)
-                .inflate(R.layout.item_diary, parent, false))
+            = ViewHolder(
+            LayoutInflater.from(parent.context)
+                .inflate(R.layout.item_diary, parent, false)
+        )
 
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             val diary = diaries[position]
-            holder.view.diary_text_title.text = diary
+            holder.view.text_title.text = diary
         }
 
         override fun getItemCount(): Int = diaries.count()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
     }
 }

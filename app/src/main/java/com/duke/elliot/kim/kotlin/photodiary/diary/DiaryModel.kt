@@ -9,4 +9,4 @@ data class DiaryModel(@PrimaryKey(autoGenerate = true)
                       val date: String,
                       var title: String? = null,
                       var content: String,
-                      val writingTime: Long,)
+                      val time: Long)

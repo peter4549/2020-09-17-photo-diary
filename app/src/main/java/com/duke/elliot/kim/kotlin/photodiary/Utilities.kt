@@ -32,7 +32,7 @@ fun showToast(context: Context, text: String, duration: Int = Toast.LENGTH_SHORT
     }
 }
 
-fun convertDpToPixel(context: Context, dp: Float)
+fun convertDpToPx(context: Context, dp: Float)
         = dp * (context.resources.displayMetrics.densityDpi.toFloat() / DisplayMetrics.DENSITY_DEFAULT)
 
 fun setImage(imageView: ImageView, bitmap: Bitmap) {

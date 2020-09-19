@@ -4,8 +4,8 @@ import com.duke.elliot.kim.kotlin.photodiary.base.BaseRecyclerViewAdapter
 import com.duke.elliot.kim.kotlin.photodiary.setImage
 import kotlinx.android.synthetic.main.item_media.view.*
 
-class MediaRecyclerViewAdapter(layoutId: Int, items: ArrayList<MediaModel>):
-    BaseRecyclerViewAdapter<MediaModel>(layoutId, items) {
+class MediaRecyclerViewAdapter(layoutId: Int, mediaArrayList: ArrayList<MediaModel>)
+    : BaseRecyclerViewAdapter<MediaModel>(layoutId, mediaArrayList) {
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val media = items[position]

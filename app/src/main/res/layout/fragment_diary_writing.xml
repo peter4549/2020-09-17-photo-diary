@@ -53,12 +53,11 @@
         app:layout_constraintTop_toBottomOf="@+id/text_date_time" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_view"
+        android:id="@+id/recycler_view_media"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
+        android:layout_margin="8dp"
+        android:background="@color/colorMediaRecyclerViewBackground"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -83,13 +82,13 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/recycler_view" />
+        app:layout_constraintTop_toBottomOf="@+id/recycler_view_media" />
 
     <LinearLayout
         android:id="@+id/linear_layout_options_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorBottomNavigationViewBackground"
+        android:background="@color/colorLinearLayoutOptionsMenuBackground"
         android:orientation="vertical"
         app:labelVisibilityMode="unlabeled"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -100,9 +99,8 @@
             android:id="@+id/frame_layout_dropdown"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
-            android:background="@color/colorFrameLayoutBackground"
+            android:background="@color/colorDefaultThemeLight"
+            android:elevation="2dp"
             app:layout_constraintBottom_toTopOf="@+id/bottom_navigation_view"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
@@ -126,46 +124,46 @@
 
             <ImageView
                 android:id="@+id/image_photo"
-                android:layout_width="28dp"
-                android:layout_height="28dp"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
                 android:layout_gravity="center_vertical"
-                android:layout_marginStart="16dp"
+                android:layout_marginStart="24dp"
                 android:contentDescription="@string/photo"
                 app:srcCompat="@drawable/ic_sharp_photo_library_28" />
 
             <ImageView
                 android:id="@+id/image_video"
-                android:layout_width="28dp"
-                android:layout_height="28dp"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
                 android:layout_gravity="center_vertical"
-                android:layout_marginStart="16dp"
+                android:layout_marginStart="24dp"
                 android:contentDescription="@string/video"
                 app:srcCompat="@drawable/ic_sharp_video_library_28" />
 
             <ImageView
                 android:id="@+id/image_audio"
-                android:layout_width="28dp"
-                android:layout_height="28dp"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
                 android:layout_gravity="center_vertical"
-                android:layout_marginStart="16dp"
+                android:layout_marginStart="24dp"
                 android:contentDescription="@string/audio"
                 app:srcCompat="@drawable/ic_sharp_mic_28" />
 
             <ImageView
                 android:id="@+id/image_drawing"
-                android:layout_width="28dp"
-                android:layout_height="28dp"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
                 android:layout_gravity="center_vertical"
-                android:layout_marginStart="16dp"
+                android:layout_marginStart="24dp"
                 android:contentDescription="@string/drawing"
                 app:srcCompat="@drawable/ic_sharp_brush_28" />
 
             <ImageView
                 android:id="@+id/image_text"
-                android:layout_width="28dp"
-                android:layout_height="28dp"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
                 android:layout_gravity="center_vertical"
-                android:layout_marginStart="32dp"
+                android:layout_marginStart="48dp"
                 android:contentDescription="@string/text"
                 app:srcCompat="@drawable/ic_sharp_title_28" />
 
@@ -177,7 +175,7 @@
         android:id="@+id/linear_layout_options_menu"
         android:layout_width="match_parent"
         android:layout_height="@dimen/dimen_linear_layout_options_menu_height"
-        android:background="@color/colorBottomNavigationViewBackground"
+        android:background="@color/colorLinearLayoutOptionsMenuBackground"
         android:orientation="horizontal"
         android:visibility="gone"
         app:labelVisibilityMode="unlabeled"

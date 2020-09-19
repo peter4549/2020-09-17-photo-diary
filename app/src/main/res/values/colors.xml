@@ -7,9 +7,10 @@
     <color name="colorDefaultThemeDark">#B39DDB</color>
     <color name="colorDefaultThemeLight">#EDE7F6</color>
 
-    <color name="colorBottomNavigationViewBackground">@color/colorGhostWhite</color>
+    <color name="colorLinearLayoutOptionsMenuBackground">@color/colorGhostWhite</color>
     <color name="colorFrameLayoutBackground">@color/colorGhostWhite</color>
     <color name="colorIconTint">@color/colorSilver</color>
+    <color name="colorMediaRecyclerViewBackground">#40F8F8FF</color>
     <color name="colorTextViewBackground">@color/colorGhostWhite</color>
     <color name="colorToolbarBackground">@color/colorGhostWhite</color>
 

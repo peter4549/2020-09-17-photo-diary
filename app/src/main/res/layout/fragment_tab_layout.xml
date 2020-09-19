@@ -17,6 +17,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:title="@string/app_name" />
 
+    <!-- 색상 수정할것. -->
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tab_layout"
         android:layout_width="match_parent"
