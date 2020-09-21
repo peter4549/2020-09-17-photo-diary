@@ -1,396 +1,476 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<layout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/colorDefaultThemeLight">
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:background="@color/colorToolbarBackground"
-        android:minHeight="?attr/actionBarSize"
-        android:theme="?attr/actionBarTheme"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <data>
+        <variable
+            name="diaryWritingViewModel"
+            type="com.duke.elliot.kim.kotlin.photodiary.diary.DiaryWritingViewModel" />
+    </data>
 
-    <TextView
-        android:id="@+id/text_date_time"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:background="@drawable/text_view_background_rounded_corners"
-        android:padding="8dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar"
-        tools:text="2020년 9월 17일 오후 8:20" />
-
-    <EditText
-        android:id="@+id/edit_text_title"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:autofillHints="@string/title"
-        android:background="@drawable/text_view_background_rounded_corners"
-        android:ellipsize="end"
-        android:ems="10"
-        android:hint="@string/title"
-        android:inputType="text"
-        android:maxLines="1"
-        android:padding="8dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/text_date_time" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_view_media"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        android:background="@color/colorMediaRecyclerViewBackground"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edit_text_title" />
-
-    <EditText
-        android:id="@+id/edit_text_content"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        android:autofillHints="@string/today_story"
-        android:background="@drawable/text_view_background_rounded_corners"
-        android:ellipsize="end"
-        android:ems="10"
-        android:gravity="top"
-        android:hint="@string/today_story"
-        android:inputType="text"
-        android:padding="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/recycler_view_media" />
-
-    <LinearLayout
-        android:id="@+id/linear_layout_options_container"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/colorLinearLayoutOptionsMenuBackground"
-        android:orientation="vertical"
-        app:labelVisibilityMode="unlabeled"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        android:layout_height="match_parent"
+        android:background="@color/colorDefaultThemeLight">
 
-        <FrameLayout
-            android:id="@+id/frame_layout_dropdown"
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/dimen_toolbar_height"
+            android:background="@color/colorToolbarBackground"
+            android:elevation="2dp"
+            android:theme="@style/ToolbarTheme"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="@dimen/dimen_layout_options_container_height"
+            android:fillViewport="true"
+            app:layout_constraintBottom_toTopOf="@+id/layout_options_container"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/text_date_time"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="64dp"
+                    android:layout_marginEnd="8dp"
+                    android:background="@drawable/text_view_background_rounded_corners"
+                    android:padding="8dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/toolbar"
+                    tools:text="2020년 9월 17일 오후 8:20" />
+
+                <EditText
+                    android:id="@+id/edit_text_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:autofillHints="@string/title"
+                    android:background="@drawable/text_view_background_rounded_corners"
+                    android:ellipsize="end"
+                    android:ems="10"
+                    android:hint="@string/title"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:padding="8dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/text_date_time" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recycler_view_media"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="8dp"
+                    android:background="@drawable/media_recycler_view_background_rounded_corners"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/edit_text_title" />
+
+                <EditText
+                    android:id="@+id/edit_text_content"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:autofillHints="@string/today_story"
+                    android:background="@drawable/text_view_background_rounded_corners"
+                    android:ellipsize="end"
+                    android:ems="10"
+                    android:gravity="top"
+                    android:hint="@string/today_story"
+                    android:inputType="textMultiLine"
+                    android:lineSpacingMultiplier="1.1"
+                    android:overScrollMode="always"
+                    android:padding="8dp"
+                    android:scrollbars="vertical"
+                    app:layout_constraintBottom_toTopOf="@+id/layout_options_container"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/recycler_view_media" />
+
+            </LinearLayout>
+        </ScrollView>
+
+        <LinearLayout
+            android:id="@+id/layout_options_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/colorDefaultThemeLight"
-            android:elevation="2dp"
-            app:layout_constraintBottom_toTopOf="@+id/bottom_navigation_view"
+            android:background="@color/colorLayoutOptionsMenuBackground"
+            android:orientation="vertical"
+            app:labelVisibilityMode="unlabeled"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
 
-            <ImageView
-                android:id="@+id/image_dropdown"
-                android:layout_width="28dp"
-                android:layout_height="28dp"
-                android:layout_gravity="center"
-                app:srcCompat="@drawable/ic_sharp_arrow_drop_down_28"
-                android:contentDescription="@string/dropdown" />
-
-        </FrameLayout>
-
-        <LinearLayout
-            android:id="@+id/linear_layout_options"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/dimen_linear_layout_options_height"
-            android:layout_gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <ImageView
-                android:id="@+id/image_photo"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:layout_gravity="center_vertical"
-                android:layout_marginStart="24dp"
-                android:contentDescription="@string/photo"
-                app:srcCompat="@drawable/ic_sharp_photo_library_28" />
-
-            <ImageView
-                android:id="@+id/image_video"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:layout_gravity="center_vertical"
-                android:layout_marginStart="24dp"
-                android:contentDescription="@string/video"
-                app:srcCompat="@drawable/ic_sharp_video_library_28" />
-
-            <ImageView
-                android:id="@+id/image_audio"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:layout_gravity="center_vertical"
-                android:layout_marginStart="24dp"
-                android:contentDescription="@string/audio"
-                app:srcCompat="@drawable/ic_sharp_mic_28" />
-
-            <ImageView
-                android:id="@+id/image_drawing"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:layout_gravity="center_vertical"
-                android:layout_marginStart="24dp"
-                android:contentDescription="@string/drawing"
-                app:srcCompat="@drawable/ic_sharp_brush_28" />
-
-            <ImageView
-                android:id="@+id/image_text"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:layout_gravity="center_vertical"
-                android:layout_marginStart="48dp"
-                android:contentDescription="@string/text"
-                app:srcCompat="@drawable/ic_sharp_title_28" />
-
-        </LinearLayout>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/linear_layout_options_menu"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/dimen_linear_layout_options_menu_height"
-        android:background="@color/colorLinearLayoutOptionsMenuBackground"
-        android:orientation="horizontal"
-        android:visibility="gone"
-        app:labelVisibilityMode="unlabeled"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
-
-        <LinearLayout
-            android:id="@+id/linear_layout_photo_options_menu"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/dimen_linear_layout_options_menu_height"
-            android:gravity="center"
-            android:orientation="horizontal"
-            android:visibility="visible">
-
-            <Space
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:layout_weight="1" />
-
-            <LinearLayout
-                android:id="@+id/linear_layout_photo_shoot"
-                android:layout_width="80dp"
-                android:layout_height="80dp"
-                android:gravity="center"
-                android:orientation="vertical"
-                tools:ignore="UseCompoundDrawables">
+            <FrameLayout
+                android:id="@+id/frame_layout_dropdown"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/colorDefaultThemeLight"
+                android:elevation="2dp"
+                app:layout_constraintBottom_toTopOf="@+id/bottom_navigation_view"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent">
 
                 <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:contentDescription="@string/camera"
-                    android:src="@drawable/ic_sharp_photo_camera_32"
-                    app:tint="@color/colorDefaultThemeDark" />
+                    android:id="@+id/image_dropdown"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:layout_gravity="center"
+                    android:contentDescription="@string/dropdown"
+                    app:srcCompat="@drawable/ic_sharp_arrow_drop_down_28" />
 
-                <TextView
-                    android:layout_width="80dp"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:text="@string/photo_shoot" />
-            </LinearLayout>
-
-            <Space
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:layout_weight="1"/>
+            </FrameLayout>
 
             <LinearLayout
-                android:id="@+id/linear_layout_photo_album"
-                android:layout_width="80dp"
-                android:layout_height="80dp"
-                android:gravity="center"
-                android:orientation="vertical"
-                tools:ignore="UseCompoundDrawables">
+                android:id="@+id/layout_options"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dimen_layout_options_height"
+                android:layout_gravity="center_vertical"
+                android:clickable="true"
+                android:focusable="true"
+                android:orientation="horizontal">
 
                 <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:id="@+id/image_photo"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="24dp"
                     android:contentDescription="@string/photo"
-                    android:src="@drawable/ic_sharp_photo_library_32"
-                    app:tint="@color/colorDefaultThemeDark" />
-
-
-                <TextView
-                    android:layout_width="80dp"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:text="@string/album" />
-            </LinearLayout>
-
-            <Space
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:layout_weight="1" />
-
-            <LinearLayout
-                android:id="@+id/linear_layout_google_photos"
-                android:layout_width="80dp"
-                android:layout_height="80dp"
-                android:gravity="center"
-                android:orientation="vertical"
-                tools:ignore="UseCompoundDrawables">
+                    app:srcCompat="@drawable/ic_sharp_photo_library_32" />
 
                 <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:contentDescription="@string/google_photos"
-                    android:src="@drawable/ic_google_photos_32" />
-
-                <TextView
-                    android:layout_width="80dp"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:text="@string/google_photos" />
-            </LinearLayout>
-
-            <Space
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:layout_weight="1"/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/linear_layout_video_options_menu"
-            android:layout_width="match_parent"
-            android:layout_height="80dp"
-            android:orientation="horizontal"
-            android:visibility="gone">
-
-            <Space
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:layout_weight="1"/>
-
-            <LinearLayout
-                android:id="@+id/linear_layout_video_album"
-                android:layout_width="80dp"
-                android:layout_height="80dp"
-                android:gravity="center"
-                android:orientation="vertical"
-                tools:ignore="UseCompoundDrawables">
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:id="@+id/image_video"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="24dp"
                     android:contentDescription="@string/video"
-                    android:src="@drawable/ic_sharp_video_library_32"
-                    app:tint="@color/colorDefaultThemeDark" />
+                    app:srcCompat="@drawable/ic_sharp_video_library_32" />
 
+                <ImageView
+                    android:id="@+id/image_audio"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="24dp"
+                    android:contentDescription="@string/audio"
+                    app:srcCompat="@drawable/ic_sharp_library_music_32" />
 
-                <TextView
-                    android:layout_width="80dp"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:text="@string/album" />
+                <ImageView
+                    android:id="@+id/image_drawing"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="24dp"
+                    android:contentDescription="@string/drawing"
+                    app:srcCompat="@drawable/ic_sharp_brush_32" />
+
+                <ImageView
+                    android:id="@+id/image_text"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="48dp"
+                    android:contentDescription="@string/text"
+                    app:srcCompat="@drawable/ic_sharp_title_32" />
+
             </LinearLayout>
-
-            <Space
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:layout_weight="1"/>
         </LinearLayout>
+
+        <View
+            android:id="@+id/options_menu_background"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dimen_layout_options_menu_height"
+            android:background="@color/colorLayoutOptionsMenuBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:orientation="horizontal"
+            android:visibility="gone"
+            app:labelVisibilityMode="unlabeled"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"/>
 
         <LinearLayout
-            android:id="@+id/linear_layout_audio_options_menu"
+            android:id="@+id/layout_options_menu"
             android:layout_width="match_parent"
-            android:layout_height="80dp"
+            android:layout_height="@dimen/dimen_layout_options_menu_height"
+            android:background="@color/colorLayoutOptionsMenuBackground"
+            android:clickable="true"
+            android:focusable="true"
             android:orientation="horizontal"
-            android:visibility="gone">
-
-            <Space
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:layout_weight="1"/>
-
-            <LinearLayout
-                android:id="@+id/linear_layout_voice_recording"
-                android:layout_width="80dp"
-                android:layout_height="80dp"
-                android:gravity="center"
-                android:orientation="vertical"
-                tools:ignore="UseCompoundDrawables">
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:contentDescription="@string/mic"
-                    android:src="@drawable/ic_sharp_mic_32"
-                    app:tint="@color/colorDefaultThemeDark" />
-
-
-                <TextView
-                    android:layout_width="80dp"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:text="@string/voice_recording" />
-            </LinearLayout>
-
-            <Space
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:layout_weight="1"/>
+            android:visibility="gone"
+            app:labelVisibilityMode="unlabeled"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
 
             <LinearLayout
-                android:id="@+id/linear_layout_music"
-                android:layout_width="80dp"
-                android:layout_height="80dp"
+                android:id="@+id/layout_photo_options_menu"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dimen_layout_options_menu_height"
                 android:gravity="center"
-                android:orientation="vertical"
-                tools:ignore="UseCompoundDrawables">
+                android:orientation="horizontal"
+                android:visibility="visible">
 
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:contentDescription="@string/music"
-                    android:src="@drawable/ic_sharp_library_music_32"
-                    app:tint="@color/colorDefaultThemeDark" />
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1" />
 
-                <TextView
+                <LinearLayout
+                    android:id="@+id/layout_photo_shoot"
                     android:layout_width="80dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="80dp"
                     android:gravity="center"
-                    android:text="@string/music" />
+                    android:onClick="@{() -> diaryWritingViewModel.runCamera()}"
+                    android:orientation="vertical"
+                    tools:ignore="UseCompoundDrawables">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:contentDescription="@string/camera"
+                        android:src="@drawable/ic_sharp_photo_camera_32"
+                        app:tint="@color/colorDefaultThemeDark" />
+
+                    <TextView
+                        android:layout_width="80dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:padding="8dp"
+                        android:text="@string/photo_shoot" />
+                </LinearLayout>
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1"/>
+
+                <LinearLayout
+                    android:id="@+id/layout_photo_album"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:gravity="center"
+                    android:onClick="@{() -> diaryWritingViewModel.openPhotoGallery()}"
+                    android:orientation="vertical"
+                    tools:ignore="UseCompoundDrawables">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:contentDescription="@string/photo"
+                        android:src="@drawable/ic_sharp_photo_library_32"
+                        app:tint="@color/colorDefaultThemeDark" />
+
+
+                    <TextView
+                        android:layout_width="80dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:padding="8dp"
+                        android:text="@string/album" />
+                </LinearLayout>
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1" />
+
+                <LinearLayout
+                    android:id="@+id/layout_google_photos_for_photo"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:gravity="center"
+                    android:onClick="@{() -> diaryWritingViewModel.launchGooglePhotosForPhoto()}"
+                    android:orientation="vertical"
+                    tools:ignore="UseCompoundDrawables">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:contentDescription="@string/google_photos"
+                        android:src="@drawable/ic_google_photos_32" />
+
+                    <TextView
+                        android:layout_width="80dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:padding="8dp"
+                        android:text="@string/google_photos" />
+                </LinearLayout>
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1"/>
             </LinearLayout>
 
-            <Space
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:layout_weight="1"/>
+            <LinearLayout
+                android:id="@+id/layout_video_options_menu"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dimen_layout_options_menu_height"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1"/>
+
+                <LinearLayout
+                    android:id="@+id/layout_video_album"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:gravity="center"
+                    android:onClick="@{() -> diaryWritingViewModel.openVideoGallery()}"
+                    android:orientation="vertical"
+                    tools:ignore="UseCompoundDrawables">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:contentDescription="@string/video"
+                        android:src="@drawable/ic_sharp_video_library_32"
+                        app:tint="@color/colorDefaultThemeDark" />
+
+
+                    <TextView
+                        android:layout_width="80dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:padding="8dp"
+                        android:text="@string/album" />
+                </LinearLayout>
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1" />
+
+                <LinearLayout
+                    android:id="@+id/layout_google_photos_for_video"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:gravity="center"
+                    android:onClick="@{() -> diaryWritingViewModel.launchGooglePhotosForVideo()}"
+                    android:orientation="vertical"
+                    tools:ignore="UseCompoundDrawables">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:contentDescription="@string/photo"
+                        android:src="@drawable/ic_google_photos_32" />
+
+                    <TextView
+                        android:layout_width="80dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:padding="8dp"
+                        android:text="@string/google_photos" />
+                </LinearLayout>
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/layout_audio_options_menu"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dimen_layout_options_menu_height"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1"/>
+
+                <LinearLayout
+                    android:id="@+id/layout_voice_recording"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    tools:ignore="UseCompoundDrawables">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:contentDescription="@string/mic"
+                        android:src="@drawable/ic_sharp_mic_32"
+                        app:tint="@color/colorDefaultThemeDark" />
+
+
+                    <TextView
+                        android:layout_width="80dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:padding="8dp"
+                        android:text="@string/voice_recording" />
+                </LinearLayout>
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1"/>
+
+                <LinearLayout
+                    android:id="@+id/layout_music"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    tools:ignore="UseCompoundDrawables">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:contentDescription="@string/music"
+                        android:src="@drawable/ic_sharp_library_music_32"
+                        app:tint="@color/colorDefaultThemeDark" />
+
+                    <TextView
+                        android:layout_width="80dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:padding="8dp"
+                        android:text="@string/music" />
+                </LinearLayout>
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1"/>
+            </LinearLayout>
         </LinearLayout>
-    </LinearLayout>
-
-    <!-- app:menu="@menu/menu_write_bottom_navigation_view"
-        app:itemIconTint="@color/selector_bottom_navigation_view"
-        app:itemTextAppearanceActive="@style/BottomNavigationViewItemTextActiveStyle"
-        app:itemTextAppearanceInactive="@style/BottomNavigationViewItemTextInactiveStyle" -->
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

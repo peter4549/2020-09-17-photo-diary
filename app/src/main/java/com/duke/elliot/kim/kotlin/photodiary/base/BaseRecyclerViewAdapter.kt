@@ -75,4 +75,8 @@ open class BaseRecyclerViewAdapter<T: Any?>(private val layoutId: Int,
             }
         }
     }
+
+    fun smoothScrollToEnd() {
+        recyclerView.smoothScrollToPosition(itemCount - 1)
+    }
 }

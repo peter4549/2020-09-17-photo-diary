@@ -2,6 +2,7 @@ package com.duke.elliot.kim.kotlin.photodiary
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.net.Uri
 import android.util.AttributeSet
 import android.util.DisplayMetrics
 import android.widget.ImageView
@@ -10,6 +11,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.load.resource.bitmap.DownsampleStrategy
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import kotlinx.coroutines.CoroutineScope
@@ -38,11 +40,29 @@ fun convertDpToPx(context: Context, dp: Float)
 fun setImage(imageView: ImageView, bitmap: Bitmap) {
     Glide.with(imageView.context)
         .load(bitmap)
-        .error(R.drawable.ic_sharp_not_interested_112)
+        .disallowHardwareConfig()
         .diskCacheStrategy(DiskCacheStrategy.NONE)
-        .skipMemoryCache(true)
+        .downsample(DownsampleStrategy.AT_MOST)
+        .error(R.drawable.ic_sharp_not_interested_112)
+        .fallback(R.drawable.ic_sharp_not_interested_112)
+        .listener(null)
+        .skipMemoryCache(false)
         .transform(CenterCrop(), RoundedCorners(8))
         .transition(DrawableTransitionOptions.withCrossFade())
+        .into(imageView)
+}
+
+fun setImage(imageView: ImageView, uri: Uri) {
+    Glide.with(imageView.context)
+        .load(uri)
+        .disallowHardwareConfig()
+        .diskCacheStrategy(DiskCacheStrategy.NONE)
+        .downsample(DownsampleStrategy.AT_MOST)
+        .error(R.drawable.ic_sharp_not_interested_112)
+        .fallback(R.drawable.ic_sharp_not_interested_112)
         .listener(null)
+        .skipMemoryCache(false)
+        .transform(CenterCrop(), RoundedCorners(8))
+        .transition(DrawableTransitionOptions.withCrossFade())
         .into(imageView)
 }

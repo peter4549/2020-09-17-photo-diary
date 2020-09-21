@@ -3,6 +3,8 @@ package com.duke.elliot.kim.kotlin.photodiary
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.view.View
+import android.view.animation.Animation
+import android.view.animation.Transformation
 import android.widget.ImageView
 
 fun View.hideDown(duration: Number, height: Float) {
@@ -10,6 +12,18 @@ fun View.hideDown(duration: Number, height: Float) {
         translationY = 0F
 
         animate().translationY(height)
+            .setDuration(duration.toLong())
+            .setListener(null)
+    }
+}
+
+fun View.hideDownWithFading(duration: Number, height: Float) {
+    this.apply {
+        translationY = 0F
+
+        animate()
+            .alpha(0F)
+            .translationY(height)
             .setDuration(duration.toLong())
             .setListener(null)
     }
@@ -32,6 +46,7 @@ fun View.hideDown(duration: Number) {
 
 fun View.showUp(duration: Number, height: Float = 0F) {
     this.apply {
+        alpha = 1F
         translationY = height
         visibility = View.VISIBLE
 

@@ -22,6 +22,7 @@
     <string name="voice_recording">음성 녹음</string>
     <string name="mic">마이크</string>
     <string name="media">Media</string>
+    <string name="select_album">앨범 선택</string>
 
     <!-- TabFragment -->
     <string name="diary">다이어리</string>

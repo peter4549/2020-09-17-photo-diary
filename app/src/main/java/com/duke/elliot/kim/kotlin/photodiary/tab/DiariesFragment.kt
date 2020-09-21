@@ -7,11 +7,14 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.duke.elliot.kim.kotlin.photodiary.*
 import com.duke.elliot.kim.kotlin.photodiary.base.BaseRecyclerViewAdapter
+import com.duke.elliot.kim.kotlin.photodiary.databinding.FragmentDairiesBinding
 import com.duke.elliot.kim.kotlin.photodiary.diary.DiaryModel
 import kotlinx.android.synthetic.main.fragment_dairies.view.*
 import kotlinx.android.synthetic.main.item_diary.view.*
 
 class DiariesFragment: Fragment() {
+
+    private lateinit var binding: FragmentDairiesBinding
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -23,8 +26,6 @@ class DiariesFragment: Fragment() {
         (requireActivity() as MainActivity).viewModel.diaries.observe(requireActivity()) { diaries ->
             when((requireActivity() as MainActivity).viewModel.diariesFragmentAction) {
                 MainViewModel.Action.UNINITIALIZED -> {
-                    showToast(requireContext(), "I am Diaries")
-                    println("DDDDDDD here i am DDDDDDD" + diaries[0].title)
                     view.recycler_view_diary.apply {
                         adapter = DiaryRecyclerViewAdapter(R.layout.item_diary, diaries) /**test layout. */
                         layoutManager = GridLayoutManagerWrapper(requireContext(), 1)
@@ -37,12 +38,6 @@ class DiariesFragment: Fragment() {
         }
 
         return view
-    }
-
-    override fun onResume() {
-        showToast(requireContext(), "RESUME, IN DIARY" +
-                (requireActivity() as MainActivity).viewModel.diaries.value.toString())
-        super.onResume()
     }
 
     class DiaryRecyclerViewAdapter(layoutId: Int, diaries: ArrayList<DiaryModel>)
