@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="dimen_layout_options_container_height">84dp</dimen>  <!-- 이거보다 많이 띄워야 나중에 텍스트 옵션킬 때 제대로 보여질듯. -->
+    <dimen name="dimen_edit_text_content_min_height">168dp</dimen>
     <dimen name="dimen_layout_options_height">56dp</dimen>
     <dimen name="dimen_layout_options_menu_height">112dp</dimen>
     <dimen name="dimen_toolbar_height">56dp</dimen>
+    <dimen name="dimen_scroll_view_bottom_margin">28dp</dimen>
 </resources>

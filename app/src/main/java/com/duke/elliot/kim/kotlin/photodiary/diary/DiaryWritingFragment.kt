@@ -1,6 +1,8 @@
 package com.duke.elliot.kim.kotlin.photodiary.diary
 
+import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
+import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
@@ -8,10 +10,8 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
-import android.view.LayoutInflater
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
@@ -30,8 +30,10 @@ import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventList
 class DiaryWritingFragment: Fragment() {
 
     private lateinit var binding: FragmentDiaryWritingBinding
+    private lateinit var inputMethodManager: InputMethodManager
     private lateinit var viewModel: DiaryWritingViewModel
     private lateinit var viewModelFactory: DiaryWritingViewModelFactory
+    private var keyboardShown = false
     private var layoutOptionsHeight = 0F
     private var layoutOptionsIsShown = true
     private var layoutOptionsMenuHeight = 0F
@@ -39,8 +41,28 @@ class DiaryWritingFragment: Fragment() {
     private var mediumAnimationDuration = 0
     private var recyclerViewMediaIsShown = false
     private var shortAnimationDuration = 0
-    private val bottomNavigationViewOptionsClickListener = View.OnClickListener { view ->
-        showOptionsMenu(view)
+    private val layoutOptionsOnClickListener = View.OnClickListener { view ->
+        if (!keyboardShown)
+            showOptionsMenu(view)
+    }
+
+    private val editTextOnFocusChangeListener = View.OnFocusChangeListener { view, hasFocus ->
+        if (hasFocus && !keyboardShown && layoutOptionsMenuIsShown) {
+            binding.layoutOptionsMenu
+                .hideDownWithFading(
+                    shortAnimationDuration,
+                    layoutOptionsMenuHeight
+                )
+            binding.optionsMenuBackground
+                .hideDown(shortAnimationDuration, layoutOptionsMenuHeight)
+            binding.layoutOptionsContainer
+                .translateDown(shortAnimationDuration, layoutOptionsMenuHeight) {
+                    showKeyboard(view, inputMethodManager)
+                }
+            layoutOptionsMenuIsShown = false
+        } else if (hasFocus && !keyboardShown) {
+            showKeyboard(view, inputMethodManager)
+        }
     }
 
     override fun onCreateView(
@@ -56,6 +78,8 @@ class DiaryWritingFragment: Fragment() {
         )
 
         initializeToolbar(binding.toolbar)
+        inputMethodManager = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        hideKeyboard(binding.root, inputMethodManager)
 
         // val scoreFragmentArgs by navArgs<ScoreFragmentArgs>() TODO 여기서 다이어리 정보 전달 받을 것. 팩토리로전달.
         viewModelFactory = DiaryWritingViewModelFactory(null) // null 나중에 대체되야함.
@@ -104,6 +128,12 @@ class DiaryWritingFragment: Fragment() {
             resources.getDimension(R.dimen.dimen_layout_options_menu_height) / resources.displayMetrics.density
         )
 
+        binding.editTextTitle.showSoftInputOnFocus = false
+        binding.editTextContent.showSoftInputOnFocus = false
+
+        binding.editTextTitle.onFocusChangeListener = editTextOnFocusChangeListener
+        binding.editTextContent.onFocusChangeListener = editTextOnFocusChangeListener
+
         binding.frameLayoutDropdown.setOnClickListener {
             when {
                 layoutOptionsMenuIsShown -> {
@@ -130,28 +160,37 @@ class DiaryWritingFragment: Fragment() {
             }
         }
 
-        binding.imagePhoto.setOnClickListener(bottomNavigationViewOptionsClickListener)
-        binding.imageVideo.setOnClickListener(bottomNavigationViewOptionsClickListener)
-        binding.imageAudio.setOnClickListener(bottomNavigationViewOptionsClickListener)
-        binding.imageDrawing.setOnClickListener(bottomNavigationViewOptionsClickListener)
+        binding.imagePhoto.setOnClickListener(layoutOptionsOnClickListener)
+        binding.imageVideo.setOnClickListener(layoutOptionsOnClickListener)
+        binding.imageAudio.setOnClickListener(layoutOptionsOnClickListener)
+        binding.imageDrawing.setOnClickListener(layoutOptionsOnClickListener)
 
         setEventListener(
             requireActivity(),
             binding.lifecycleOwner ?: viewLifecycleOwner,
             object : KeyboardVisibilityEventListener {
                 override fun onVisibilityChanged(isOpen: Boolean) {
+                    /*
                     if (isOpen && layoutOptionsMenuIsShown) {
                         binding.layoutOptionsMenu
                             .hideDownWithFading(
-                                shortAnimationDuration shr 1,
+                                shortAnimationDuration,
                                 layoutOptionsMenuHeight
                             )
                         binding.optionsMenuBackground
-                            .hideDown(mediumAnimationDuration shr 1, layoutOptionsMenuHeight)
+                            .hideDown(mediumAnimationDuration, layoutOptionsMenuHeight)
                         binding.layoutOptionsContainer
-                            .translateDown(mediumAnimationDuration shr 1, layoutOptionsMenuHeight)
+                            .translateDown(mediumAnimationDuration, layoutOptionsMenuHeight)
                         layoutOptionsMenuIsShown = false
                     }
+
+                     */
+                    if (!isOpen) {
+                        binding.editTextTitle.clearFocus()
+                        binding.editTextContent.clearFocus()
+                    }
+
+                    keyboardShown = isOpen
                 }
             })
 
@@ -162,6 +201,14 @@ class DiaryWritingFragment: Fragment() {
         (requireActivity() as MainActivity).setSupportActionBar(toolbar)
         (requireActivity() as MainActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
         setHasOptionsMenu(true)
+    }
+
+    private fun showKeyboard(view: View, inputMethodManager: InputMethodManager) {
+        inputMethodManager.showSoftInput(view, 0);
+    }
+
+    private fun hideKeyboard(view: View, inputMethodManager: InputMethodManager) {
+        inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0);
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

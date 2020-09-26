@@ -40,25 +40,45 @@ class DiaryWritingViewModel: ViewModel() {
     }
 
     fun runCamera() {
-        MediaHelper.photoHelper.dispatchImageCaptureIntent(fragment)
+        synchronized(this) {
+            MediaHelper.photoHelper.dispatchImageCaptureIntent(fragment)
+        }
     }
 
     fun openPhotoGallery() {
-        MediaHelper.photoHelper.dispatchImagePickerIntent(fragment)
+        synchronized(this) {
+            MediaHelper.photoHelper.dispatchImagePickerIntent(fragment)
+        }
     }
 
+    // TODO 더 많은 사진 보기. get_content 함수로 대체되어야함.
     fun launchGooglePhotosForPhoto() {
-        MediaHelper.launchGooglePhotosPicker(fragment, MediaHelper.MediaType.PHOTO)
+        synchronized(this) {
+            MediaHelper.launchGooglePhotosPicker(fragment, MediaHelper.MediaType.PHOTO)
+        }
     }
 
     fun getCurrentPhotoBitmap() = PhotoHelper.getCurrentPhotoBitmap()
 
     fun openVideoGallery() {
-        MediaHelper.videoHelper.dispatchVideoPickerIntent(fragment)
+        synchronized(this) {
+            MediaHelper.videoHelper.dispatchVideoPickerIntent(fragment)
+        }
     }
 
+    // TODO 더 많은 사진 보기. get_content 함수로 대체되어야함.
     fun launchGooglePhotosForVideo() {
         MediaHelper.launchGooglePhotosPicker(fragment, MediaHelper.MediaType.VIDEO)
+    }
+
+    fun openAudioGallery() {
+        synchronized(this) {
+            MediaHelper.audioHelper.dispatchAudioPickerIntent(fragment)
+        }
+    }
+
+    fun startAudioRecordingFragment() {
+        fragment.view?.let { MediaHelper.audioHelper.startAudioRecordingFragment(it) }
     }
 
     object Action {

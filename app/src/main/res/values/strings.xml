@@ -26,4 +26,7 @@
 
     <!-- TabFragment -->
     <string name="diary">다이어리</string>
+
+    <!-- AudioRecordingFragment -->
+    <string name="audio_button">Audio button</string>
 </resources>

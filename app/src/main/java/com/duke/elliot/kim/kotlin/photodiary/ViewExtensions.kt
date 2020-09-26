@@ -78,6 +78,21 @@ fun View.translateDown(duration: Number, height: Float) {
     }
 }
 
+fun View.translateDown(duration: Number, height: Float, animationEndCallback: (() -> Unit)? = null) {
+    this.apply {
+        translationY = -height
+
+        animate().translationY(0F)
+            .setDuration(duration.toLong())
+            .setListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator?) {
+                    animationEndCallback?.invoke()
+                    super.onAnimationEnd(animation)
+                }
+            })
+    }
+}
+
 fun View.translateUp(duration: Number, height: Float) {
     this.apply {
         translationY = 0F

@@ -25,10 +25,6 @@ android {
         }
     }
 
-    dataBinding {
-        enabled = true
-    }
-
     buildFeatures {
         dataBinding true
     }
@@ -74,4 +70,10 @@ dependencies {
 
     // KeyboardVisibilityEvent
     implementation 'net.yslibrary.keyboardvisibilityevent:keyboardvisibilityevent:3.0.0-RC2'
+
+    // Timber
+    implementation 'com.jakewharton.timber:timber:4.7.1'
+
+    // android-siri-wave
+    implementation 'com.dnkilic.waveform:waveform:0.9.3'
 }

@@ -5,11 +5,12 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
-import android.media.ExifInterface
 import android.os.Environment
 import android.provider.MediaStore
 import androidx.core.content.FileProvider
+import androidx.exifinterface.media.ExifInterface
 import androidx.fragment.app.Fragment
+import com.duke.elliot.kim.kotlin.photodiary.R
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -63,9 +64,11 @@ object PhotoHelper {
 
     fun dispatchImagePickerIntent(fragment: Fragment) {
         Intent(Intent.ACTION_PICK).also { imagePickerIntent ->
+            //imagePickerIntent.action = Intent.ACTION_GET_CONTENT
             imagePickerIntent.type = "image/*"
             imagePickerIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
-            fragment.startActivityForResult(imagePickerIntent, MediaHelper.REQUEST_IMAGE_PICK)
+            fragment.startActivityForResult(Intent.createChooser(imagePickerIntent,
+                fragment.getString(R.string.select_album)), MediaHelper.REQUEST_IMAGE_PICK)
         }
     }
 }

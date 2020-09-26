@@ -29,7 +29,7 @@
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginBottom="@dimen/dimen_layout_options_container_height"
+            android:layout_marginBottom="@dimen/dimen_scroll_view_bottom_margin"
             android:fillViewport="true"
             app:layout_constraintBottom_toTopOf="@+id/layout_options_container"
             app:layout_constraintEnd_toEndOf="parent"
@@ -101,6 +101,7 @@
                     android:hint="@string/today_story"
                     android:inputType="textMultiLine"
                     android:lineSpacingMultiplier="1.1"
+                    android:minHeight="@dimen/dimen_edit_text_content_min_height"
                     android:overScrollMode="always"
                     android:padding="8dp"
                     android:scrollbars="vertical"
@@ -419,6 +420,7 @@
                     android:layout_width="80dp"
                     android:layout_height="80dp"
                     android:gravity="center"
+                    android:onClick="@{() -> diaryWritingViewModel.startAudioRecordingFragment()}"
                     android:orientation="vertical"
                     tools:ignore="UseCompoundDrawables">
 
@@ -448,6 +450,7 @@
                     android:layout_width="80dp"
                     android:layout_height="80dp"
                     android:gravity="center"
+                    android:onClick="@{() -> diaryWritingViewModel.openAudioGallery()}"
                     android:orientation="vertical"
                     tools:ignore="UseCompoundDrawables">
 

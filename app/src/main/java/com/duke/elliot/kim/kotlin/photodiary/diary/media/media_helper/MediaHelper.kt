@@ -14,6 +14,8 @@ object MediaHelper {
     const val REQUEST_IMAGE_CAPTURE = 1000
     const val REQUEST_IMAGE_PICK = 1001
     const val REQUEST_VIDEO_PICK = 1002
+    const val REQUEST_RECORD_AUDIO = 1003
+    const val REQUEST_AUDIO_PICK = 1004
     private const val GOOGLE_PHOTOS_PACKAGE_NAME = "com.google.android.apps.photos"
 
     object MediaType {
@@ -45,7 +47,7 @@ object MediaHelper {
             intent.action = Intent.ACTION_PICK
             intent.type =
                 if(type == MediaType.PHOTO)
-                    "photo/*"
+                    "image/*"
                 else
                     "video/*"
 
