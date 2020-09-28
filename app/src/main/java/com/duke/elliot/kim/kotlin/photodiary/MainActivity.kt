@@ -1,16 +1,17 @@
 package com.duke.elliot.kim.kotlin.photodiary
 
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.item_diary.view.*
 import timber.log.Timber
-
 
 class MainActivity : AppCompatActivity() {
 
@@ -29,6 +30,9 @@ class MainActivity : AppCompatActivity() {
          * */
         val viewModelFactory = ViewModelProvider.AndroidViewModelFactory.getInstance(application)
         viewModel = ViewModelProvider(this, viewModelFactory)[MainViewModel::class.java]
+
+        themeColorDark = ContextCompat.getColor(this, R.color.colorDefaultThemeDark)
+        themeColorLight = ContextCompat.getColor(this, R.color.colorDefaultThemeLight)
 
         /*
         viewModel.diaries.observe(this, { diaries ->
@@ -75,5 +79,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupTimber() {
         Timber.plant(Timber.DebugTree())
+    }
+
+    companion object {
+        var themeColorDark = 0
+        var themeColorLight = 0
     }
 }

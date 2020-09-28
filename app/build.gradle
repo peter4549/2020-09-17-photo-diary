@@ -74,6 +74,5 @@ dependencies {
     // Timber
     implementation 'com.jakewharton.timber:timber:4.7.1'
 
-    // android-siri-wave
-    implementation 'com.dnkilic.waveform:waveform:0.9.3'
+    implementation 'com.cleveroad:audiovisualization:1.0.1'
 }

@@ -5,4 +5,9 @@
     <dimen name="dimen_layout_options_menu_height">112dp</dimen>
     <dimen name="dimen_toolbar_height">56dp</dimen>
     <dimen name="dimen_scroll_view_bottom_margin">28dp</dimen>
+
+    <!-- WaveInApp -->
+    <dimen name="dimen_bubble_size">32dp</dimen>
+    <dimen name="dimen_footer_height">224dp</dimen>
+    <dimen name="dimen_wave_height">112dp</dimen>
 </resources>

@@ -29,4 +29,5 @@
 
     <!-- AudioRecordingFragment -->
     <string name="audio_button">Audio button</string>
+    <string name="save">저장</string>
 </resources>

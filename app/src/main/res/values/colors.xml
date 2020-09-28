@@ -4,12 +4,22 @@
     <color name="colorPrimaryDark">#3700B3</color>
     <color name="colorAccent">#03DAC5</color>
 
+    <array name="colorAudioVisualizationView">
+        <item>@color/colorFragmentBackgroundLight</item>
+        <item>@color/colorFragmentBackgroundLight</item>
+        <item>@color/colorDefaultThemeLight</item>
+    </array>
+
+    <!--item name="colorDefaultThemeLight1">#EDE7F6</item>
+    <item name="colorDefaultThemeLight2">@color/colorGhostWhite</item> -->
+
     <color name="colorDefaultThemeDark">#B39DDB</color>
     <color name="colorDefaultThemeLight">#EDE7F6</color>
     <color name="colorTextDisabledDark">@color/colorSilver</color>
     <color name="colorTextEnabledDark">@color/colorBlueGrey</color>
 
     <color name="colorLayoutOptionsMenuBackground">@color/colorGhostWhite</color>
+    <color name="colorFragmentBackgroundLight">@color/colorGhostWhite</color>
     <color name="colorFrameLayoutBackground">@color/colorGhostWhite</color>
     <color name="colorIconTint">@color/colorSilver</color>
     <color name="colorMediaRecyclerViewBackground">#40F8F8FF</color>

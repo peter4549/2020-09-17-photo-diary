@@ -2,10 +2,19 @@ package com.duke.elliot.kim.kotlin.photodiary
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
+import android.graphics.BlendMode
+import android.graphics.BlendModeColorFilter
+import android.graphics.PorterDuff
+import android.graphics.drawable.Drawable
+import android.os.Build
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.Transformation
+import android.widget.ImageButton
 import android.widget.ImageView
+import androidx.annotation.RequiresApi
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.DrawableCompat
 
 fun View.hideDown(duration: Number, height: Float) {
     this.apply {
@@ -109,4 +118,18 @@ fun ImageView.rotate(degrees: Float, duration: Number,
         .setDuration(duration.toLong())
         .setListener(animationListenerAdapter)
         .start()
+}
+
+fun ImageButton.setTintById(id: Int) {
+    DrawableCompat.setTint(
+        DrawableCompat.wrap(this.drawable),
+        ContextCompat.getColor(this.context, id)
+    )
+}
+
+fun ImageButton.setTintByColor(color: Int) {
+    DrawableCompat.setTint(
+        DrawableCompat.wrap(this.drawable),
+        color
+    )
 }

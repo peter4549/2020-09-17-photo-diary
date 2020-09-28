@@ -2,68 +2,181 @@ package com.duke.elliot.kim.kotlin.photodiary.diary.media
 
 import android.Manifest
 import android.content.Context
+import android.content.pm.ActivityInfo
 import android.media.MediaPlayer
 import android.media.MediaRecorder
 import android.os.Bundle
 import android.os.Environment
-import android.util.DisplayMetrics
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.OnClickListener
 import android.view.ViewGroup
-import android.widget.Button
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import com.cleveroad.audiovisualization.AudioVisualization
+import com.duke.elliot.kim.kotlin.photodiary.MainActivity
 import com.duke.elliot.kim.kotlin.photodiary.R
-import com.duke.elliot.kim.kotlin.photodiary.diary.media.media_helper.PhotoHelper
-import kotlinx.android.synthetic.main.fragment_audio_recording.view.*
+import com.duke.elliot.kim.kotlin.photodiary.databinding.FragmentAudioRecordingBinding
+import com.duke.elliot.kim.kotlin.photodiary.setTintByColor
+import com.duke.elliot.kim.kotlin.photodiary.setTintById
+import kotlinx.android.synthetic.main.fragment_audio_recording.*
 import timber.log.Timber
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
 
+
 private const val REQUEST_RECORD_AUDIO_PERMISSION = 200
 
 class AudioRecordingFragment: Fragment() {
 
+    private lateinit var audioRecorder: AudioRecorder
+    private lateinit var audioRecordingDbmHandler: AudioRecordingDbmHandler
+    private lateinit var audioVisualization: AudioVisualization
+    private lateinit var binding: FragmentAudioRecordingBinding
     private lateinit var currentAudioPath: String
     private var permissions: Array<String> = arrayOf(Manifest.permission.RECORD_AUDIO)
     private var player: MediaPlayer? = null
     private var recorder: MediaRecorder? = null
+    private var state = State.INITIAL
+    private val audioButtonOnClickListener = View.OnClickListener { view ->
+        when(view.id) {
+            R.id.image_button_play -> onClickImageButtonPlay()
+            R.id.image_button_record -> onClickImageButtonRecord()
+            R.id.image_button_stop -> {
+            }
+        }
+    }
+
+    private fun onClickImageButtonPlay() {
+        when(state) {
+            State.PAUSE_PLAYING -> {
+                image_button_play.setImageDrawable(
+                    ContextCompat.getDrawable(
+                        requireContext(),
+                        R.drawable.ic_circled_pause_256px
+                    )
+                )
+                resumePlaying()
+                image_button_record.isEnabled = false
+                image_button_record.setTintById(R.color.colorSilver)
+                state = State.PLAYING
+            }
+            State.PAUSE_RECORDING -> {
+                image_button_play.setImageDrawable(
+                    ContextCompat.getDrawable(
+                        requireContext(),
+                        R.drawable.ic_circled_pause_256px
+                    )
+                )
+                onPlay(true)
+                image_button_record.isEnabled = false
+                image_button_record.setTintById(R.color.colorSilver)
+                state = State.PLAYING
+            }
+            State.PLAYING -> {
+                image_button_play.setImageDrawable(
+                    ContextCompat.getDrawable(
+                        requireContext(),
+                        R.drawable.ic_circled_play_256px
+                    )
+                )
+                pausePlaying()
+                image_button_record.isEnabled = true
+                image_button_record.setTintByColor(MainActivity.themeColorDark)
+                state = State.PAUSE_PLAYING
+            }
+        }
+    }
+
+    private fun onClickImageButtonRecord() {
+        when(state) {
+            State.INITIAL -> {
+                image_button_record.setImageDrawable(
+                    ContextCompat.getDrawable(
+                        requireContext(),
+                        R.drawable.ic_circled_pause_256px
+                    )
+                )
+
+                // TODO: Set animation
+                image_button_play.visibility = View.VISIBLE
+                image_button_play.isEnabled = false
+                image_button_play.setTintById(R.color.colorSilver)
+                image_button_stop.visibility = View.VISIBLE
+
+                audioRecorder.startRecord()
+                state = State.RECORDING
+            }
+            State.PAUSE_PLAYING, State.PAUSE_RECORDING -> {
+                image_button_record.setImageDrawable(
+                    ContextCompat.getDrawable(
+                        requireContext(),
+                        R.drawable.ic_circled_pause_256px
+                    )
+                )
+                image_button_play.isEnabled = false
+                image_button_play.setTintById(R.color.colorSilver)
+                state = State.RECORDING
+            }
+            State.RECORDING -> {
+                image_button_record.setImageDrawable(
+                    ContextCompat.getDrawable(
+                        requireContext(),
+                        R.drawable.ic_record_80
+                    )
+                )
+
+                image_button_play.isEnabled = true
+                image_button_play.setTintByColor(MainActivity.themeColorDark)
+                state = pauseRecording()
+            }
+        }
+    }
+
+    private fun onClickImageButtonStop() {
+
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_audio_recording, container, false)
+        binding = DataBindingUtil.inflate(
+            inflater,
+            R.layout.fragment_audio_recording,
+            container,
+            false
+        )
 
-        ActivityCompat.requestPermissions(requireActivity(), permissions, REQUEST_RECORD_AUDIO_PERMISSION)
+        audioVisualization = binding.audioVisualizationView
+
+        ActivityCompat.requestPermissions(
+            requireActivity(),
+            permissions,
+            REQUEST_RECORD_AUDIO_PERMISSION
+        )
 
         currentAudioPath = "${requireContext().externalCacheDir?.absolutePath}/audiorecordtest.3gp"
 
-        // TODO: Temp
-        val dm = DisplayMetrics()
-        println("DDDDDD" + dm)
+        binding.imageButtonPlay.setOnClickListener(audioButtonOnClickListener)
+        binding.imageButtonRecord.setOnClickListener(audioButtonOnClickListener)
 
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-            requireContext().display?.getRealMetrics(dm)
+        audioRecorder = AudioRecorder()
+        audioRecordingDbmHandler = AudioRecordingDbmHandler()
+        audioRecorder.recordingCallback(audioRecordingDbmHandler)
+        audioVisualization.linkTo(audioRecordingDbmHandler)
 
-        } else
-            requireActivity().windowManager.defaultDisplay.getMetrics(dm)
-        println("PPPPPPP" + dm)
-        
-        //view.wave_view.speechStarted()
+        return binding.root
+    }
 
-        view.image_button_audio.setOnClickListener {
-            view.wave_view.initialize(dm)
-        }
-
-        view.button.setOnClickListener {
-            view.wave_view.speechStarted()
-        }
-
-        return view
+    override fun onResume() {
+        super.onResume()
+        requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LOCKED
     }
 
     private fun onPlay(start: Boolean) = if (start) {
@@ -82,6 +195,14 @@ class AudioRecordingFragment: Fragment() {
                 Timber.e(e, "prepare() failed")
             }
         }
+    }
+
+    private fun pausePlaying() {
+        player?.pause()
+    }
+
+    private fun resumePlaying() {
+        player?.start()
     }
 
     private fun stopPlaying() {
@@ -112,6 +233,21 @@ class AudioRecordingFragment: Fragment() {
         }
     }
 
+    private fun pauseRecording(): Int {
+        return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            recorder?.pause()
+            State.PAUSE_RECORDING
+        } else {
+            onRecord(false)
+            State.STOP_RECORDING
+        }
+    }
+
+    private fun resumeRecording() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N)
+            recorder?.resume()
+    }
+
     private fun stopRecording() {
         recorder?.apply {
             stop()
@@ -126,6 +262,7 @@ class AudioRecordingFragment: Fragment() {
         player = null
         recorder?.release()
         recorder = null
+        requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_FULL_USER
     }
 
     private fun createAudioFile(context: Context): File {
@@ -140,7 +277,9 @@ class AudioRecordingFragment: Fragment() {
         }
     }
 
-    internal inner class RecordButton(context: Context) : androidx.appcompat.widget.AppCompatButton(context) {
+    internal inner class RecordButton(context: Context) : androidx.appcompat.widget.AppCompatButton(
+        context
+    ) {
 
         var mStartRecording = true
 
@@ -156,6 +295,17 @@ class AudioRecordingFragment: Fragment() {
         init {
             text = "Start recording"
             setOnClickListener(clicker)
+        }
+    }
+
+    companion object {
+        object State {
+            const val INITIAL = 0
+            const val PAUSE_PLAYING = 1
+            const val PAUSE_RECORDING = 2
+            const val PLAYING = 3
+            const val RECORDING = 4
+            const val STOP_RECORDING = 5
         }
     }
 }
