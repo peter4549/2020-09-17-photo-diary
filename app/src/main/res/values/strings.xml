@@ -1,15 +1,16 @@
 <resources>
     <string name="app_name">포토 다이어리</string>
 
-    <!-- Common -->
-    <string name="photo">사진</string>
-
     <!-- DiaryWritingFragment -->
     <string name="album">앨범</string>
+    <string name="bold">Bold</string>
     <string name="camera">카메라</string>
+    <string name="failed_to_store_image">이미지를 저장하지 못했습니다.</string>
     <string name="google_photos">Google 포토</string>
+    <string name="italic">Italic</string>
     <string name="music">음악</string>
     <string name="new_diary">새 다이어리</string>
+    <string name="photo">사진</string>
     <string name="photo_shoot">사진 촬영</string>
     <string name="title">제목</string>
     <string name="today_story">오늘의 이야기</string>
@@ -23,6 +24,18 @@
     <string name="mic">마이크</string>
     <string name="media">Media</string>
     <string name="select_album">앨범 선택</string>
+    <string name="set_text_color">Set text color</string>
+    <string name="underline">Underline</string>
+    <string-array name="fonts">
+        <item>나눔바른고딕</item>
+        <item>나눔바른펜</item>
+        <item>나눔손글씨 붓</item>
+        <item>나눔고딕</item>
+        <item>나눔명조</item>
+        <item>나눔손글씨 펜</item>
+        <item>나눔스퀘어</item>
+        <item>나눔스퀘어라운드</item>
+    </string-array>
 
     <!-- TabFragment -->
     <string name="diary">다이어리</string>

@@ -62,9 +62,10 @@ object PhotoHelper {
             null
     }
 
-    fun dispatchImagePickerIntent(fragment: Fragment) {
+    fun dispatchImagePickerIntent(fragment: Fragment, getContent: Boolean) {
         Intent(Intent.ACTION_PICK).also { imagePickerIntent ->
-            //imagePickerIntent.action = Intent.ACTION_GET_CONTENT
+            if (getContent)
+                imagePickerIntent.action = Intent.ACTION_GET_CONTENT
             imagePickerIntent.type = "image/*"
             imagePickerIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
             fragment.startActivityForResult(Intent.createChooser(imagePickerIntent,

@@ -117,7 +117,7 @@
             android:id="@+id/layout_options_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/colorLayoutOptionsMenuBackground"
+            android:background="@color/colorOptionItemsBackground"
             android:orientation="vertical"
             app:labelVisibilityMode="unlabeled"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -178,7 +178,7 @@
                     android:layout_gravity="center_vertical"
                     android:layout_marginStart="24dp"
                     android:contentDescription="@string/audio"
-                    app:srcCompat="@drawable/ic_sharp_library_music_32" />
+                    app:srcCompat="@drawable/ic_sharp_library_music_40" />
 
                 <ImageView
                     android:id="@+id/image_drawing"
@@ -202,10 +202,10 @@
         </LinearLayout>
 
         <View
-            android:id="@+id/options_menu_background"
+            android:id="@+id/option_items_background"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/dimen_layout_options_menu_height"
-            android:background="@color/colorLayoutOptionsMenuBackground"
+            android:layout_height="@dimen/dimen_layout_option_items_height"
+            android:background="@color/colorOptionItemsBackground"
             android:clickable="true"
             android:focusable="true"
             android:orientation="horizontal"
@@ -216,10 +216,10 @@
             app:layout_constraintStart_toStartOf="parent"/>
 
         <LinearLayout
-            android:id="@+id/layout_options_menu"
+            android:id="@+id/layout_option_items"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/dimen_layout_options_menu_height"
-            android:background="@color/colorLayoutOptionsMenuBackground"
+            android:layout_height="@dimen/dimen_layout_option_items_height"
+            android:background="@color/colorOptionItemsBackground"
             android:clickable="true"
             android:focusable="true"
             android:orientation="horizontal"
@@ -230,9 +230,9 @@
             app:layout_constraintStart_toStartOf="parent">
 
             <LinearLayout
-                android:id="@+id/layout_photo_options_menu"
+                android:id="@+id/layout_photo_option_items"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/dimen_layout_options_menu_height"
+                android:layout_height="@dimen/dimen_layout_option_items_height"
                 android:gravity="center"
                 android:orientation="horizontal"
                 android:visibility="visible">
@@ -242,87 +242,40 @@
                     android:layout_height="1dp"
                     android:layout_weight="1" />
 
-                <LinearLayout
-                    android:id="@+id/layout_photo_shoot"
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
-                    android:gravity="center"
-                    android:onClick="@{() -> diaryWritingViewModel.runCamera()}"
-                    android:orientation="vertical"
-                    tools:ignore="UseCompoundDrawables">
-
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:contentDescription="@string/camera"
-                        android:src="@drawable/ic_sharp_photo_camera_32"
-                        app:tint="@color/colorDefaultThemeDark" />
-
-                    <TextView
-                        android:layout_width="80dp"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:padding="8dp"
-                        android:text="@string/photo_shoot" />
-                </LinearLayout>
+                <ImageView
+                    android:id="@+id/image_camera_item"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="2dp"
+                    android:contentDescription="@string/camera"
+                    android:src="@drawable/ic_sharp_photo_camera_48"
+                    app:tint="@color/colorDefaultThemeDark" />
 
                 <Space
                     android:layout_width="0dp"
                     android:layout_height="1dp"
                     android:layout_weight="1"/>
 
-                <LinearLayout
-                    android:id="@+id/layout_photo_album"
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
-                    android:gravity="center"
-                    android:onClick="@{() -> diaryWritingViewModel.openPhotoGallery()}"
-                    android:orientation="vertical"
-                    tools:ignore="UseCompoundDrawables">
-
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:contentDescription="@string/photo"
-                        android:src="@drawable/ic_sharp_photo_library_32"
-                        app:tint="@color/colorDefaultThemeDark" />
-
-
-                    <TextView
-                        android:layout_width="80dp"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:padding="8dp"
-                        android:text="@string/album" />
-                </LinearLayout>
+                <ImageView
+                    android:id="@+id/image_photo_item"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:contentDescription="@string/photo"
+                    android:src="@drawable/ic_sharp_insert_photo_48"
+                    app:tint="@color/colorDefaultThemeDark" />
 
                 <Space
                     android:layout_width="0dp"
                     android:layout_height="1dp"
                     android:layout_weight="1" />
 
-                <LinearLayout
-                    android:id="@+id/layout_google_photos_for_photo"
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
-                    android:gravity="center"
-                    android:onClick="@{() -> diaryWritingViewModel.launchGooglePhotosForPhoto()}"
-                    android:orientation="vertical"
-                    tools:ignore="UseCompoundDrawables">
-
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:contentDescription="@string/google_photos"
-                        android:src="@drawable/ic_google_photos_32" />
-
-                    <TextView
-                        android:layout_width="80dp"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:padding="8dp"
-                        android:text="@string/google_photos" />
-                </LinearLayout>
+                <ImageView
+                    android:id="@+id/image_photo_library_item"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:contentDescription="@string/album"
+                    android:src="@drawable/ic_sharp_photo_library_48"
+                    app:tint="@color/colorDefaultThemeDark"/>
 
                 <Space
                     android:layout_width="0dp"
@@ -331,9 +284,9 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/layout_video_options_menu"
+                android:id="@+id/layout_video_option_items"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/dimen_layout_options_menu_height"
+                android:layout_height="@dimen/dimen_layout_option_items_height"
                 android:gravity="center"
                 android:orientation="horizontal"
                 android:visibility="gone">
@@ -343,58 +296,26 @@
                     android:layout_height="1dp"
                     android:layout_weight="1"/>
 
-                <LinearLayout
-                    android:id="@+id/layout_video_album"
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
-                    android:gravity="center"
-                    android:onClick="@{() -> diaryWritingViewModel.openVideoGallery()}"
-                    android:orientation="vertical"
-                    tools:ignore="UseCompoundDrawables">
-
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:contentDescription="@string/video"
-                        android:src="@drawable/ic_sharp_video_library_32"
-                        app:tint="@color/colorDefaultThemeDark" />
-
-
-                    <TextView
-                        android:layout_width="80dp"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:padding="8dp"
-                        android:text="@string/album" />
-                </LinearLayout>
+                <ImageView
+                    android:id="@+id/image_video_item"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:contentDescription="@string/video"
+                    android:src="@drawable/ic_video_96px"
+                    app:tint="@color/colorDefaultThemeDark" />
 
                 <Space
                     android:layout_width="0dp"
                     android:layout_height="1dp"
                     android:layout_weight="1" />
 
-                <LinearLayout
-                    android:id="@+id/layout_google_photos_for_video"
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
-                    android:gravity="center"
-                    android:onClick="@{() -> diaryWritingViewModel.launchGooglePhotosForVideo()}"
-                    android:orientation="vertical"
-                    tools:ignore="UseCompoundDrawables">
-
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:contentDescription="@string/photo"
-                        android:src="@drawable/ic_google_photos_32" />
-
-                    <TextView
-                        android:layout_width="80dp"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:padding="8dp"
-                        android:text="@string/google_photos" />
-                </LinearLayout>
+                <ImageView
+                    android:id="@+id/image_video_library_item"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:contentDescription="@string/album"
+                    android:src="@drawable/ic_sharp_video_library_48"
+                    app:tint="@color/colorDefaultThemeDark"/>
 
                 <Space
                     android:layout_width="0dp"
@@ -403,9 +324,9 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/layout_audio_options_menu"
+                android:id="@+id/layout_audio_option_items"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/dimen_layout_options_menu_height"
+                android:layout_height="@dimen/dimen_layout_option_items_height"
                 android:gravity="center"
                 android:orientation="horizontal"
                 android:visibility="gone">
@@ -415,64 +336,140 @@
                     android:layout_height="1dp"
                     android:layout_weight="1"/>
 
-                <LinearLayout
-                    android:id="@+id/layout_voice_recording"
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
-                    android:gravity="center"
-                    android:onClick="@{() -> diaryWritingViewModel.startAudioRecordingFragment()}"
-                    android:orientation="vertical"
-                    tools:ignore="UseCompoundDrawables">
-
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:contentDescription="@string/mic"
-                        android:src="@drawable/ic_sharp_mic_32"
-                        app:tint="@color/colorDefaultThemeDark" />
-
-
-                    <TextView
-                        android:layout_width="80dp"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:padding="8dp"
-                        android:text="@string/voice_recording" />
-                </LinearLayout>
+                <ImageView
+                    android:id="@+id/image_audio_item"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:contentDescription="@string/music"
+                    android:src="@drawable/ic_sharp_music_note_40"
+                    app:tint="@color/colorDefaultThemeDark" />
 
                 <Space
                     android:layout_width="0dp"
                     android:layout_height="1dp"
                     android:layout_weight="1"/>
 
-                <LinearLayout
-                    android:id="@+id/layout_music"
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
-                    android:gravity="center"
-                    android:onClick="@{() -> diaryWritingViewModel.openAudioGallery()}"
-                    android:orientation="vertical"
-                    tools:ignore="UseCompoundDrawables">
-
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:contentDescription="@string/music"
-                        android:src="@drawable/ic_sharp_library_music_32"
-                        app:tint="@color/colorDefaultThemeDark" />
-
-                    <TextView
-                        android:layout_width="80dp"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:padding="8dp"
-                        android:text="@string/music" />
-                </LinearLayout>
+                <ImageView
+                    android:id="@+id/image_audio_library_item"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:contentDescription="@string/album"
+                    android:src="@drawable/ic_sharp_library_music_40"
+                    app:tint="@color/colorDefaultThemeDark" />
 
                 <Space
                     android:layout_width="0dp"
                     android:layout_height="1dp"
                     android:layout_weight="1"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/layout_text_option_items"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dimen_layout_option_items_height"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:orientation="horizontal"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginStart="16dp"
+                    android:gravity="center_vertical">
+
+                    <Spinner
+                        android:id="@+id/spinner_font"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@null" />
+
+                    <Spinner
+                        android:id="@+id/spinner_text_size"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@null"/>
+
+                    <ImageView
+                        android:id="@+id/image_button_text_align_left"
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginStart="8dp"
+                        android:src="@drawable/ic_sharp_format_align_left_24"
+                        app:tint="@color/colorTextOptionItemsSelected"/>
+
+                    <ImageView
+                        android:id="@+id/image_button_text_align_center"
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:layout_marginEnd="8dp"
+                        android:src="@drawable/ic_sharp_format_align_center_24"
+                        app:tint="@color/colorTextOptionItemsUnselected"/>
+
+                    <ImageView
+                        android:id="@+id/image_button_text_align_right"
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:src="@drawable/ic_sharp_format_align_right_24"
+                        app:tint="@color/colorTextOptionItemsUnselected"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:orientation="horizontal"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginStart="16dp"
+                    android:gravity="center_vertical">
+
+                    <ImageView
+                        android:id="@+id/image_button_bold"
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:layout_marginEnd="4dp"
+                        android:background="@color/colorFragmentBackgroundLight"
+                        android:contentDescription="@string/bold"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/ic_sharp_format_bold_28"
+                        app:tint="@color/colorTextOptionItemsUnselected" />
+
+                    <ImageView
+                        android:id="@+id/image_button_italic"
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:layout_marginEnd="4dp"
+                        android:background="@color/colorFragmentBackgroundLight"
+                        android:contentDescription="@string/italic"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/ic_sharp_format_italic_28"
+                        app:tint="@color/colorTextOptionItemsUnselected"/>
+
+                    <ImageView
+                        android:id="@+id/image_button_underline"
+                        android:layout_width="26dp"
+                        android:layout_height="26dp"
+                        android:layout_marginEnd="4dp"
+                        android:background="@color/colorFragmentBackgroundLight"
+                        android:contentDescription="@string/underline"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/ic_sharp_format_underlined_28"
+                        app:tint="@color/colorTextOptionItemsUnselected"/>
+
+                    <ImageView
+                        android:id="@+id/image_button_text_color"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:layout_marginTop="0.5dp"
+                        android:background="@color/colorFragmentBackgroundLight"
+                        android:contentDescription="@string/set_text_color"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/ic_sharp_text_format_32"
+                        app:tint="@color/colorTextOptionItemsUnselected"/>
+                </LinearLayout>
             </LinearLayout>
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>

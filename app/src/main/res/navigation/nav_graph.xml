@@ -26,6 +26,6 @@
     </fragment>
     <fragment
         android:id="@+id/audioRecordingFragment"
-        android:name="com.duke.elliot.kim.kotlin.photodiary.diary.media.AudioRecordingFragment"
+        android:name="com.duke.elliot.kim.kotlin.photodiary.diary.media.audio.AudioRecordingFragment"
         android:label="AudioRecordingFragment" />
 </navigation>

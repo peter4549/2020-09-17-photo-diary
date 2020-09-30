@@ -16,19 +16,24 @@
     <color name="colorDefaultThemeDark">#B39DDB</color>
     <color name="colorDefaultThemeLight">#EDE7F6</color>
     <color name="colorTextDisabledDark">@color/colorSilver</color>
-    <color name="colorTextEnabledDark">@color/colorBlueGrey</color>
+    <color name="colorTextEnabledDark">@color/colorBlueGrey900</color>
 
-    <color name="colorLayoutOptionsMenuBackground">@color/colorGhostWhite</color>
+    <color name="colorOptionItemsBackground">@color/colorGhostWhite</color>
     <color name="colorFragmentBackgroundLight">@color/colorGhostWhite</color>
     <color name="colorFrameLayoutBackground">@color/colorGhostWhite</color>
     <color name="colorIconTint">@color/colorSilver</color>
     <color name="colorMediaRecyclerViewBackground">#40F8F8FF</color>
+    <color name="colorSpinnerDivider">@color/colorSilver</color>
+    <color name="colorTextOptionItemsSelected">@color/colorGrey700</color>
+    <color name="colorTextOptionItemsUnselected">@color/colorGrey600</color>
     <color name="colorTextViewBackground">@color/colorGhostWhite</color>
     <color name="colorToolbarBackground">@color/colorDefaultThemeDark</color>
     <color name="colorToolbarTitle">@color/colorWhite</color>
 
-    <color name="colorBlueGrey">#263238</color>
+    <color name="colorBlueGrey900">#263238</color>
     <color name="colorGhostWhite">#F8F8FF</color>
+    <color name="colorGrey600">#9E9E9E</color>
+    <color name="colorGrey700">#455a64</color>
     <color name="colorSilver">#C0C0C0</color>
     <color name="colorWhite">#FEFEFE</color>
 </resources>

@@ -1,13 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="dimen_edit_text_content_min_height">168dp</dimen>
-    <dimen name="dimen_layout_options_height">56dp</dimen>
-    <dimen name="dimen_layout_options_menu_height">112dp</dimen>
+    <dimen name="dimen_edit_text_content_min_height">160dp</dimen>
+    <dimen name="dimen_layout_options_height">48dp</dimen>
+    <dimen name="dimen_layout_option_items_height">96dp</dimen>
     <dimen name="dimen_toolbar_height">56dp</dimen>
     <dimen name="dimen_scroll_view_bottom_margin">28dp</dimen>
-
-    <!-- WaveInApp -->
-    <dimen name="dimen_bubble_size">32dp</dimen>
-    <dimen name="dimen_footer_height">224dp</dimen>
-    <dimen name="dimen_wave_height">112dp</dimen>
 </resources>

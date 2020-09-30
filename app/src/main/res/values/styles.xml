@@ -1,7 +1,6 @@
 <resources>
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
-        <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
@@ -9,9 +8,10 @@
         <item name="android:buttonStyle">@style/ButtonStyle</item>
         <item name="android:editTextStyle">@style/EditTextStyle</item>
         <item name="android:textViewStyle">@style/TextViewStyle</item>
+
+        <item name="android:dropDownListViewStyle">@style/SpinnerStyle</item>
     </style>
 
-    <!-- Default style -->
     <style name="ButtonStyle" parent="@android:style/Widget.DeviceDefault.Button.Borderless">
         <item name="android:fontFamily">@font/font_family_nanum_barun_gothic</item>
         <item name="android:includeFontPadding">false</item>
@@ -34,5 +34,10 @@
         <item name="colorControlNormal">@color/colorToolbarTitle</item>
         <item name="android:textColorPrimary">@color/colorToolbarTitle</item>
         <item name="android:textColorSecondary">@color/colorToolbarTitle</item>
+    </style>
+
+    <style name="SpinnerStyle">
+        <item name="android:divider">@color/colorSpinnerDivider</item>
+        <item name="android:dividerHeight">0.5dp</item>
     </style>
 </resources>

@@ -74,5 +74,6 @@ dependencies {
     // Timber
     implementation 'com.jakewharton.timber:timber:4.7.1'
 
-    implementation 'com.cleveroad:audiovisualization:1.0.1'
+    // AndroidDraw
+    implementation 'com.github.divyanshub024:AndroidDraw:v0.1'
 }

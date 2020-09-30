@@ -1,10 +1,10 @@
 package com.duke.elliot.kim.kotlin.photodiary.diary
 
-import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
@@ -12,6 +12,8 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.view.*
 import android.view.inputmethod.InputMethodManager
+import android.widget.ArrayAdapter
+import android.widget.SpinnerAdapter
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
@@ -25,7 +27,6 @@ import com.duke.elliot.kim.kotlin.photodiary.diary.media.MediaRecyclerViewAdapte
 import com.duke.elliot.kim.kotlin.photodiary.diary.media.media_helper.MediaHelper
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent.setEventListener
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener
-
 
 class DiaryWritingFragment: Fragment() {
 
@@ -41,19 +42,25 @@ class DiaryWritingFragment: Fragment() {
     private var mediumAnimationDuration = 0
     private var recyclerViewMediaIsShown = false
     private var shortAnimationDuration = 0
-    private val layoutOptionsOnClickListener = View.OnClickListener { view ->
-        if (!keyboardShown)
-            showOptionsMenu(view)
+
+    private val optionsOnClickListener = View.OnClickListener { view ->
+        when (view.id) {
+            R.id.image_drawing -> MediaHelper.startDrawingActivity(this)
+            else -> {
+                if (!keyboardShown)
+                    showOptionsMenu(view)
+            }
+        }
     }
 
     private val editTextOnFocusChangeListener = View.OnFocusChangeListener { view, hasFocus ->
         if (hasFocus && !keyboardShown && layoutOptionsMenuIsShown) {
-            binding.layoutOptionsMenu
+            binding.layoutOptionItems
                 .hideDownWithFading(
                     shortAnimationDuration,
                     layoutOptionsMenuHeight
                 )
-            binding.optionsMenuBackground
+            binding.optionItemsBackground
                 .hideDown(shortAnimationDuration, layoutOptionsMenuHeight)
             binding.layoutOptionsContainer
                 .translateDown(shortAnimationDuration, layoutOptionsMenuHeight) {
@@ -62,6 +69,18 @@ class DiaryWritingFragment: Fragment() {
             layoutOptionsMenuIsShown = false
         } else if (hasFocus && !keyboardShown) {
             showKeyboard(view, inputMethodManager)
+        }
+    }
+
+    private val optionItemsOnClickListener = View.OnClickListener { view ->
+        when(view.id) {
+            R.id.image_camera_item -> MediaHelper.photoHelper.dispatchImageCaptureIntent(this)
+            R.id.image_photo_item -> MediaHelper.photoHelper.dispatchImagePickerIntent(this, false)
+            R.id.image_photo_library_item -> MediaHelper.photoHelper.dispatchImagePickerIntent(this, true)
+            R.id.image_video_item -> MediaHelper.videoHelper.dispatchVideoPickerIntent(this, false)
+            R.id.image_video_library_item -> MediaHelper.videoHelper.dispatchVideoPickerIntent(this, true)
+            R.id.image_audio_item -> MediaHelper.audioHelper.dispatchAudioPickerIntent(this, false)
+            R.id.image_audio_library_item -> MediaHelper.audioHelper.dispatchAudioPickerIntent(this, true)
         }
     }
 
@@ -78,13 +97,13 @@ class DiaryWritingFragment: Fragment() {
         )
 
         initializeToolbar(binding.toolbar)
+        initializeSpinners()
         inputMethodManager = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         hideKeyboard(binding.root, inputMethodManager)
 
         // val scoreFragmentArgs by navArgs<ScoreFragmentArgs>() TODO 여기서 다이어리 정보 전달 받을 것. 팩토리로전달.
         viewModelFactory = DiaryWritingViewModelFactory(null) // null 나중에 대체되야함.
         viewModel = ViewModelProvider(viewModelStore, viewModelFactory)[DiaryWritingViewModel::class.java]
-        viewModel.setFragment(this)
 
         binding.diaryWritingViewModel = viewModel
         binding.lifecycleOwner = viewLifecycleOwner
@@ -125,7 +144,7 @@ class DiaryWritingFragment: Fragment() {
         )
         layoutOptionsMenuHeight = convertDpToPx(
             requireContext(),
-            resources.getDimension(R.dimen.dimen_layout_options_menu_height) / resources.displayMetrics.density
+            resources.getDimension(R.dimen.dimen_layout_option_items_height) / resources.displayMetrics.density
         )
 
         binding.editTextTitle.showSoftInputOnFocus = false
@@ -137,9 +156,9 @@ class DiaryWritingFragment: Fragment() {
         binding.frameLayoutDropdown.setOnClickListener {
             when {
                 layoutOptionsMenuIsShown -> {
-                    binding.layoutOptionsMenu
+                    binding.layoutOptionItems
                         .hideDown(shortAnimationDuration, layoutOptionsMenuHeight)
-                    binding.optionsMenuBackground
+                    binding.optionItemsBackground
                         .hideDown(mediumAnimationDuration, layoutOptionsMenuHeight)
                     binding.layoutOptionsContainer
                         .translateDown(mediumAnimationDuration, layoutOptionsMenuHeight)
@@ -160,10 +179,13 @@ class DiaryWritingFragment: Fragment() {
             }
         }
 
-        binding.imagePhoto.setOnClickListener(layoutOptionsOnClickListener)
-        binding.imageVideo.setOnClickListener(layoutOptionsOnClickListener)
-        binding.imageAudio.setOnClickListener(layoutOptionsOnClickListener)
-        binding.imageDrawing.setOnClickListener(layoutOptionsOnClickListener)
+        binding.imagePhoto.setOnClickListener(optionsOnClickListener)
+        binding.imageVideo.setOnClickListener(optionsOnClickListener)
+        binding.imageAudio.setOnClickListener(optionsOnClickListener)
+        binding.imageDrawing.setOnClickListener(optionsOnClickListener)
+        binding.imageText.setOnClickListener(optionsOnClickListener)
+
+        initializeOptionItems()
 
         setEventListener(
             requireActivity(),
@@ -203,12 +225,38 @@ class DiaryWritingFragment: Fragment() {
         setHasOptionsMenu(true)
     }
 
+    private fun initializeOptionItems() {
+        binding.imageCameraItem.setOnClickListener(optionItemsOnClickListener)
+        binding.imagePhotoItem.setOnClickListener(optionItemsOnClickListener)
+        binding.imagePhotoLibraryItem.setOnClickListener(optionItemsOnClickListener)
+        binding.imageVideoItem.setOnClickListener(optionItemsOnClickListener)
+        binding.imageVideoLibraryItem.setOnClickListener(optionItemsOnClickListener)
+        binding.imageAudioItem.setOnClickListener(optionItemsOnClickListener)
+        binding.imageAudioLibraryItem.setOnClickListener(optionItemsOnClickListener)
+    }
+
+    private fun initializeSpinners() {
+        ArrayAdapter.createFromResource(
+            requireContext(),
+            R.array.fonts,
+            R.layout.item_spinner
+        ).also { adapter ->
+            binding.spinnerFont.adapter = adapter
+        }
+
+        val fontSizes = arrayOf(
+            12, 14, 16, 18, 20, 22, 24
+        )
+        binding.spinnerTextSize.adapter =
+            ArrayAdapter(requireContext(), R.layout.item_spinner, fontSizes)
+    }
+
     private fun showKeyboard(view: View, inputMethodManager: InputMethodManager) {
-        inputMethodManager.showSoftInput(view, 0);
+        inputMethodManager.showSoftInput(view, 0)
     }
 
     private fun hideKeyboard(view: View, inputMethodManager: InputMethodManager) {
-        inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0);
+        inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -265,6 +313,13 @@ class DiaryWritingFragment: Fragment() {
                         addMedia(MediaModel(MediaHelper.MediaType.VIDEO, videoUri = videoUri))
                     }
                 }
+                MediaHelper.REQUEST_CODE_DRAW -> {
+                    val result= data?.getByteArrayExtra("bitmap")
+                    val bitmap = result?.size?.let { BitmapFactory.decodeByteArray(result, 0, it) }
+                    bitmap?.let { addMedia(MediaModel(MediaHelper.MediaType.PHOTO, it)) } ?: run {
+                        showToast(requireContext(), getString(R.string.failed_to_store_image))
+                    }
+                }
             }
         }
     }
@@ -273,6 +328,7 @@ class DiaryWritingFragment: Fragment() {
         try {
             imageUri?.let {
                 return if (Build.VERSION.SDK_INT < 28) {
+                    @Suppress("DEPRECATION")
                     MediaStore.Images.Media.getBitmap(
                         requireContext().contentResolver,
                         imageUri
@@ -309,9 +365,10 @@ class DiaryWritingFragment: Fragment() {
     }
 
     private fun showOptionsMenu(view: View) {
-        binding.layoutPhotoOptionsMenu.visibility = View.GONE
-        binding.layoutVideoOptionsMenu.visibility = View.GONE
-        binding.layoutAudioOptionsMenu.visibility = View.GONE
+        binding.layoutPhotoOptionItems.visibility = View.GONE
+        binding.layoutVideoOptionItems.visibility = View.GONE
+        binding.layoutAudioOptionItems.visibility = View.GONE
+        binding.layoutTextOptionItems.visibility = View.GONE
 
         if (!layoutOptionsMenuIsShown) {
             binding.layoutOptionsContainer.translateUp(
@@ -319,12 +376,12 @@ class DiaryWritingFragment: Fragment() {
                 layoutOptionsMenuHeight
             )
 
-            binding.optionsMenuBackground.showUp(
+            binding.optionItemsBackground.showUp(
                 shortAnimationDuration,
                 layoutOptionsMenuHeight
             )
 
-            binding.layoutOptionsMenu.showUp(
+            binding.layoutOptionItems.showUp(
                 mediumAnimationDuration,
                 layoutOptionsMenuHeight
             )
@@ -332,9 +389,10 @@ class DiaryWritingFragment: Fragment() {
         }
 
         when(view.id) {
-            R.id.image_photo -> binding.layoutPhotoOptionsMenu.visibility = View.VISIBLE
-            R.id.image_video -> binding.layoutVideoOptionsMenu.visibility = View.VISIBLE
-            R.id.image_audio -> binding.layoutAudioOptionsMenu.visibility = View.VISIBLE
+            R.id.image_photo -> binding.layoutPhotoOptionItems.visibility = View.VISIBLE
+            R.id.image_video -> binding.layoutVideoOptionItems.visibility = View.VISIBLE
+            R.id.image_audio -> binding.layoutAudioOptionItems.visibility = View.VISIBLE
+            R.id.image_text -> binding.layoutTextOptionItems.visibility = View.VISIBLE
         }
     }
 }
