@@ -10,9 +10,6 @@
         <item>@color/colorDefaultThemeLight</item>
     </array>
 
-    <!--item name="colorDefaultThemeLight1">#EDE7F6</item>
-    <item name="colorDefaultThemeLight2">@color/colorGhostWhite</item> -->
-
     <color name="colorDefaultThemeDark">#B39DDB</color>
     <color name="colorDefaultThemeLight">#EDE7F6</color>
     <color name="colorTextDisabledDark">@color/colorSilver</color>
@@ -31,9 +28,37 @@
     <color name="colorToolbarTitle">@color/colorWhite</color>
 
     <color name="colorBlueGrey900">#263238</color>
+    <color name="colorDarkGray">#A9A9A9</color>
     <color name="colorGhostWhite">#F8F8FF</color>
     <color name="colorGrey600">#9E9E9E</color>
-    <color name="colorGrey700">#455a64</color>
+    <color name="colorGrey700">#455A64</color>
     <color name="colorSilver">#C0C0C0</color>
     <color name="colorWhite">#FEFEFE</color>
+
+    <!-- PhotoEditor -->
+    <color name="colorSemiBlackTransparent">#99000000</color>
+    <color name="colorToolBackground">#151414</color>
+    <color name="colorSeekBarProgressTint">@color/colorDarkGray</color>
+    <color name="colorSeekBarThumbTint">@color/colorDarkGray</color>
+
+    <!-- Default Colors 500 -->
+    <color name="colorRed500">#F44330</color>
+    <color name="colorPink500">#E91E63</color>
+    <color name="colorPurple500">#9C27B0</color>
+    <color name="colorDeepPurple500">#673AB7</color>
+    <color name="colorIndigo500">#3F51B5</color>
+    <color name="colorBlue500">#2196F3</color>
+    <color name="colorLightBlue500">#03A9F4</color>
+    <color name="colorCyan500">#00BCD4</color>
+    <color name="colorTeal500">#009688</color>
+    <color name="colorGreen500">#4CAF50</color>
+    <color name="colorLightGreen500">#8BC34A</color>
+    <color name="colorLime500">#CDDC39</color>
+    <color name="colorYellow500">#FFEB3B</color>
+    <color name="colorAmber500">#FFC107</color>
+    <color name="colorOrange500">#FF9800</color>
+    <color name="colorDeepOrange500">#FF5722</color>
+    <color name="colorBrown500">#795548</color>
+    <color name="colorGrey500">#9E9E9E</color>
+    <color name="colorBlueGrey500">#607D8B</color>
 </resources>

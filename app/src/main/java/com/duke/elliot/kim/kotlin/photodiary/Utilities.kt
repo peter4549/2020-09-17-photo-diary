@@ -17,6 +17,8 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.*
 
 @Suppress("unused")
 class GridLayoutManagerWrapper: GridLayoutManager {
@@ -66,3 +68,6 @@ fun setImage(imageView: ImageView, uri: Uri) {
         .transition(DrawableTransitionOptions.withCrossFade())
         .into(imageView)
 }
+
+fun getCurrentDateString(): String = SimpleDateFormat("yyyy년 M월 d일 EEEE", Locale.getDefault()).format(Date())
+fun getCurrentTimeString(): String = SimpleDateFormat("aa h:m", Locale.getDefault()).format(Date())

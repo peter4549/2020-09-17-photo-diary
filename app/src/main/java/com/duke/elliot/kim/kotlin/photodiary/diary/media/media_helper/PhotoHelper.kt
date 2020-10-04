@@ -20,6 +20,8 @@ object PhotoHelper {
 
     private lateinit var currentPhotoPath: String
 
+    fun getCurrentPhotoPath() = currentPhotoPath
+
     fun dispatchImageCaptureIntent(fragment: Fragment) {
         Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { imageCaptureIntent ->
             imageCaptureIntent.resolveActivity(fragment.requireContext().packageManager)?.also {

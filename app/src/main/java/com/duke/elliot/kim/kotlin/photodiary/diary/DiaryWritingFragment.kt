@@ -13,17 +13,17 @@ import android.provider.MediaStore
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.ArrayAdapter
-import android.widget.SpinnerAdapter
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.duke.elliot.kim.kotlin.photodiary.*
 import com.duke.elliot.kim.kotlin.photodiary.databinding.FragmentDiaryWritingBinding
 import com.duke.elliot.kim.kotlin.photodiary.diary.media.MediaModel
-import com.duke.elliot.kim.kotlin.photodiary.diary.media.MediaRecyclerViewAdapter
+import com.duke.elliot.kim.kotlin.photodiary.diary.media.MediaAdapter
 import com.duke.elliot.kim.kotlin.photodiary.diary.media.media_helper.MediaHelper
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent.setEventListener
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener
@@ -97,13 +97,17 @@ class DiaryWritingFragment: Fragment() {
         )
 
         initializeToolbar(binding.toolbar)
-        initializeSpinners()
-        inputMethodManager = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        hideKeyboard(binding.root, inputMethodManager)
 
         // val scoreFragmentArgs by navArgs<ScoreFragmentArgs>() TODO 여기서 다이어리 정보 전달 받을 것. 팩토리로전달.
         viewModelFactory = DiaryWritingViewModelFactory(null) // null 나중에 대체되야함.
         viewModel = ViewModelProvider(viewModelStore, viewModelFactory)[DiaryWritingViewModel::class.java]
+
+        initializeSpinners()
+        inputMethodManager = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        hideKeyboard(binding.root, inputMethodManager)
+
+        binding.textDate.text = viewModel.date
+        binding.textTime.text = viewModel.time
 
         binding.diaryWritingViewModel = viewModel
         binding.lifecycleOwner = viewLifecycleOwner
@@ -115,7 +119,12 @@ class DiaryWritingFragment: Fragment() {
             when (viewModel.action) {
                 DiaryWritingViewModel.Action.UNINITIALIZED -> {
                     binding.recyclerViewMedia.apply {
-                        adapter = MediaRecyclerViewAdapter(R.layout.item_media, mediaArrayList)
+                        adapter = MediaAdapter(R.layout.item_media, mediaArrayList) {
+                            when(it.type) {
+                                MediaHelper.MediaType.PHOTO -> navigateToPhotoEditorFragment(requireNotNull(it.bitmap))
+                                // TODO: else throw class cast exception.
+                            }
+                        }
                         layoutManager = GridLayoutManagerWrapper(requireContext(), 1).apply {
                             orientation = LinearLayoutManager.HORIZONTAL
                         }
@@ -274,7 +283,8 @@ class DiaryWritingFragment: Fragment() {
                 MediaHelper.REQUEST_IMAGE_CAPTURE -> {
                     val bitmap =
                         viewModel.getCurrentPhotoBitmap()?.setConfigure(Bitmap.Config.ARGB_8888)
-                    bitmap?.let { MediaModel(MediaModel.Type.PHOTO, it) }?.let { addMedia(it) }
+                    bitmap?.let { MediaModel(MediaModel.Type.PHOTO, it, MediaHelper.photoHelper.getCurrentPhotoPath()) }
+                        ?.let { addMedia(it) }
                         ?: run {
                             showToast(requireContext(), getString(R.string.failed_to_load_image))
                         }
@@ -299,7 +309,7 @@ class DiaryWritingFragment: Fragment() {
                             )
                         }
                     }
-                    (binding.recyclerViewMedia.adapter as MediaRecyclerViewAdapter).smoothScrollToEnd()
+                    (binding.recyclerViewMedia.adapter as MediaAdapter).smoothScrollToEnd()
                 }
                 MediaHelper.REQUEST_VIDEO_PICK -> {
                     if (data?.clipData != null) {
@@ -394,6 +404,10 @@ class DiaryWritingFragment: Fragment() {
             R.id.image_audio -> binding.layoutAudioOptionItems.visibility = View.VISIBLE
             R.id.image_text -> binding.layoutTextOptionItems.visibility = View.VISIBLE
         }
+    }
+
+    private fun navigateToPhotoEditorFragment(bitmap: Bitmap) {
+        findNavController().navigate(DiaryWritingFragmentDirections.actionDiaryWritingFragmentToPhotoEditorFragment(bitmap))
     }
 }
 

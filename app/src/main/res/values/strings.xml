@@ -25,6 +25,9 @@
     <string name="media">Media</string>
     <string name="select_album">앨범 선택</string>
     <string name="set_text_color">Set text color</string>
+    <string name="text_align_center">가운데 정렬</string>
+    <string name="text_align_left">왼쪽 정렬</string>
+    <string name="text_align_right">오른쪽 정렬</string>
     <string name="underline">Underline</string>
     <string-array name="fonts">
         <item>나눔바른고딕</item>
@@ -40,7 +43,20 @@
     <!-- TabFragment -->
     <string name="diary">다이어리</string>
 
-    <!-- AudioRecordingFragment -->
-    <string name="audio_button">Audio button</string>
+    <!-- PhotoEditorFragment -->
+    <string name="close">Close</string>
+    <string name="redo">Redo</string>
     <string name="save">저장</string>
+    <string name="undo">Undo</string>
+
+    <!-- Editing Tools -->
+    <string name="editing_tool_brush">브러시</string>
+    <string name="editing_tool_text">텍스트</string>
+    <string name="editing_tool_eraser">지우개</string>
+    <string name="editing_tool_filter">필터</string>
+    <string name="editing_tool_emoji">이모티콘</string>
+    <string name="editing_tool_sticker">스티커</string>
+
+    <string name="size">크기</string>
+    <string name="opacity">불투명도</string>
 </resources>

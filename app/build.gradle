@@ -28,6 +28,8 @@ android {
     buildFeatures {
         dataBinding true
     }
+
+    kotlinOptions { jvmTarget = "1.8" }
 }
 
 dependencies {
@@ -76,4 +78,7 @@ dependencies {
 
     // AndroidDraw
     implementation 'com.github.divyanshub024:AndroidDraw:v0.1'
+
+    // PhotoEditor
+    implementation 'ja.burhanrashid52:photoeditor:1.0.0'
 }

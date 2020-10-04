@@ -22,8 +22,7 @@ object MediaHelper {
     object MediaType {
         const val PHOTO = 0
         const val VIDEO = 1
-        const val VOICE_RECORDING = 2
-        const val MUSIC = 3
+        const val AUDIO = 2
     }
 
     val photoHelper = PhotoHelper

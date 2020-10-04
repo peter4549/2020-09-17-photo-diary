@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
     app:startDestination="@id/tabFragment">
-
     <fragment
         android:id="@+id/tabFragment"
         android:name="com.duke.elliot.kim.kotlin.photodiary.tab.TabFragment"
@@ -13,6 +12,10 @@
         <action
             android:id="@+id/action_tabFragment_to_diaryWritingFragment"
             app:destination="@id/diaryWritingFragment"
+            app:enterAnim="@anim/anim_slide_in_from_bottom"
+            app:exitAnim="@anim/anim_slide_out_to_top"
+            app:popEnterAnim="@anim/anim_slide_in_from_top"
+            app:popExitAnim="@anim/anim_slide_out_to_bottom"
             app:popUpToInclusive="false" />
     </fragment>
     <fragment
@@ -21,11 +24,26 @@
         android:label="DiaryWritingFragment"
         tools:layout="@layout/fragment_diary_writing">
         <action
-            android:id="@+id/action_diaryWritingFragment_to_audioRecordingFragment"
-            app:destination="@id/audioRecordingFragment" />
+            android:id="@+id/action_diaryWritingFragment_to_photoEditorFragment"
+            app:destination="@id/photoEditorFragment"
+            app:enterAnim="@anim/anim_slide_in_from_left"
+            app:exitAnim="@anim/anim_slide_out_to_right"
+            app:popEnterAnim="@anim/anim_slide_in_from_left"
+            app:popExitAnim="@anim/anim_slide_out_to_right" />
     </fragment>
     <fragment
-        android:id="@+id/audioRecordingFragment"
-        android:name="com.duke.elliot.kim.kotlin.photodiary.diary.media.audio.AudioRecordingFragment"
-        android:label="AudioRecordingFragment" />
+        android:id="@+id/photoEditorFragment"
+        android:name="com.duke.elliot.kim.kotlin.photodiary.diary.media.photo_editor.PhotoEditorFragment"
+        android:label="PhotoEditorFragment" >
+        <action
+            android:id="@+id/action_photoEditorFragment_to_diaryWritingFragment"
+            app:destination="@id/diaryWritingFragment"
+            app:enterAnim="@anim/anim_slide_in_from_left"
+            app:exitAnim="@anim/anim_slide_out_to_right"
+            app:popUpToInclusive="true" />
+        <argument
+            android:name="bitmap"
+            app:argType="android.graphics.Bitmap"
+            app:nullable="true"/>
+    </fragment>
 </navigation>
