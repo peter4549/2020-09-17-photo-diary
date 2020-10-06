@@ -15,6 +15,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.ArrayAdapter
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -25,6 +26,7 @@ import com.duke.elliot.kim.kotlin.photodiary.databinding.FragmentDiaryWritingBin
 import com.duke.elliot.kim.kotlin.photodiary.diary.media.MediaModel
 import com.duke.elliot.kim.kotlin.photodiary.diary.media.MediaAdapter
 import com.duke.elliot.kim.kotlin.photodiary.diary.media.media_helper.MediaHelper
+import com.duke.elliot.kim.kotlin.photodiary.utility.*
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent.setEventListener
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener
 
@@ -121,7 +123,12 @@ class DiaryWritingFragment: Fragment() {
                     binding.recyclerViewMedia.apply {
                         adapter = MediaAdapter(R.layout.item_media, mediaArrayList) {
                             when(it.type) {
-                                MediaHelper.MediaType.PHOTO -> navigateToPhotoEditorFragment(requireNotNull(it.bitmap))
+                                MediaHelper.MediaType.PHOTO -> {
+                                    val imageUri = bitmapToImageFile(requireContext(), requireNotNull(it.bitmap), ORIGIN_BITMAP_IMAGE_FILE)?.toUri()
+                                    imageUri?.let { uri -> navigateToPhotoEditorFragment(uri) } ?: run {
+                                        showToast(requireContext(), getString(R.string.failed_to_open_editor))
+                                    }
+                                }
                                 // TODO: else throw class cast exception.
                             }
                         }
@@ -327,7 +334,7 @@ class DiaryWritingFragment: Fragment() {
                     val result= data?.getByteArrayExtra("bitmap")
                     val bitmap = result?.size?.let { BitmapFactory.decodeByteArray(result, 0, it) }
                     bitmap?.let { addMedia(MediaModel(MediaHelper.MediaType.PHOTO, it)) } ?: run {
-                        showToast(requireContext(), getString(R.string.failed_to_store_image))
+                        showToast(requireContext(), getString(R.string.failed_to_save_image))
                     }
                 }
             }
@@ -374,6 +381,11 @@ class DiaryWritingFragment: Fragment() {
         (requireActivity() as MainActivity).viewModel.add(diary)
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        viewModel.deleteTempJpegFiles(requireContext())
+    }
+
     private fun showOptionsMenu(view: View) {
         binding.layoutPhotoOptionItems.visibility = View.GONE
         binding.layoutVideoOptionItems.visibility = View.GONE
@@ -406,8 +418,12 @@ class DiaryWritingFragment: Fragment() {
         }
     }
 
-    private fun navigateToPhotoEditorFragment(bitmap: Bitmap) {
-        findNavController().navigate(DiaryWritingFragmentDirections.actionDiaryWritingFragmentToPhotoEditorFragment(bitmap))
+    private fun navigateToPhotoEditorFragment(uri: Uri) {
+        findNavController().navigate(DiaryWritingFragmentDirections.actionDiaryWritingFragmentToPhotoEditorFragment(uri))
+    }
+
+    companion object {
+        const val ORIGIN_BITMAP_IMAGE_FILE = "OriginBitmapImageFile"
     }
 }
 

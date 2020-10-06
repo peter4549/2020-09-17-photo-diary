@@ -5,7 +5,8 @@
     <string name="album">앨범</string>
     <string name="bold">Bold</string>
     <string name="camera">카메라</string>
-    <string name="failed_to_store_image">이미지를 저장하지 못했습니다.</string>
+    <string name="failed_to_open_editor">에디터를 열지 못했습니다.</string>
+    <string name="failed_to_save_image">이미지를 저장하지 못했습니다.</string>
     <string name="google_photos">Google 포토</string>
     <string name="italic">Italic</string>
     <string name="music">음악</string>
@@ -51,12 +52,29 @@
 
     <!-- Editing Tools -->
     <string name="editing_tool_brush">브러시</string>
-    <string name="editing_tool_text">텍스트</string>
+    <string name="editing_tool_crop">자르기</string>
+    <string name="editing_tool_emoji">이모티콘</string>
     <string name="editing_tool_eraser">지우개</string>
     <string name="editing_tool_filter">필터</string>
-    <string name="editing_tool_emoji">이모티콘</string>
     <string name="editing_tool_sticker">스티커</string>
+    <string name="editing_tool_text">텍스트</string>
 
-    <string name="size">크기</string>
+    <string name="done">Done</string>
+    <string name="edit_photo">사진 편집</string>
+    <string name="editing_tool_icon">Tool icon</string>
+    <string name="filter">Filter</string>
     <string name="opacity">불투명도</string>
+    <string name="size">크기</string>
+
+    <!-- SimpleCropView -->
+    <string name="fit_image">FIT IMAGE</string>
+    <string name="square">SQUARE</string>
+    <string name="free">FREE</string>
+    <string name="circle">CIRCLE</string>
+    <string name="circle_square">CIRCLE SQUARE</string>
+    <string name="rotate_left">Rotate left</string>
+    <string name="rotate_right">Rotate right</string>
+    <string name="select_color">색상 선택</string>
+
+    <string name="failed_to_load_image">이미지를 로드하지 못했습니다.</string>
 </resources>

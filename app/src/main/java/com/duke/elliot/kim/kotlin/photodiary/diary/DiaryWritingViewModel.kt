@@ -1,11 +1,20 @@
 package com.duke.elliot.kim.kotlin.photodiary.diary
 
+import android.content.Context
+import android.os.Environment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.duke.elliot.kim.kotlin.photodiary.diary.media.MediaModel
 import com.duke.elliot.kim.kotlin.photodiary.diary.media.media_helper.PhotoHelper
-import com.duke.elliot.kim.kotlin.photodiary.getCurrentDateString
-import com.duke.elliot.kim.kotlin.photodiary.getCurrentTimeString
+import com.duke.elliot.kim.kotlin.photodiary.diary.media.photo_editor.PhotoEditorFragment
+import com.duke.elliot.kim.kotlin.photodiary.diary.media.simple_crop_view.SimpleCropViewFragment
+import com.duke.elliot.kim.kotlin.photodiary.utility.getCurrentDateString
+import com.duke.elliot.kim.kotlin.photodiary.utility.getCurrentTimeString
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import timber.log.Timber
+import java.io.File
 
 class DiaryWritingViewModel: ViewModel() {
 
@@ -43,6 +52,35 @@ class DiaryWritingViewModel: ViewModel() {
     }
 
     fun getCurrentPhotoBitmap() = PhotoHelper.getCurrentPhotoBitmap()
+
+    fun deleteTempJpegFiles(context: Context) {
+        CoroutineScope(Dispatchers.IO).launch {
+            val tempJpegFileNames = arrayOf(
+                DiaryWritingFragment.ORIGIN_BITMAP_IMAGE_FILE,
+                PhotoEditorFragment.EDITED_BITMAP_IMAGE_FILE,
+                SimpleCropViewFragment.CROPPED_BITMAP_IMAGE_FILE
+            )
+            val picturesDirectory = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+            val files = picturesDirectory?.listFiles()?.filter {
+                it.name.endsWith(".jpg") && (
+                        it.name.startsWith(tempJpegFileNames[0])
+                                || it.name.startsWith(tempJpegFileNames[1])
+                                || it.name.startsWith(tempJpegFileNames[2])
+                        )
+            }?.filterNotNull()
+
+            if (files != null) {
+                for (file in files) {
+                    if (file.exists()) {
+                        if (file.delete())
+                            Timber.d("File deleted: ${file.name}")
+                        else
+                            Timber.e("Failed to delete file: ${file.name}")
+                    }
+                }
+            }
+        }
+    }
 
     // TODO: ListAdapter를 사용한 업데이트 로직으로 변경 해볼것. 다만 그리드 레이아웃도 가능한지 확인 필요.
     object Action {

@@ -9,6 +9,7 @@ import com.duke.elliot.kim.kotlin.photodiary.*
 import com.duke.elliot.kim.kotlin.photodiary.base.BaseRecyclerViewAdapter
 import com.duke.elliot.kim.kotlin.photodiary.databinding.FragmentDairiesBinding
 import com.duke.elliot.kim.kotlin.photodiary.diary.DiaryModel
+import com.duke.elliot.kim.kotlin.photodiary.utility.GridLayoutManagerWrapper
 import kotlinx.android.synthetic.main.fragment_dairies.view.*
 import kotlinx.android.synthetic.main.item_diary.view.*
 

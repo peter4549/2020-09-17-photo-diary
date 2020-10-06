@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.duke.elliot.kim.kotlin.photodiary.GridLayoutManagerWrapper
+import com.duke.elliot.kim.kotlin.photodiary.utility.GridLayoutManagerWrapper
 import com.duke.elliot.kim.kotlin.photodiary.MainActivity
 import com.duke.elliot.kim.kotlin.photodiary.MainViewModel
 import com.duke.elliot.kim.kotlin.photodiary.R

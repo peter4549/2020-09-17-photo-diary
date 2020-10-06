@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
+import com.duke.elliot.kim.kotlin.photodiary.fluid_keyboard_resize.FluidContentResize
 import kotlinx.android.synthetic.main.item_diary.view.*
 import timber.log.Timber
 
@@ -23,6 +24,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         setupTimber()
+
+        FluidContentResize.listen(this)
 
 
         /** 데이터만 관리하는 존재, 각 프래그먼트는 여기의 데이터를 참조한다. ABC, 가 있고, write frag에서 D를 추가.
@@ -75,6 +78,11 @@ class MainActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+    }
+
+    override fun onBackPressed() {
+        println("KKKKKKK + ${supportFragmentManager.fragments.map { it.tag }}")
+        super.onBackPressed()
     }
 
     private fun setupTimber() {

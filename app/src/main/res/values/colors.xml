@@ -61,4 +61,15 @@
     <color name="colorBrown500">#795548</color>
     <color name="colorGrey500">#9E9E9E</color>
     <color name="colorBlueGrey500">#607D8B</color>
+
+    <!-- SimpleCropView -->
+    <color name="simpleCropViewWindowBackground">#1C1C1C</color>
+    <color name="colorSimpleCropViewButtonNormal">#FFFFFB</color>
+    <color name="colorSimpleCropViewTextPrimary">#FFFFFB</color>
+    <color name="colorSimpleCropViewTextPrimaryInverse">#1C1C1C</color>
+    <color name="colorSimpleCropViewOverlay">#AA1C1C1C</color>
+    <color name="colorSimpleCropViewDivider">#3C3C3C</color>
+    <color name="colorSimpleCropViewFrameBlue">#2196F3</color>
+    <color name="colorSimpleCropViewFrameGrey">#424242</color>
+    <color name="colorSimpleCropViewFrameWhite">#FFFFFB</color>
 </resources>

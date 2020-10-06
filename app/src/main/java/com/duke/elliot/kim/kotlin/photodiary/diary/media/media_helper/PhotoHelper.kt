@@ -48,7 +48,18 @@ object PhotoHelper {
         val timestamp: String = SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault()).format(Date())
         val picturesDirectory = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
         return File.createTempFile(
-            "JPEG_${timestamp}_",
+            "JPEG_${timestamp}",
+            ".jpg",
+            picturesDirectory
+        ).apply {
+            currentPhotoPath = absolutePath
+        }
+    }
+
+    fun createImageFile(context: Context, fileName: String): File {
+        val picturesDirectory = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        return File.createTempFile(
+            fileName,
             ".jpg",
             picturesDirectory
         ).apply {

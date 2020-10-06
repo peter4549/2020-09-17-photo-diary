@@ -6,6 +6,6 @@
     <dimen name="dimen_toolbar_height">56dp</dimen>
     <dimen name="dimen_scroll_view_bottom_margin">28dp</dimen>
 
-    <dimen name="dimen_editing_tool_icon_height">40dp</dimen>
-    <dimen name="dimen_editing_tool_icon_width">40dp</dimen>
+    <dimen name="dimen_editing_tool_icon_height">32dp</dimen>
+    <dimen name="dimen_editing_tool_icon_width">32dp</dimen>
 </resources>

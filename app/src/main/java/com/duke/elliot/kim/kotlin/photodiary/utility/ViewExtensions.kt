@@ -1,18 +1,10 @@
-package com.duke.elliot.kim.kotlin.photodiary
+package com.duke.elliot.kim.kotlin.photodiary.utility
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
-import android.graphics.BlendMode
-import android.graphics.BlendModeColorFilter
-import android.graphics.PorterDuff
-import android.graphics.drawable.Drawable
-import android.os.Build
 import android.view.View
-import android.view.animation.Animation
-import android.view.animation.Transformation
 import android.widget.ImageButton
 import android.widget.ImageView
-import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 

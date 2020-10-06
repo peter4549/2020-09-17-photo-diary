@@ -8,13 +8,13 @@ import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.GridLayoutManager
-import com.duke.elliot.kim.kotlin.photodiary.GridLayoutManagerWrapper
+import com.duke.elliot.kim.kotlin.photodiary.utility.GridLayoutManagerWrapper
 import com.duke.elliot.kim.kotlin.photodiary.R
 import com.duke.elliot.kim.kotlin.photodiary.databinding.FragmentBrushPropertiesBottomSheetDialogBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 
-class BrushPropertiesFragment : BottomSheetDialogFragment(), OnSeekBarChangeListener {
+class BrushPropertiesBottomSheetDialogFragment : BottomSheetDialogFragment(), OnSeekBarChangeListener {
     private lateinit var binding: FragmentBrushPropertiesBottomSheetDialogBinding
     private var properties: Properties? = null
 
