@@ -36,11 +36,11 @@ open class BaseRecyclerViewAdapter<T: Any?>(private val layoutId: Int,
         notifyItemInserted(position)
     }
 
-    fun update(item: T) {
+    fun updateUi(item: T) {
         notifyItemChanged(items.indexOf(item))
     }
 
-    fun update(position: Int) {
+    fun updateUi(position: Int) {
         CoroutineScope(Dispatchers.Main).launch {
             notifyItemChanged(position)
         }
@@ -77,6 +77,6 @@ open class BaseRecyclerViewAdapter<T: Any?>(private val layoutId: Int,
     }
 
     fun smoothScrollToEnd() {
-        recyclerView.smoothScrollToPosition(itemCount - 1)
+        recyclerView.smoothScrollToPosition(itemCount)
     }
 }

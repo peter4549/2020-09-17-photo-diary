@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/background_grey_rounded_corners">
+
+    <TextView
+        android:id="@+id/text_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@color/colorDialogBackground"
+        android:gravity="center"
+        android:padding="16dp"
+        android:textStyle="bold"
+        app:autoSizeMaxTextSize="20sp"
+        app:autoSizeMinTextSize="16sp"
+        app:autoSizeStepGranularity="2sp"
+        app:autoSizeTextType="uniform"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="로그인" />
+
+    <TextView
+        android:id="@+id/text_message"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@color/colorDialogBackground"
+        android:gravity="center"
+        android:lineSpacingMultiplier="1.2"
+        android:maxLines="4"
+        android:paddingBottom="24dp"
+        android:paddingEnd="16dp"
+        android:paddingStart="16dp"
+        android:textStyle="bold"
+        app:autoSizeMaxTextSize="14sp"
+        app:autoSizeMinTextSize="12sp"
+        app:autoSizeStepGranularity="2sp"
+        app:autoSizeTextType="uniform"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text_title"
+        tools:text="로그인 후 이용하실 수 있습니다. 로그인하시겠습니까?" />
+
+    <Button
+        android:id="@+id/button_cancel"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="1dp"
+        android:layout_marginEnd="1dp"
+        android:background="@color/colorDialogBackground"
+        android:text="@string/cancel"
+        android:textStyle="bold"
+        app:autoSizeMaxTextSize="16sp"
+        app:autoSizeMinTextSize="14sp"
+        app:autoSizeStepGranularity="2sp"
+        app:autoSizeTextType="uniform"
+        app:layout_constraintEnd_toStartOf="@+id/button_ok"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text_message" />
+
+    <Button
+        android:id="@+id/button_ok"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="1dp"
+        android:background="@color/colorDialogBackground"
+        android:text="@string/ok"
+        android:textStyle="bold"
+        app:autoSizeMaxTextSize="16sp"
+        app:autoSizeMinTextSize="14sp"
+        app:autoSizeStepGranularity="2sp"
+        app:autoSizeTextType="uniform"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/button_cancel"
+        app:layout_constraintTop_toBottomOf="@+id/text_message" />
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -13,8 +13,8 @@ import com.duke.elliot.kim.kotlin.photodiary.R
 import com.duke.elliot.kim.kotlin.photodiary.databinding.FragmentBrushPropertiesBottomSheetDialogBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
-
 class BrushPropertiesBottomSheetDialogFragment : BottomSheetDialogFragment(), OnSeekBarChangeListener {
+
     private lateinit var binding: FragmentBrushPropertiesBottomSheetDialogBinding
     private var properties: Properties? = null
 
@@ -34,6 +34,7 @@ class BrushPropertiesBottomSheetDialogFragment : BottomSheetDialogFragment(), On
             container,
             false
         )
+
         return binding.root
     }
 

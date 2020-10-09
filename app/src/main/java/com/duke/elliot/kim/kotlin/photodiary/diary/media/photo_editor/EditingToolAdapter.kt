@@ -10,7 +10,7 @@ import com.duke.elliot.kim.kotlin.photodiary.R
 
 @Suppress("SpellCheckingInspection")
 enum class ToolType {
-    BRUSH, TEXT, ERASER, FILTER, EMOJI, STICKER, CROP
+    BRUSH, TEXT, ERASER, FILTER, EMOJI, /* STICKER, */ CROP
 }
 
 class EditingToolRecyclerViewAdapter(private val onItemSelected: OnItemSelected) :
@@ -60,6 +60,6 @@ class EditingToolRecyclerViewAdapter(private val onItemSelected: OnItemSelected)
         tools.add(ToolModel(R.string.editing_tool_filter, R.drawable.ic_round_photo_filter_40, ToolType.FILTER))
         @Suppress("SpellCheckingInspection")
         tools.add(ToolModel(R.string.editing_tool_emoji, R.drawable.ic_round_insert_emoticon_40, ToolType.EMOJI))
-        tools.add(ToolModel(R.string.editing_tool_sticker, R.drawable.ic_round_image_40, ToolType.STICKER))
+        // tools.add(ToolModel(R.string.editing_tool_sticker, R.drawable.ic_round_image_40, ToolType.STICKER))
     }
 }

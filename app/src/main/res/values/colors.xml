@@ -16,6 +16,7 @@
     <color name="colorTextEnabledDark">@color/colorBlueGrey900</color>
 
     <color name="colorOptionItemsBackground">@color/colorGhostWhite</color>
+    <color name="colorFragmentBackgroundForBorder">@color/colorSilver</color>
     <color name="colorFragmentBackgroundLight">@color/colorGhostWhite</color>
     <color name="colorFrameLayoutBackground">@color/colorGhostWhite</color>
     <color name="colorIconTint">@color/colorSilver</color>
@@ -37,9 +38,10 @@
 
     <!-- PhotoEditor -->
     <color name="colorSemiBlackTransparent">#99000000</color>
-    <color name="colorToolBackground">#151414</color>
-    <color name="colorSeekBarProgressTint">@color/colorDarkGray</color>
-    <color name="colorSeekBarThumbTint">@color/colorDarkGray</color>
+    <color name="colorToolBackground">@color/colorDefaultBackgroundBlack</color>
+    <color name="colorSeekBarProgressBackgroundTint">@color/colorSilver</color>
+    <color name="colorSeekBarProgressTint">@color/colorWhite</color>
+    <color name="colorSeekBarThumbTint">@color/colorWhite</color>
 
     <!-- Default Colors 500 -->
     <color name="colorRed500">#F44330</color>
@@ -62,8 +64,12 @@
     <color name="colorGrey500">#9E9E9E</color>
     <color name="colorBlueGrey500">#607D8B</color>
 
+    <color name="colorDefaultBackgroundBlack">#151414</color>
+
+    <color name="colorDialogBackground">@color/colorGhostWhite</color>
+
     <!-- SimpleCropView -->
-    <color name="simpleCropViewWindowBackground">#1C1C1C</color>
+    <color name="colorSimpleCropViewWindowBackground">@color/colorDefaultBackgroundBlack</color>
     <color name="colorSimpleCropViewButtonNormal">#FFFFFB</color>
     <color name="colorSimpleCropViewTextPrimary">#FFFFFB</color>
     <color name="colorSimpleCropViewTextPrimaryInverse">#1C1C1C</color>

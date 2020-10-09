@@ -1,6 +1,8 @@
 package com.duke.elliot.kim.kotlin.photodiary
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,7 +12,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
+import com.duke.elliot.kim.kotlin.photodiary.diary.media.photo_editor.REQUEST_CODE_WRITE_EXTERNAL_STORAGE
 import com.duke.elliot.kim.kotlin.photodiary.fluid_keyboard_resize.FluidContentResize
+import com.duke.elliot.kim.kotlin.photodiary.utility.hasPermissions
 import kotlinx.android.synthetic.main.item_diary.view.*
 import timber.log.Timber
 
@@ -78,11 +82,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-    }
-
-    override fun onBackPressed() {
-        println("KKKKKKK + ${supportFragmentManager.fragments.map { it.tag }}")
-        super.onBackPressed()
     }
 
     private fun setupTimber() {

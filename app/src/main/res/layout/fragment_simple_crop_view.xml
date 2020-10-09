@@ -15,7 +15,7 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:padding="24dp"
-            custom:scv_background_color="@color/simpleCropViewWindowBackground"
+            custom:scv_background_color="@color/colorSimpleCropViewWindowBackground"
             custom:scv_crop_mode="fit_image"
             custom:scv_frame_color="@color/colorSimpleCropViewFrameWhite"
             custom:scv_frame_stroke_weight="1dp"
@@ -40,7 +40,7 @@
             android:id="@+id/horizontal_scroll_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/simpleCropViewWindowBackground"
+            android:background="@color/colorSimpleCropViewWindowBackground"
             android:scrollbars="none">
 
             <LinearLayout
@@ -164,7 +164,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/simpleCropViewWindowBackground"
+            android:background="@color/colorSimpleCropViewWindowBackground"
             android:orientation="horizontal">
 
             <ImageButton
@@ -190,7 +190,7 @@
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="@string/select_color"
                 android:padding="16dp"
-                android:src="@drawable/ic_square_26"
+                android:src="@drawable/ic_square_24"
                 android:tint="@color/colorSimpleCropViewFrameWhite" />
 
             <LinearLayout

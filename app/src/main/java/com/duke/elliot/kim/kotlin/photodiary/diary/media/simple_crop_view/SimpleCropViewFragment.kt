@@ -22,7 +22,9 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.duke.elliot.kim.kotlin.photodiary.R
 import com.duke.elliot.kim.kotlin.photodiary.databinding.FragmentSimpleCropViewBinding
-import com.duke.elliot.kim.kotlin.photodiary.utility.*
+import com.duke.elliot.kim.kotlin.photodiary.diary.media.media_helper.PhotoHelper
+import com.duke.elliot.kim.kotlin.photodiary.utility.lockActivityOrientation
+import com.duke.elliot.kim.kotlin.photodiary.utility.showToast
 import com.isseiaoki.simplecropview.CropImageView
 
 class SimpleCropViewFragment: Fragment() {
@@ -149,7 +151,10 @@ class SimpleCropViewFragment: Fragment() {
         else
             currentFrameColorIndex += 1
 
-        val frameColor = ContextCompat.getColor(requireContext(), frameColors[currentFrameColorIndex])
+        val frameColor = ContextCompat.getColor(
+            requireContext(),
+            frameColors[currentFrameColorIndex]
+        )
         binding.cropImageView.setFrameColor(frameColor)
         binding.cropImageView.setGuideColor(frameColor)
         binding.cropImageView.setHandleColor(frameColor)
@@ -159,7 +164,11 @@ class SimpleCropViewFragment: Fragment() {
     private fun cropImage() {
         val cropped = binding.cropImageView.croppedBitmap
         cropped?.let { bitmap ->
-            val imageUri = bitmapToImageFile(requireContext(), bitmap, CROPPED_BITMAP_IMAGE_FILE)?.toUri()
+            val imageUri = PhotoHelper.bitmapToTempImageFile(
+                requireContext(),
+                bitmap,
+                SIMPLE_CROP_VIEW_IMAGE_FILE_NAME
+            )?.toUri()
             findNavController().previousBackStackEntry?.savedStateHandle?.set(
                 KEY_CROPPED_BITMAP_URI,
                 imageUri
@@ -173,6 +182,6 @@ class SimpleCropViewFragment: Fragment() {
 
     companion object {
         const val KEY_CROPPED_BITMAP_URI = "key_cropped_bitmap_uri"
-        const val CROPPED_BITMAP_IMAGE_FILE = "CroppedBitmapImageFile"
+        const val SIMPLE_CROP_VIEW_IMAGE_FILE_NAME = "simple_crop_view_image_"
     }
 }

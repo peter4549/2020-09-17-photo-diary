@@ -14,7 +14,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.io.File
 
 class DiaryWritingViewModel: ViewModel() {
 
@@ -38,6 +37,8 @@ class DiaryWritingViewModel: ViewModel() {
     val mediaArrayListSize: Int
         get() = _mediaArrayListSize
 
+    var selectedItemPosition: Int? = null
+
     init {
         mediaArrayList.value = arrayListOf()
         _mediaArrayListSize = mediaArrayList.value?.size ?: 0
@@ -51,21 +52,19 @@ class DiaryWritingViewModel: ViewModel() {
         _mediaArrayListSize = mediaArrayList.value?.count() ?: 0
     }
 
-    fun getCurrentPhotoBitmap() = PhotoHelper.getCurrentPhotoBitmap()
+    fun getCurrentImageUri() = PhotoHelper.getCurrentImageUri()
 
     fun deleteTempJpegFiles(context: Context) {
         CoroutineScope(Dispatchers.IO).launch {
             val tempJpegFileNames = arrayOf(
-                DiaryWritingFragment.ORIGIN_BITMAP_IMAGE_FILE,
-                PhotoEditorFragment.EDITED_BITMAP_IMAGE_FILE,
-                SimpleCropViewFragment.CROPPED_BITMAP_IMAGE_FILE
+                PhotoEditorFragment.PHOTO_EDITOR_IMAGE_FILE_NAME,
+                SimpleCropViewFragment.SIMPLE_CROP_VIEW_IMAGE_FILE_NAME
             )
             val picturesDirectory = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
             val files = picturesDirectory?.listFiles()?.filter {
                 it.name.endsWith(".jpg") && (
                         it.name.startsWith(tempJpegFileNames[0])
                                 || it.name.startsWith(tempJpegFileNames[1])
-                                || it.name.startsWith(tempJpegFileNames[2])
                         )
             }?.filterNotNull()
 
@@ -82,7 +81,7 @@ class DiaryWritingViewModel: ViewModel() {
         }
     }
 
-    // TODO: ListAdapter를 사용한 업데이트 로직으로 변경 해볼것. 다만 그리드 레이아웃도 가능한지 확인 필요.
+    // TODO: ListAdapter를 사용한 업데이트 로직으로 변경 해볼것. 다만 그리드 레이아웃도 가능한지 확인 필요. 되는것으로 확인!
     object Action {
         const val UNINITIALIZED = 0
         const val INITIALIZED = 1

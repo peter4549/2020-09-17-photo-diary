@@ -78,7 +78,6 @@
             android:layout_height="wrap_content"
             android:background="@color/colorToolBackground"
             android:orientation="horizontal"
-            android:paddingTop="4dp"
             android:paddingBottom="4dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintBottom_toTopOf="@+id/guideline"

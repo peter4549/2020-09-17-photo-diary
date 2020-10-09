@@ -4,9 +4,7 @@ import android.graphics.Bitmap
 import android.net.Uri
 
 data class MediaModel(val type: Int,
-                      val bitmap: Bitmap? = null,
-                      val cacheFilePath: String? = null,
-                      val videoUri: Uri? = null) {
+                      var uri: Uri) {
     object Type {
         const val PHOTO = 0
         const val VIDEO = 1

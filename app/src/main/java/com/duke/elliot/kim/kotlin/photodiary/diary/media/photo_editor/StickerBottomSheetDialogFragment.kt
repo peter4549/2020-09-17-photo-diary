@@ -72,7 +72,7 @@ class StickerBottomSheetDialogFragment : BottomSheetDialogFragment() {
     }
 
     inner class StickerAdapter : RecyclerView.Adapter<StickerAdapter.ViewHolder>() {
-        var stickerList = intArrayOf(R.drawable.ic_sharp_not_interested_112, R.drawable.ic_sharp_photo_library_24)
+        var stickerList = intArrayOf()
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             val view: View =
                 LayoutInflater.from(parent.context).inflate(R.layout.item_sticker, parent, false)
@@ -106,6 +106,7 @@ class StickerBottomSheetDialogFragment : BottomSheetDialogFragment() {
         }
     }
 
+    /*
     private fun convertEmoji(emoji: String): String {
         var returnedEmoji = ""
         returnedEmoji = try {
@@ -120,4 +121,5 @@ class StickerBottomSheetDialogFragment : BottomSheetDialogFragment() {
     private fun getEmojiByUnicode(unicode: Int): String {
         return String(Character.toChars(unicode))
     }
+     */
 }

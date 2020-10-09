@@ -3,14 +3,13 @@ package com.duke.elliot.kim.kotlin.photodiary.diary
 import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.ImageDecoder
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
-import android.provider.MediaStore
-import android.view.*
+import android.view.LayoutInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.ArrayAdapter
 import androidx.appcompat.widget.Toolbar
@@ -21,11 +20,14 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.duke.elliot.kim.kotlin.photodiary.*
+import com.duke.elliot.kim.kotlin.photodiary.MainActivity
+import com.duke.elliot.kim.kotlin.photodiary.R
 import com.duke.elliot.kim.kotlin.photodiary.databinding.FragmentDiaryWritingBinding
-import com.duke.elliot.kim.kotlin.photodiary.diary.media.MediaModel
 import com.duke.elliot.kim.kotlin.photodiary.diary.media.MediaAdapter
+import com.duke.elliot.kim.kotlin.photodiary.diary.media.MediaModel
 import com.duke.elliot.kim.kotlin.photodiary.diary.media.media_helper.MediaHelper
+import com.duke.elliot.kim.kotlin.photodiary.diary.media.media_helper.PhotoHelper
+import com.duke.elliot.kim.kotlin.photodiary.diary.media.photo_editor.PhotoEditorFragment
 import com.duke.elliot.kim.kotlin.photodiary.utility.*
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent.setEventListener
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener
@@ -34,13 +36,14 @@ class DiaryWritingFragment: Fragment() {
 
     private lateinit var binding: FragmentDiaryWritingBinding
     private lateinit var inputMethodManager: InputMethodManager
+    private lateinit var mediaAdapter: MediaAdapter
     private lateinit var viewModel: DiaryWritingViewModel
     private lateinit var viewModelFactory: DiaryWritingViewModelFactory
     private var keyboardShown = false
     private var layoutOptionsHeight = 0F
     private var layoutOptionsIsShown = true
-    private var layoutOptionsMenuHeight = 0F
-    private var layoutOptionsMenuIsShown = false
+    private var layoutOptionItemsHeight = 0F
+    private var layoutOptionItemsIsShown = false
     private var mediumAnimationDuration = 0
     private var recyclerViewMediaIsShown = false
     private var shortAnimationDuration = 0
@@ -56,19 +59,19 @@ class DiaryWritingFragment: Fragment() {
     }
 
     private val editTextOnFocusChangeListener = View.OnFocusChangeListener { view, hasFocus ->
-        if (hasFocus && !keyboardShown && layoutOptionsMenuIsShown) {
+        if (hasFocus && !keyboardShown && layoutOptionItemsIsShown) {
             binding.layoutOptionItems
                 .hideDownWithFading(
                     shortAnimationDuration,
-                    layoutOptionsMenuHeight
+                    layoutOptionItemsHeight
                 )
             binding.optionItemsBackground
-                .hideDown(shortAnimationDuration, layoutOptionsMenuHeight)
+                .hideDown(shortAnimationDuration, layoutOptionItemsHeight)
             binding.layoutOptionsContainer
-                .translateDown(shortAnimationDuration, layoutOptionsMenuHeight) {
+                .translateDown(shortAnimationDuration, layoutOptionItemsHeight) {
                     showKeyboard(view, inputMethodManager)
                 }
-            layoutOptionsMenuIsShown = false
+            layoutOptionItemsIsShown = false
         } else if (hasFocus && !keyboardShown) {
             showKeyboard(view, inputMethodManager)
         }
@@ -78,11 +81,20 @@ class DiaryWritingFragment: Fragment() {
         when(view.id) {
             R.id.image_camera_item -> MediaHelper.photoHelper.dispatchImageCaptureIntent(this)
             R.id.image_photo_item -> MediaHelper.photoHelper.dispatchImagePickerIntent(this, false)
-            R.id.image_photo_library_item -> MediaHelper.photoHelper.dispatchImagePickerIntent(this, true)
+            R.id.image_photo_library_item -> MediaHelper.photoHelper.dispatchImagePickerIntent(
+                this,
+                true
+            )
             R.id.image_video_item -> MediaHelper.videoHelper.dispatchVideoPickerIntent(this, false)
-            R.id.image_video_library_item -> MediaHelper.videoHelper.dispatchVideoPickerIntent(this, true)
+            R.id.image_video_library_item -> MediaHelper.videoHelper.dispatchVideoPickerIntent(
+                this,
+                true
+            )
             R.id.image_audio_item -> MediaHelper.audioHelper.dispatchAudioPickerIntent(this, false)
-            R.id.image_audio_library_item -> MediaHelper.audioHelper.dispatchAudioPickerIntent(this, true)
+            R.id.image_audio_library_item -> MediaHelper.audioHelper.dispatchAudioPickerIntent(
+                this,
+                true
+            )
         }
     }
 
@@ -120,18 +132,19 @@ class DiaryWritingFragment: Fragment() {
         viewModel.mediaArrayList.observe(viewLifecycleOwner, { mediaArrayList ->
             when (viewModel.action) {
                 DiaryWritingViewModel.Action.UNINITIALIZED -> {
-                    binding.recyclerViewMedia.apply {
-                        adapter = MediaAdapter(R.layout.item_media, mediaArrayList) {
+                    mediaAdapter = MediaAdapter(R.layout.item_media, mediaArrayList).apply {
+                        setItemClickListener {
+                            viewModel.selectedItemPosition = getSelectedPosition()
                             when(it.type) {
-                                MediaHelper.MediaType.PHOTO -> {
-                                    val imageUri = bitmapToImageFile(requireContext(), requireNotNull(it.bitmap), ORIGIN_BITMAP_IMAGE_FILE)?.toUri()
-                                    imageUri?.let { uri -> navigateToPhotoEditorFragment(uri) } ?: run {
-                                        showToast(requireContext(), getString(R.string.failed_to_open_editor))
-                                    }
+                                MediaHelper.MediaType.PHOTO -> navigateToPhotoEditorFragment(it.uri)
+                                else -> {
+                                    // TODO: Throw class cast exception
                                 }
-                                // TODO: else throw class cast exception.
                             }
                         }
+                    }
+                    binding.recyclerViewMedia.apply {
+                        adapter = mediaAdapter
                         layoutManager = GridLayoutManagerWrapper(requireContext(), 1).apply {
                             orientation = LinearLayoutManager.HORIZONTAL
                         }
@@ -139,7 +152,7 @@ class DiaryWritingFragment: Fragment() {
                     viewModel.action = DiaryWritingViewModel.Action.INITIALIZED
                 }
                 DiaryWritingViewModel.Action.ADDED -> {
-                    binding.recyclerViewMedia.adapter?.notifyItemInserted(viewModel.mediaArrayListSize - 1)
+                    mediaAdapter.notifyItemInserted(viewModel.mediaArrayListSize - 1)
                 }
             }
         })
@@ -158,7 +171,7 @@ class DiaryWritingFragment: Fragment() {
             requireContext(),
             resources.getDimension(R.dimen.dimen_layout_options_height) / resources.displayMetrics.density
         )
-        layoutOptionsMenuHeight = convertDpToPx(
+        layoutOptionItemsHeight = convertDpToPx(
             requireContext(),
             resources.getDimension(R.dimen.dimen_layout_option_items_height) / resources.displayMetrics.density
         )
@@ -171,14 +184,14 @@ class DiaryWritingFragment: Fragment() {
 
         binding.frameLayoutDropdown.setOnClickListener {
             when {
-                layoutOptionsMenuIsShown -> {
+                layoutOptionItemsIsShown -> {
                     binding.layoutOptionItems
-                        .hideDown(shortAnimationDuration, layoutOptionsMenuHeight)
+                        .hideDown(shortAnimationDuration, layoutOptionItemsHeight)
                     binding.optionItemsBackground
-                        .hideDown(mediumAnimationDuration, layoutOptionsMenuHeight)
+                        .hideDown(mediumAnimationDuration, layoutOptionItemsHeight)
                     binding.layoutOptionsContainer
-                        .translateDown(mediumAnimationDuration, layoutOptionsMenuHeight)
-                    layoutOptionsMenuIsShown = false
+                        .translateDown(mediumAnimationDuration, layoutOptionItemsHeight)
+                    layoutOptionItemsIsShown = false
                 }
                 layoutOptionsIsShown -> {
                     binding.imageDropdown.rotate(180F, shortAnimationDuration)
@@ -208,21 +221,6 @@ class DiaryWritingFragment: Fragment() {
             binding.lifecycleOwner ?: viewLifecycleOwner,
             object : KeyboardVisibilityEventListener {
                 override fun onVisibilityChanged(isOpen: Boolean) {
-                    /*
-                    if (isOpen && layoutOptionsMenuIsShown) {
-                        binding.layoutOptionsMenu
-                            .hideDownWithFading(
-                                shortAnimationDuration,
-                                layoutOptionsMenuHeight
-                            )
-                        binding.optionsMenuBackground
-                            .hideDown(mediumAnimationDuration, layoutOptionsMenuHeight)
-                        binding.layoutOptionsContainer
-                            .translateDown(mediumAnimationDuration, layoutOptionsMenuHeight)
-                        layoutOptionsMenuIsShown = false
-                    }
-
-                     */
                     if (!isOpen) {
                         binding.editTextTitle.clearFocus()
                         binding.editTextContent.clearFocus()
@@ -231,6 +229,16 @@ class DiaryWritingFragment: Fragment() {
                     keyboardShown = isOpen
                 }
             })
+
+        findNavController().currentBackStackEntry
+            ?.savedStateHandle?.get<Uri>(PhotoEditorFragment.KEY_EDITED_IMAGE_URI)
+            ?.let { uri ->
+                findNavController().currentBackStackEntry?.savedStateHandle
+                    ?.remove<Uri>(PhotoEditorFragment.KEY_EDITED_IMAGE_URI)
+                viewModel.selectedItemPosition?.let { position ->
+                    mediaAdapter.changeImageUri(position, uri)
+                }
+            }
 
         return binding.root
     }
@@ -288,59 +296,82 @@ class DiaryWritingFragment: Fragment() {
         if (resultCode == RESULT_OK) {
             when(requestCode) {
                 MediaHelper.REQUEST_IMAGE_CAPTURE -> {
-                    val bitmap =
-                        viewModel.getCurrentPhotoBitmap()?.setConfigure(Bitmap.Config.ARGB_8888)
-                    bitmap?.let { MediaModel(MediaModel.Type.PHOTO, it, MediaHelper.photoHelper.getCurrentPhotoPath()) }
-                        ?.let { addMedia(it) }
-                        ?: run {
-                            showToast(requireContext(), getString(R.string.failed_to_load_image))
-                        }
+                    viewModel.getCurrentImageUri()?.let {
+                        MediaModel(MediaModel.Type.PHOTO, it)
+                    }?.let { addMedia(it) } ?: run {
+                        showToast(requireContext(), getString(R.string.failed_to_load_image))
+                    }
                 }
                 MediaHelper.REQUEST_IMAGE_PICK -> {
                     if (data?.clipData != null) {
-                        var imageUri: Uri?
                         for (i in 0 until (data.clipData?.itemCount ?: 0)) {
-                            imageUri = data.clipData?.getItemAt(i)?.uri
-                            getBitmap(imageUri)?.let { MediaModel(MediaModel.Type.PHOTO, it) }
-                                ?.let {
-                                    addMedia(
-                                        it
-                                    )
+                            data.clipData?.getItemAt(i)?.uri?.let { uri ->
+                                PhotoHelper.createImageFile(requireContext(), i.toString())?.let {
+                                    copyFile(requireContext(), uri, it)?.let { uri ->
+                                        addMedia(MediaModel(MediaModel.Type.PHOTO, uri))
+                                    } ?: run {
+                                        showToast(requireContext(), getString(R.string.failed_to_load_image))
+                                    }
+                                } ?: run {
+                                    showToast(requireContext(), getString(R.string.failed_to_load_image))
                                 }
+                            }
                         }
                     } else if (data?.data != null) {
-                        val imageUri = data.data
-                        getBitmap(imageUri)?.let { MediaModel(MediaModel.Type.PHOTO, it) }?.let {
-                            addMedia(
-                                it
-                            )
+                        data.data?.let { uri ->
+                            PhotoHelper.createImageFile(requireContext())?.let {
+                                copyFile(requireContext(), uri, it)?.let {
+                                    addMedia(MediaModel(MediaModel.Type.PHOTO, uri))
+                                } ?: run {
+                                    showToast(requireContext(), getString(R.string.failed_to_load_image))
+                                }
+                            } ?: run {
+                                showToast(requireContext(), getString(R.string.failed_to_load_image))
+                            }
+                        } ?: run {
+                            showToast(requireContext(), getString(R.string.failed_to_load_image))
                         }
                     }
-                    (binding.recyclerViewMedia.adapter as MediaAdapter).smoothScrollToEnd()
+
+                    mediaAdapter.smoothScrollToEnd()
                 }
                 MediaHelper.REQUEST_VIDEO_PICK -> {
                     if (data?.clipData != null) {
-                        var videoUri: Uri?
                         for (i in 0 until (data.clipData?.itemCount ?: 0)) {
-                            videoUri = data.clipData?.getItemAt(i)?.uri
-                            addMedia(MediaModel(MediaHelper.MediaType.VIDEO, videoUri = videoUri))
+                            data.clipData?.getItemAt(i)?.uri?.let { videoUri ->
+                                addMedia(MediaModel(MediaHelper.MediaType.VIDEO, uri = videoUri))
+                            } ?: run {
+                                // TODO: Change Message Image -> VIDEO
+                                showToast(requireContext(), getString(R.string.failed_to_load_image))
+                            }
                         }
                     } else if (data?.data != null) {
-                        val videoUri = data.data
-                        addMedia(MediaModel(MediaHelper.MediaType.VIDEO, videoUri = videoUri))
+                        data.data?.let { videoUri ->
+                            addMedia(MediaModel(MediaHelper.MediaType.VIDEO, uri = videoUri))
+                        } ?: run {
+                            // TODO: Change Message Image -> Video
+                            showToast(requireContext(), getString(R.string.failed_to_load_image))
+                        }
                     }
                 }
                 MediaHelper.REQUEST_CODE_DRAW -> {
-                    val result= data?.getByteArrayExtra("bitmap")
+                    val result = data?.getByteArrayExtra("bitmap")
                     val bitmap = result?.size?.let { BitmapFactory.decodeByteArray(result, 0, it) }
-                    bitmap?.let { addMedia(MediaModel(MediaHelper.MediaType.PHOTO, it)) } ?: run {
-                        showToast(requireContext(), getString(R.string.failed_to_save_image))
+                    bitmap?.let {
+                        PhotoHelper.saveBitmapToFile(requireContext(), it)?.toUri()?.let { uri ->
+                            addMedia(MediaModel(MediaHelper.MediaType.PHOTO, uri))
+                        } ?: run {
+                            showToast(requireContext(), getString(R.string.failed_to_load_image))
+                        }
+                    } ?: run {
+                        showToast(requireContext(), getString(R.string.failed_to_load_image))
                     }
                 }
             }
         }
     }
 
+    /*
     private fun getBitmap(imageUri: Uri?): Bitmap? {
         try {
             imageUri?.let {
@@ -369,6 +400,7 @@ class DiaryWritingFragment: Fragment() {
             return null
         }
     }
+     */
 
     private fun addMedia(media: MediaModel) {
         if (!recyclerViewMediaIsShown)
@@ -392,22 +424,22 @@ class DiaryWritingFragment: Fragment() {
         binding.layoutAudioOptionItems.visibility = View.GONE
         binding.layoutTextOptionItems.visibility = View.GONE
 
-        if (!layoutOptionsMenuIsShown) {
+        if (!layoutOptionItemsIsShown) {
             binding.layoutOptionsContainer.translateUp(
                 shortAnimationDuration,
-                layoutOptionsMenuHeight
+                layoutOptionItemsHeight
             )
 
             binding.optionItemsBackground.showUp(
                 shortAnimationDuration,
-                layoutOptionsMenuHeight
+                layoutOptionItemsHeight
             )
 
             binding.layoutOptionItems.showUp(
                 mediumAnimationDuration,
-                layoutOptionsMenuHeight
+                layoutOptionItemsHeight
             )
-            layoutOptionsMenuIsShown = true
+            layoutOptionItemsIsShown = true
         }
 
         when(view.id) {
@@ -419,13 +451,18 @@ class DiaryWritingFragment: Fragment() {
     }
 
     private fun navigateToPhotoEditorFragment(uri: Uri) {
-        findNavController().navigate(DiaryWritingFragmentDirections.actionDiaryWritingFragmentToPhotoEditorFragment(uri))
-    }
+        if (layoutOptionItemsIsShown) {
+            binding.layoutOptionItems
+                .hideDownWithFading(
+                    shortAnimationDuration,
+                    layoutOptionItemsHeight
+                )
 
-    companion object {
-        const val ORIGIN_BITMAP_IMAGE_FILE = "OriginBitmapImageFile"
+            layoutOptionItemsIsShown = false
+        }
+
+        findNavController().navigate(
+            DiaryWritingFragmentDirections.actionDiaryWritingFragmentToPhotoEditorFragment(uri)
+        )
     }
 }
-
-fun Bitmap.setConfigure(config: Bitmap.Config): Bitmap = this.copy(config, true)
-

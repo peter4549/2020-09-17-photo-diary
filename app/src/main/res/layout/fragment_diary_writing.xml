@@ -468,7 +468,7 @@
                         android:layout_marginTop="0.5dp"
                         android:contentDescription="@string/set_text_color"
                         android:scaleType="fitCenter"
-                        android:src="@drawable/ic_square_26"
+                        android:src="@drawable/ic_square_24"
                         app:tint="@color/colorTextOptionItemsUnselected"/>
                 </LinearLayout>
 

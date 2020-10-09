@@ -4,17 +4,21 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.pm.ActivityInfo
+import android.content.pm.PackageManager
+import android.database.Cursor
 import android.graphics.*
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
-import android.os.Environment
+import android.provider.MediaStore
 import android.util.AttributeSet
 import android.util.DisplayMetrics
 import android.view.Surface
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bumptech.glide.Glide
@@ -28,15 +32,13 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.duke.elliot.kim.kotlin.photodiary.R
-import com.duke.elliot.kim.kotlin.photodiary.diary.media.media_helper.MediaHelper
-import com.duke.elliot.kim.kotlin.photodiary.diary.media.media_helper.PhotoHelper
-import com.duke.elliot.kim.kotlin.photodiary.diary.media.photo_editor.PhotoEditorFragment
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
+import java.io.OutputStream
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -262,42 +264,43 @@ fun lockActivityOrientation(activity: Activity) {
         return
 
     when (rotation) {
-        Surface.ROTATION_90 -> if (width > height) activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+        Surface.ROTATION_90 -> if (width > height) activity.requestedOrientation =
+            ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
         else activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT
-        Surface.ROTATION_180 -> if (height > width) activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT
+        Surface.ROTATION_180 -> if (height > width) activity.requestedOrientation =
+            ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT
         else activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE
-        Surface.ROTATION_270 -> if (width > height) activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE
+        Surface.ROTATION_270 -> if (width > height) activity.requestedOrientation =
+            ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE
         else activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         else -> if (height > width) activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         else activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
     }
 }
 
-fun bitmapToImageFile(context: Context, bitmap: Bitmap, fileName: String): File? {
-    val imageFile: File? = try {
-        MediaHelper.photoHelper.createImageFile(context,
-            fileName
-        )
-    } catch (e: IOException) {
-        return null
-    }
-
-    var outputStream: FileOutputStream? = null
-
+fun copyFile(context: Context, sourceUri: Uri, destinationFile: File): Uri? {
+    val inputStream = context.contentResolver?.openInputStream(sourceUri) ?: return null
+    val outputStream: OutputStream = FileOutputStream(destinationFile)
     try {
-        outputStream = FileOutputStream(imageFile)
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
-    } catch (e: Exception) {
-        e.printStackTrace()
-        return null
-    } finally {
         try {
-            outputStream?.close()
+            val buffer = ByteArray(1024)
+            var size: Int
+
+            while (inputStream.read(buffer).also { size = it } > 0)
+                outputStream.write(buffer, 0, size)
         } catch (e: IOException) {
             e.printStackTrace()
+        } finally {
+            outputStream.close()
         }
+    } catch (e: IOException) {
+        e.printStackTrace()
+    } finally {
+        outputStream.close()
+        return destinationFile.toUri()
     }
-
-    return imageFile
 }
 
+fun hasPermissions(context: Context, permissionRequired: Array<String>) = permissionRequired.all {
+    ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
+}
