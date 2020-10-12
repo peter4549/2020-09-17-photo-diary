@@ -54,33 +54,6 @@ class DiaryWritingViewModel: ViewModel() {
 
     fun getCurrentImageUri() = PhotoHelper.getCurrentImageUri()
 
-    fun deleteTempJpegFiles(context: Context) {
-        CoroutineScope(Dispatchers.IO).launch {
-            val tempJpegFileNames = arrayOf(
-                PhotoEditorFragment.PHOTO_EDITOR_IMAGE_FILE_NAME,
-                SimpleCropViewFragment.SIMPLE_CROP_VIEW_IMAGE_FILE_NAME
-            )
-            val picturesDirectory = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-            val files = picturesDirectory?.listFiles()?.filter {
-                it.name.endsWith(".jpg") && (
-                        it.name.startsWith(tempJpegFileNames[0])
-                                || it.name.startsWith(tempJpegFileNames[1])
-                        )
-            }?.filterNotNull()
-
-            if (files != null) {
-                for (file in files) {
-                    if (file.exists()) {
-                        if (file.delete())
-                            Timber.d("File deleted: ${file.name}")
-                        else
-                            Timber.e("Failed to delete file: ${file.name}")
-                    }
-                }
-            }
-        }
-    }
-
     // TODO: ListAdapter를 사용한 업데이트 로직으로 변경 해볼것. 다만 그리드 레이아웃도 가능한지 확인 필요. 되는것으로 확인!
     object Action {
         const val UNINITIALIZED = 0

@@ -23,13 +23,13 @@ import com.bumptech.glide.request.target.Target
 import com.duke.elliot.kim.kotlin.photodiary.R
 import com.duke.elliot.kim.kotlin.photodiary.databinding.FragmentSimpleCropViewBinding
 import com.duke.elliot.kim.kotlin.photodiary.diary.media.media_helper.PhotoHelper
-import com.duke.elliot.kim.kotlin.photodiary.utility.lockActivityOrientation
-import com.duke.elliot.kim.kotlin.photodiary.utility.showToast
+import com.duke.elliot.kim.kotlin.photodiary.utility.*
 import com.isseiaoki.simplecropview.CropImageView
 
 class SimpleCropViewFragment: Fragment() {
 
     private lateinit var binding: FragmentSimpleCropViewBinding
+    private lateinit var progressDialogFragment: ProgressDialogFragment
     private val frameColors = arrayOf(
         R.color.colorSimpleCropViewFrameWhite,
         R.color.colorSimpleCropViewFrameBlue,
@@ -72,6 +72,8 @@ class SimpleCropViewFragment: Fragment() {
             container,
             false
         )
+
+        progressDialogFragment = ProgressDialogFragment.instance
 
         val simpleCropViewFragmentArgs by navArgs<SimpleCropViewFragmentArgs>()
         imageUri = simpleCropViewFragmentArgs.imageUri // TODO 얘도 save arg에 추가할 것.
@@ -162,26 +164,29 @@ class SimpleCropViewFragment: Fragment() {
     }
 
     private fun cropImage() {
-        val cropped = binding.cropImageView.croppedBitmap
-        cropped?.let { bitmap ->
+        progressDialogFragment.show(requireActivity().supportFragmentManager, tag)
+        val croppedBitmap = binding.cropImageView.croppedBitmap
+        croppedBitmap?.let { bitmap ->
             val imageUri = PhotoHelper.bitmapToTempImageFile(
                 requireContext(),
                 bitmap,
                 SIMPLE_CROP_VIEW_IMAGE_FILE_NAME
             )?.toUri()
+            progressDialogFragment.dismiss()
             findNavController().previousBackStackEntry?.savedStateHandle?.set(
-                KEY_CROPPED_BITMAP_URI,
+                KEY_CROPPED_IMAGE_URI,
                 imageUri
             )
             findNavController().popBackStack()
         } ?: run {
+            progressDialogFragment.dismiss()
             showToast(requireContext(), getString(R.string.failed_to_save_image))
             findNavController().popBackStack()
         }
     }
 
     companion object {
-        const val KEY_CROPPED_BITMAP_URI = "key_cropped_bitmap_uri"
+        const val KEY_CROPPED_IMAGE_URI = "key_cropped_image_uri"
         const val SIMPLE_CROP_VIEW_IMAGE_FILE_NAME = "simple_crop_view_image_"
     }
 }

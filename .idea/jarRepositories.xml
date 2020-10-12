@@ -36,5 +36,20 @@
       <option name="name" value="maven2" />
       <option name="url" value="http://oss.jfrog.org/artifactory/oss-snapshot-local/" />
     </remote-repository>
+    <remote-repository>
+      <option name="id" value="maven3" />
+      <option name="name" value="maven3" />
+      <option name="url" value="https://google.bintray.com/exoplayer/" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="maven3" />
+      <option name="name" value="maven3" />
+      <option name="url" value="file:$PROJECT_DIR$/%20https:/google.bintray.com/exoplayer/%20" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="maven3" />
+      <option name="name" value="maven3" />
+      <option name="url" value="file:$PROJECT_DIR$/app/%20https:/google.bintray.com/exoplayer/%20" />
+    </remote-repository>
   </component>
 </project>

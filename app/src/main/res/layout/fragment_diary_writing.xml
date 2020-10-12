@@ -55,11 +55,13 @@
                         android:id="@+id/text_date"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:drawablePadding="8dp"
+                        android:drawablePadding="6dp"
                         android:gravity="bottom"
                         android:includeFontPadding="false"
                         android:padding="8dp"
+                        android:textColor="@color/colorTextCalendar"
                         android:textSize="12sp"
+                        android:textStyle="bold"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/toolbar"
@@ -71,11 +73,13 @@
                         android:id="@+id/text_time"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:drawablePadding="8dp"
+                        android:drawablePadding="6dp"
                         android:gravity="bottom"
                         android:includeFontPadding="false"
                         android:padding="8dp"
+                        android:textColor="@color/colorTextCalendar"
                         android:textSize="12sp"
+                        android:textStyle="bold"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/toolbar"
@@ -109,7 +113,6 @@
                     android:id="@+id/recycler_view_media"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="8dp"
                     android:background="@drawable/media_recycler_view_background_rounded_corners"
                     android:visibility="gone"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -147,7 +150,7 @@
             android:id="@+id/layout_options_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/colorOptionItemsBackground"
+            android:background="@color/colorOptionsBackground"
             android:orientation="vertical"
             app:labelVisibilityMode="unlabeled"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -235,7 +238,7 @@
             android:id="@+id/option_items_background"
             android:layout_width="match_parent"
             android:layout_height="@dimen/dimen_layout_option_items_height"
-            android:background="@color/colorOptionItemsBackground"
+            android:background="@color/colorOptionsBackground"
             android:clickable="true"
             android:focusable="true"
             android:orientation="horizontal"
@@ -279,7 +282,7 @@
                     android:layout_marginTop="2dp"
                     android:contentDescription="@string/camera"
                     android:src="@drawable/ic_sharp_photo_camera_48"
-                    app:tint="@color/colorDefaultThemeDark" />
+                    app:tint="@color/colorTextOptionItemsIcon" />
 
                 <Space
                     android:layout_width="0dp"
@@ -292,7 +295,7 @@
                     android:layout_height="40dp"
                     android:contentDescription="@string/photo"
                     android:src="@drawable/ic_sharp_insert_photo_48"
-                    app:tint="@color/colorDefaultThemeDark" />
+                    app:tint="@color/colorTextOptionItemsIcon" />
 
                 <Space
                     android:layout_width="0dp"
@@ -305,7 +308,7 @@
                     android:layout_height="40dp"
                     android:contentDescription="@string/album"
                     android:src="@drawable/ic_sharp_photo_library_48"
-                    app:tint="@color/colorDefaultThemeDark"/>
+                    app:tint="@color/colorTextOptionItemsIcon"/>
 
                 <Space
                     android:layout_width="0dp"
@@ -332,7 +335,7 @@
                     android:layout_height="40dp"
                     android:contentDescription="@string/video"
                     android:src="@drawable/ic_video_96px"
-                    app:tint="@color/colorDefaultThemeDark" />
+                    app:tint="@color/colorTextOptionItemsIcon" />
 
                 <Space
                     android:layout_width="0dp"
@@ -345,7 +348,7 @@
                     android:layout_height="40dp"
                     android:contentDescription="@string/album"
                     android:src="@drawable/ic_sharp_video_library_48"
-                    app:tint="@color/colorDefaultThemeDark"/>
+                    app:tint="@color/colorTextOptionItemsIcon"/>
 
                 <Space
                     android:layout_width="0dp"
@@ -372,7 +375,7 @@
                     android:layout_height="40dp"
                     android:contentDescription="@string/music"
                     android:src="@drawable/ic_sharp_music_note_40"
-                    app:tint="@color/colorDefaultThemeDark" />
+                    app:tint="@color/colorTextOptionItemsIcon" />
 
                 <Space
                     android:layout_width="0dp"
@@ -385,7 +388,7 @@
                     android:layout_height="40dp"
                     android:contentDescription="@string/album"
                     android:src="@drawable/ic_sharp_library_music_40"
-                    app:tint="@color/colorDefaultThemeDark" />
+                    app:tint="@color/colorTextOptionItemsIcon" />
 
                 <Space
                     android:layout_width="0dp"

@@ -8,7 +8,7 @@ import androidx.fragment.app.DialogFragment
 import com.duke.elliot.kim.kotlin.photodiary.R
 import kotlinx.android.synthetic.main.fragment_ok_cancel_dialog.view.*
 
-class OkCancelDialogFragment(): DialogFragment() {
+class OkCancelDialogFragment: DialogFragment() {
 
     private lateinit var okButtonOnClick: () -> Unit
     private lateinit var title: String

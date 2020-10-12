@@ -20,6 +20,9 @@ import com.duke.elliot.kim.kotlin.photodiary.R
 import com.duke.elliot.kim.kotlin.photodiary.databinding.FragmentTextEditorDialogBinding
 import com.duke.elliot.kim.kotlin.photodiary.diary.media.photo_editor.ColorPickerAdapter.OnColorPickerClickListener
 import com.duke.elliot.kim.kotlin.photodiary.utility.GridLayoutManagerWrapper
+import com.duke.elliot.kim.kotlin.photodiary.utility.crossFadeIn
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener
 
 class TextEditorDialogFragment : DialogFragment() {
     private lateinit var binding: FragmentTextEditorDialogBinding
@@ -33,6 +36,7 @@ class TextEditorDialogFragment : DialogFragment() {
 
     override fun onStart() {
         super.onStart()
+        requireActivity().window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
         setToFullScreen()
     }
 
@@ -40,7 +44,6 @@ class TextEditorDialogFragment : DialogFragment() {
         if (dialog != null) {
             val width = ViewGroup.LayoutParams.MATCH_PARENT
             val height = ViewGroup.LayoutParams.MATCH_PARENT
-            requireActivity().window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
             dialog?.window?.setLayout(width, height)
             dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         }
@@ -67,6 +70,15 @@ class TextEditorDialogFragment : DialogFragment() {
             false
         )
 
+        KeyboardVisibilityEvent.setEventListener(
+            requireActivity(),
+            binding.lifecycleOwner ?: viewLifecycleOwner,
+            object : KeyboardVisibilityEventListener {
+                override fun onVisibilityChanged(isOpen: Boolean) {
+                    binding.root.crossFadeIn(320L)
+                }
+            })
+
         binding.recyclerViewAddTextColorPicker.apply {
             setHasFixedSize(true)
             layoutManager = GridLayoutManagerWrapper(requireContext(), 1).apply {
@@ -91,7 +103,12 @@ class TextEditorDialogFragment : DialogFragment() {
             requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
 
         colorCode = arguments?.getInt(EXTRA_COLOR_CODE) ?: android.R.color.white
+
         inputMethodManager?.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
+
+        binding.editTextAddText.setText(arguments?.getString(EXTRA_INPUT_TEXT))
+        binding.editTextAddText.setTextColor(colorCode)
+        binding.editTextAddText.requestFocus()
 
         binding.textDone.setOnClickListener {
             inputMethodManager?.hideSoftInputFromWindow(view.windowToken, 0)
@@ -101,10 +118,6 @@ class TextEditorDialogFragment : DialogFragment() {
                 textEditor?.onDone(inputText, colorCode)
             }
         }
-
-        binding.editTextAddText.setText(arguments?.getString(EXTRA_INPUT_TEXT))
-        binding.editTextAddText.setTextColor(colorCode)
-        binding.editTextAddText.requestFocus()
     }
 
     fun setOnTextEditorListener(textEditor: TextEditor?) {

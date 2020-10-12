@@ -25,6 +25,7 @@ import androidx.transition.ChangeBounds
 import androidx.transition.TransitionManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.request.RequestListener
@@ -41,9 +42,6 @@ import ja.burhanrashid52.photoeditor.PhotoEditor.OnSaveListener
 import ja.burhanrashid52.photoeditor.PhotoFilter
 import ja.burhanrashid52.photoeditor.SaveSettings
 import ja.burhanrashid52.photoeditor.TextStyleBuilder
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.io.File
 
@@ -59,24 +57,24 @@ class PhotoEditorFragment: Fragment(),
     private lateinit var binding: FragmentPhotoEditorBinding
     private lateinit var brushPropertiesBottomSheetDialogFragment: BrushPropertiesBottomSheetDialogFragment
     private lateinit var emojiBottomSheetDialogFragment: EmojiBottomSheetDialogFragment
+    private lateinit var fileUtilities: FileUtilities
     private lateinit var photoEditor: PhotoEditor
+    private lateinit var progressDialogFragment: ProgressDialogFragment
+    private lateinit var requestPermissionsDialogFragment: OkCancelDialogFragment
+    private lateinit var saveImageDialogFragment: OkCancelDialogFragment
     // private lateinit var stickerBottomSheetDialogFragment: StickerBottomSheetDialogFragment
+    private lateinit var textEditorDialogFragment: TextEditorDialogFragment
     private lateinit var viewModel: PhotoEditorViewModel
     private lateinit var viewModelFactory: PhotoEditorFactory
     private val constraintSet = ConstraintSet()
     private val editingToolRecyclerViewAdapter = EditingToolRecyclerViewAdapter(this)
     private val filterViewAdapter = FilterViewAdapter(this)
+    private var cropped = false
     private var editedImageUri: Uri? = null
+    private var filterSelected = false
     private var isFilterVisible = false
     private var navigationDestination: NavigationDestination? = null
     private var originImageUri: Uri? = null
-
-    private val okCancelDialogFragment = OkCancelDialogFragment().apply {
-        setDialogParameters("이미지 저장", "수정된 이미지를 저장하시겠습니까?") {
-            popBackStackWithSaveImage()
-            this.dismiss()
-        }
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -90,6 +88,8 @@ class PhotoEditorFragment: Fragment(),
             false
         )
 
+        progressDialogFragment = ProgressDialogFragment.instance
+
         val photoEditorFragmentArgs by navArgs<PhotoEditorFragmentArgs>()
         var imageUri = photoEditorFragmentArgs.imageUri
         originImageUri = imageUri
@@ -98,12 +98,15 @@ class PhotoEditorFragment: Fragment(),
             imageUri = editedImageUri
 
         findNavController().currentBackStackEntry
-            ?.savedStateHandle?.get<Uri>(SimpleCropViewFragment.KEY_CROPPED_BITMAP_URI)
+            ?.savedStateHandle?.get<Uri>(SimpleCropViewFragment.KEY_CROPPED_IMAGE_URI)
             ?.let {
                 imageUri = it
                 findNavController().currentBackStackEntry?.savedStateHandle
-                    ?.remove<Uri>(SimpleCropViewFragment.KEY_CROPPED_BITMAP_URI)
+                    ?.remove<Uri>(SimpleCropViewFragment.KEY_CROPPED_IMAGE_URI)
+                cropped = true
             }
+
+        fileUtilities = FileUtilities(requireContext())
 
         viewModelFactory = PhotoEditorFactory()
         viewModel = ViewModelProvider(this, viewModelFactory)[PhotoEditorViewModel::class.java]
@@ -114,6 +117,7 @@ class PhotoEditorFragment: Fragment(),
         viewModel.imageUri.observe(viewLifecycleOwner) {
             Glide.with(requireContext())
                 .load(it)
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
                 .error(R.drawable.ic_sharp_not_interested_112)
                 .fallback(R.drawable.ic_sharp_not_interested_112)
                 .listener(object : RequestListener<Drawable> {
@@ -138,6 +142,7 @@ class PhotoEditorFragment: Fragment(),
                         return false
                     }
                 })
+                .skipMemoryCache(false)
                 .transform(CenterCrop())
                 .into(binding.photoEditorView.source)
         }
@@ -185,6 +190,7 @@ class PhotoEditorFragment: Fragment(),
                     backPressed()
                 }
             }
+
         requireActivity().onBackPressedDispatcher.addCallback(
             viewLifecycleOwner,
             onBackPressedCallback
@@ -192,6 +198,32 @@ class PhotoEditorFragment: Fragment(),
 
         binding.imageClose.setOnClickListener {
             backPressed()
+        }
+
+        binding.imageSave.setOnClickListener {
+            if (!photoEditor.isCacheEmpty || filterSelected || cropped)
+                popBackStackWithSaveImage()
+            else
+                findNavController().popBackStack()
+        }
+
+        saveImageDialogFragment =  OkCancelDialogFragment().apply {
+            setDialogParameters(binding.root.context.getString(R.string.save_image_dialog_fragment_title),
+                binding.root.context.getString(R.string.save_image_dialog_fragment_message)) {
+                popBackStackWithSaveImage()
+                this.dismiss()
+            }
+        }
+
+        requestPermissionsDialogFragment = OkCancelDialogFragment().apply {
+            setDialogParameters(binding.root.context.getString(R.string.permission_request),
+                binding.root.context.getString(R.string.write_external_storage_permission_request_message)) {
+                requestPermissions(
+                    arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                    REQUEST_CODE_WRITE_EXTERNAL_STORAGE
+                )
+                this.dismiss()
+            }
         }
 
         return binding.root
@@ -207,19 +239,32 @@ class PhotoEditorFragment: Fragment(),
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        PhotoHelper.deleteTempJpegFiles(requireContext())
+    }
+
     override fun onToolSelected(toolType: ToolType?) {
         when(toolType) {
             ToolType.BRUSH -> {
                 photoEditor.setBrushDrawingMode(true)
                 binding.textCurrentTool.text = getString(R.string.editing_tool_brush)
+
+                if (brushPropertiesBottomSheetDialogFragment.isAdded)
+                    return
+
                 brushPropertiesBottomSheetDialogFragment.show(
                     requireActivity().supportFragmentManager,
                     brushPropertiesBottomSheetDialogFragment.tag
                 )
             }
             ToolType.TEXT -> {
-                val textEditorDialogFragment =
+                if (::textEditorDialogFragment.isInitialized && textEditorDialogFragment.isAdded)
+                    return
+
+                textEditorDialogFragment =
                     TextEditorDialogFragment.show(requireActivity() as MainActivity)
+
                 textEditorDialogFragment.setOnTextEditorListener(object : TextEditor {
                     override fun onDone(inputText: String?, colorCode: Int) {
                         val styleBuilder = TextStyleBuilder()
@@ -229,6 +274,7 @@ class PhotoEditorFragment: Fragment(),
                     }
                 })
             }
+
             ToolType.ERASER -> {
                 photoEditor.brushEraser()
                 binding.textCurrentTool.setText(R.string.editing_tool_eraser)
@@ -238,6 +284,9 @@ class PhotoEditorFragment: Fragment(),
                 showFilter(true)
             }
             ToolType.EMOJI -> {
+                if (emojiBottomSheetDialogFragment.isAdded)
+                    return
+
                 emojiBottomSheetDialogFragment.show(
                     requireActivity().supportFragmentManager,
                     emojiBottomSheetDialogFragment.tag
@@ -282,7 +331,7 @@ class PhotoEditorFragment: Fragment(),
         }
 
         val changeBounds = ChangeBounds()
-        changeBounds.duration = 400
+        changeBounds.duration = 320
         changeBounds.interpolator = AnticipateOvershootInterpolator(1.0F)
         TransitionManager.beginDelayedTransition(binding.layoutFragmentPhotoEditor, changeBounds)
         constraintSet.applyTo(binding.layoutFragmentPhotoEditor)
@@ -306,6 +355,7 @@ class PhotoEditorFragment: Fragment(),
 
     override fun onFilterSelected(photoFilter: PhotoFilter?) {
         photoEditor.setFilterEffect(photoFilter)
+        filterSelected = true
     }
 
     override fun onEmojiClick(emojiUnicode: String?) {
@@ -326,10 +376,7 @@ class PhotoEditorFragment: Fragment(),
                 Manifest.permission.WRITE_EXTERNAL_STORAGE
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-            requestPermissions(
-                arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
-                REQUEST_CODE_WRITE_EXTERNAL_STORAGE
-            )
+            requestPermissionsDialogFragment.show(requireActivity().supportFragmentManager, tag)
             return
         }
 
@@ -339,8 +386,10 @@ class PhotoEditorFragment: Fragment(),
         ).absolutePath
         editedImageUri = File(filePath).toUri()
 
+        progressDialogFragment.show(requireActivity().supportFragmentManager, tag)
         photoEditor.saveAsFile(filePath, object : OnSaveListener {
             override fun onSuccess(imagePath: String) {
+                progressDialogFragment.dismiss()
                 findNavController()
                     .navigate(
                         PhotoEditorFragmentDirections
@@ -349,7 +398,9 @@ class PhotoEditorFragment: Fragment(),
             }
 
             override fun onFailure(exception: Exception) {
+                progressDialogFragment.dismiss()
                 Timber.e(exception, "Failed to save edited image file")
+                showToast(requireContext(), getString(R.string.failed_to_open_editor))
             }
         })
     }
@@ -358,10 +409,7 @@ class PhotoEditorFragment: Fragment(),
         if (isFilterVisible) {
             showFilter(false)
             binding.textCurrentTool.setText(R.string.edit_photo)
-        } else if (!photoEditor.isCacheEmpty) {
-            // TODO: Implementation - showSaveDialog()
-            // 변경사항 있는 경우인듯. 물어보고 끄기.
-            // findNavController().popBackStack()
+        } else if (!photoEditor.isCacheEmpty || filterSelected || cropped) {
             showEndDialog()
         } else {
             findNavController().popBackStack()
@@ -391,7 +439,7 @@ class PhotoEditorFragment: Fragment(),
     }
 
     private fun showEndDialog() {
-        okCancelDialogFragment.show(requireActivity().supportFragmentManager, tag)
+        saveImageDialogFragment.show(requireActivity().supportFragmentManager, tag)
     }
 
     private fun popBackStackWithSaveImage() {
@@ -402,28 +450,34 @@ class PhotoEditorFragment: Fragment(),
                 Manifest.permission.WRITE_EXTERNAL_STORAGE
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-            requestPermissions(
-                arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
-                REQUEST_CODE_WRITE_EXTERNAL_STORAGE
-            )
+            requestPermissionsDialogFragment.show(requireActivity().supportFragmentManager, tag)
             return
         }
 
         originImageUri?.let { uri ->
-            var path = uri.path ?: return
-            deleteOriginImageFile(path)
-            path = path.replace(".jpg", "_0.jpg")
+            val originImagePath = fileUtilities.getPath(uri) ?: run {
+                showToast(requireContext(), getString(R.string.failed_to_save_image))
+                findNavController().popBackStack()
+                return
+            }
+
+            val fileName = originImagePath.substringBeforeLast(".")
+            val editedImagePath = replaceLast(originImagePath, fileName, "${fileName}0")
 
             val saveSettings = SaveSettings.Builder()
                 .setClearViewsEnabled(true)
                 .setTransparencyEnabled(true)
                 .build()
 
-            photoEditor.saveAsFile(path, saveSettings, object : OnSaveListener {
+            progressDialogFragment.show(requireActivity().supportFragmentManager, tag)
+
+            photoEditor.saveAsFile(editedImagePath, saveSettings, object : OnSaveListener {
                 override fun onSuccess(imagePath: String) {
+                    progressDialogFragment.dismiss()
+                    PhotoHelper.deleteImageFile(originImagePath)
                     findNavController().previousBackStackEntry?.savedStateHandle?.set(
                         KEY_EDITED_IMAGE_URI,
-                        File(path).toUri()
+                        File(editedImagePath).toUri()
                     )
                     findNavController().popBackStack()
                 }
@@ -440,25 +494,13 @@ class PhotoEditorFragment: Fragment(),
         }
     }
 
-    private fun deleteOriginImageFile(path: String) {
-        CoroutineScope(Dispatchers.IO).launch {
-            val file = File(path)
-            if (file.exists()) {
-                if (file.delete())
-                    Timber.d("File deleted: ${file.name}")
-                else
-                    Timber.e("Failed to delete file: ${file.name}")
-            }
-        }
-    }
-
     enum class NavigationDestination {
         TO_SIMPLE_CROP_VIEW_FRAGMENT,
         TO_DIARY_WRITING_FRAGMENT
     }
 
     companion object {
-        const val PHOTO_EDITOR_IMAGE_FILE_NAME = "photo_editor_image_"
         const val KEY_EDITED_IMAGE_URI = "key_edited_image_uri"
+        const val PHOTO_EDITOR_IMAGE_FILE_NAME = "photo_editor_image_"
     }
 }

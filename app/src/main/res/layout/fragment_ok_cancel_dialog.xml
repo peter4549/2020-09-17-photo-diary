@@ -34,6 +34,7 @@
         android:paddingBottom="24dp"
         android:paddingEnd="16dp"
         android:paddingStart="16dp"
+        android:paddingTop="8dp"
         android:textStyle="bold"
         app:autoSizeMaxTextSize="14sp"
         app:autoSizeMinTextSize="12sp"

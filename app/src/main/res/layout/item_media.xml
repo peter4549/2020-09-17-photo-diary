@@ -2,17 +2,52 @@
 <androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
+    android:layout_marginBottom="8dp"
+    android:layout_marginStart="8dp"
+    android:layout_marginTop="8dp"
     android:foreground="?android:attr/selectableItemBackground"
     card_view:cardBackgroundColor="@color/colorMediaRecyclerViewBackground"
     card_view:cardCornerRadius="8dp">
 
     <ImageView
         android:id="@+id/image"
-        android:layout_width="112dp"
-        android:layout_height="112dp"
+        android:layout_width="128dp"
+        android:layout_height="128dp"
         android:contentDescription="@string/media" />
+
+    <ImageView
+        android:id="@+id/image_delete"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_gravity="end|top"
+        android:layout_margin="4dp"
+        android:elevation="2dp"
+        android:src="@drawable/ic_sharp_cancel_24"
+        android:contentDescription="@string/delete"
+        card_view:tint="@color/colorSilver"/>
+
+    <ImageView
+        android:id="@+id/image_play"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_gravity="center"
+        android:elevation="8dp"
+        android:src="@drawable/exo_icon_play"
+        android:visibility="gone"
+        card_view:tint="@color/exo_white_opacity_70"
+        tools:ignore="ContentDescription" />
+
+    <ImageView
+        android:id="@+id/image_audio"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_gravity="center"
+        android:elevation="8dp"
+        android:src="@drawable/ic_sharp_music_note_silver_112"
+        android:visibility="gone"
+        tools:ignore="ContentDescription"/>
 
 </androidx.cardview.widget.CardView>

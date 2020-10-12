@@ -8,7 +8,6 @@ data class MediaModel(val type: Int,
     object Type {
         const val PHOTO = 0
         const val VIDEO = 1
-        const val VOICE_RECORDING = 2
-        const val MUSIC = 3
+        const val AUDIO = 2
     }
 }

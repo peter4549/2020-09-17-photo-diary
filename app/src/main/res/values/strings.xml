@@ -49,9 +49,14 @@
 
     <!-- PhotoEditorFragment -->
     <string name="close">Close</string>
+    <string name="delete">Delete</string>
+    <string name="permission_request">권한 요청</string>
     <string name="redo">Redo</string>
     <string name="save">저장</string>
+    <string name="save_image_dialog_fragment_message">편집된 이미지를 저장하시겠습니까?</string>
+    <string name="save_image_dialog_fragment_title">이미지 저장</string>
     <string name="undo">Undo</string>
+    <string name="write_external_storage_permission_request_message">편집한 이미지를 저장하려면 외부 저장소 권한이 필요합니다.</string>
 
     <!-- Editing Tools -->
     <string name="editing_tool_brush">브러시</string>
@@ -79,5 +84,7 @@
     <string name="rotate_right">Rotate right</string>
     <string name="select_color">색상 선택</string>
 
+    <string name="failed_to_load_audio">오디오 파일을 로드하지 못했습니다.</string>
     <string name="failed_to_load_image">이미지를 로드하지 못했습니다.</string>
+    <string name="failed_to_load_video">비디오를 로드하지 못했습니다.</string>
 </resources>

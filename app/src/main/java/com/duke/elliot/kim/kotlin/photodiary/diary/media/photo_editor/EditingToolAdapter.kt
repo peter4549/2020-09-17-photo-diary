@@ -48,7 +48,9 @@ class EditingToolRecyclerViewAdapter(private val onItemSelected: OnItemSelected)
         var textTool: TextView = itemView.findViewById(R.id.text_tool_name)
 
         init {
-            itemView.setOnClickListener { onItemSelected.onToolSelected(tools[layoutPosition].toolType) }
+            itemView.setOnClickListener {
+                onItemSelected.onToolSelected(tools[layoutPosition].toolType)
+            }
         }
     }
 

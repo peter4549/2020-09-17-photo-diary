@@ -30,6 +30,18 @@ fun View.hideDownWithFading(duration: Number, height: Float) {
     }
 }
 
+fun View.crossFadeIn(duration: Number) {
+    this.apply {
+        alpha = 0F
+        visibility = View.VISIBLE
+
+        animate()
+            .alpha(1F)
+            .setDuration(duration.toLong())
+            .setListener(null)
+    }
+}
+
 fun View.hideDown(duration: Number) {
     this.apply {
         translationY = 0F

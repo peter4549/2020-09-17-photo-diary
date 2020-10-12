@@ -67,7 +67,7 @@ open class BaseRecyclerViewAdapter<T: Any?>(private val layoutId: Int,
         }
     }
 
-    fun remove(position: Int) {
+    open fun remove(position: Int) {
         items.removeAt(position)
         CoroutineScope(Dispatchers.IO).launch {
             launch(Dispatchers.Main) {

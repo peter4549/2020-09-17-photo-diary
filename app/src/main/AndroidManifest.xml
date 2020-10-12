@@ -29,6 +29,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".diary.media.media_helper.VideoPlayerActivity" />
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="com.duke.elliot.kim.kotlin.photodiary.fileprovider"

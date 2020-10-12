@@ -10,6 +10,9 @@
         <item name="android:textViewStyle">@style/TextViewStyle</item>
 
         <item name="android:dropDownListViewStyle">@style/SpinnerStyle</item>
+
+        <item name="android:fontFamily">@font/font_family_nanum_barun_gothic</item>
+        <item name="fontFamily">@font/font_family_nanum_barun_gothic</item>
     </style>
 
     <style name="ButtonStyle" parent="@android:style/Widget.DeviceDefault.Button.Borderless">

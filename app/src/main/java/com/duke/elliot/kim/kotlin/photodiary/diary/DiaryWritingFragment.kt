@@ -27,16 +27,24 @@ import com.duke.elliot.kim.kotlin.photodiary.diary.media.MediaAdapter
 import com.duke.elliot.kim.kotlin.photodiary.diary.media.MediaModel
 import com.duke.elliot.kim.kotlin.photodiary.diary.media.media_helper.MediaHelper
 import com.duke.elliot.kim.kotlin.photodiary.diary.media.media_helper.PhotoHelper
+import com.duke.elliot.kim.kotlin.photodiary.diary.media.media_helper.VideoPlayerActivity
 import com.duke.elliot.kim.kotlin.photodiary.diary.media.photo_editor.PhotoEditorFragment
 import com.duke.elliot.kim.kotlin.photodiary.utility.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent.setEventListener
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener
+import java.text.SimpleDateFormat
+import java.util.*
 
 class DiaryWritingFragment: Fragment() {
 
     private lateinit var binding: FragmentDiaryWritingBinding
+    private lateinit var fileUtilities: FileUtilities
     private lateinit var inputMethodManager: InputMethodManager
     private lateinit var mediaAdapter: MediaAdapter
+    private lateinit var progressDialogFragment: ProgressDialogFragment
     private lateinit var viewModel: DiaryWritingViewModel
     private lateinit var viewModelFactory: DiaryWritingViewModelFactory
     private var keyboardShown = false
@@ -91,10 +99,7 @@ class DiaryWritingFragment: Fragment() {
                 true
             )
             R.id.image_audio_item -> MediaHelper.audioHelper.dispatchAudioPickerIntent(this, false)
-            R.id.image_audio_library_item -> MediaHelper.audioHelper.dispatchAudioPickerIntent(
-                this,
-                true
-            )
+            R.id.image_audio_library_item -> MediaHelper.audioHelper.dispatchAudioContentPickerIntent(this)
         }
     }
 
@@ -112,10 +117,13 @@ class DiaryWritingFragment: Fragment() {
 
         initializeToolbar(binding.toolbar)
 
+        progressDialogFragment = ProgressDialogFragment.instance
+
         // val scoreFragmentArgs by navArgs<ScoreFragmentArgs>() TODO 여기서 다이어리 정보 전달 받을 것. 팩토리로전달.
         viewModelFactory = DiaryWritingViewModelFactory(null) // null 나중에 대체되야함.
         viewModel = ViewModelProvider(viewModelStore, viewModelFactory)[DiaryWritingViewModel::class.java]
 
+        fileUtilities = FileUtilities(requireContext())
         initializeSpinners()
         inputMethodManager = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         hideKeyboard(binding.root, inputMethodManager)
@@ -137,11 +145,15 @@ class DiaryWritingFragment: Fragment() {
                             viewModel.selectedItemPosition = getSelectedPosition()
                             when(it.type) {
                                 MediaHelper.MediaType.PHOTO -> navigateToPhotoEditorFragment(it.uri)
+                                MediaHelper.MediaType.VIDEO -> startVideoPlayerActivity(it.uri)
+                                MediaHelper.MediaType.AUDIO -> { /* play audio */ }
                                 else -> {
                                     // TODO: Throw class cast exception
                                 }
                             }
                         }
+
+                        setFileUtilities(fileUtilities)
                     }
                     binding.recyclerViewMedia.apply {
                         adapter = mediaAdapter
@@ -152,7 +164,7 @@ class DiaryWritingFragment: Fragment() {
                     viewModel.action = DiaryWritingViewModel.Action.INITIALIZED
                 }
                 DiaryWritingViewModel.Action.ADDED -> {
-                    mediaAdapter.notifyItemInserted(viewModel.mediaArrayListSize - 1)
+                    mediaAdapter.notifyItemInserted(viewModel.mediaArrayListSize)
                 }
             }
         })
@@ -296,39 +308,73 @@ class DiaryWritingFragment: Fragment() {
         if (resultCode == RESULT_OK) {
             when(requestCode) {
                 MediaHelper.REQUEST_IMAGE_CAPTURE -> {
-                    viewModel.getCurrentImageUri()?.let {
-                        MediaModel(MediaModel.Type.PHOTO, it)
-                    }?.let { addMedia(it) } ?: run {
+                    progressDialogFragment.show(requireActivity().supportFragmentManager, tag)
+                    @Suppress("SpellCheckingInspection")
+                    viewModel.getCurrentImageUri()?.let { uri ->
+                        CoroutineScope(Dispatchers.Main).launch {
+                            fileUtilities.copyFileToInternalStorage(uri)?.let { copiedUri ->
+                                progressDialogFragment.dismiss()
+                                addMedia(MediaModel(MediaModel.Type.PHOTO, copiedUri))
+                            } ?: run {
+                                progressDialogFragment.dismiss()
+                                showToast(
+                                    requireContext(),
+                                    getString(R.string.failed_to_load_image)
+                                )
+                            }
+                        }
+                    } ?: run {
+                        progressDialogFragment.dismiss()
                         showToast(requireContext(), getString(R.string.failed_to_load_image))
                     }
                 }
                 MediaHelper.REQUEST_IMAGE_PICK -> {
                     if (data?.clipData != null) {
-                        for (i in 0 until (data.clipData?.itemCount ?: 0)) {
+                        progressDialogFragment.show(requireActivity().supportFragmentManager, tag)
+                        @Suppress("SpellCheckingInspection")
+                        val timestamp: String = SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault()).format(Date())
+                        val totalItemCount = data.clipData?.itemCount ?: 0
+                        var itemCount = 0
+                        for (i in 0 until totalItemCount) {
                             data.clipData?.getItemAt(i)?.uri?.let { uri ->
-                                PhotoHelper.createImageFile(requireContext(), i.toString())?.let {
-                                    copyFile(requireContext(), uri, it)?.let { uri ->
-                                        addMedia(MediaModel(MediaModel.Type.PHOTO, uri))
+                                CoroutineScope(Dispatchers.Main).launch {
+                                    fileUtilities.copyFileToInternalStorage(
+                                        uri,
+                                        suffix = "_${timestamp}"
+                                    )?.let { copiedUri ->
+                                        itemCount += 1
+                                        if (itemCount >= totalItemCount)
+                                            progressDialogFragment.dismiss()
+                                        addMedia(MediaModel(MediaModel.Type.PHOTO, copiedUri))
                                     } ?: run {
-                                        showToast(requireContext(), getString(R.string.failed_to_load_image))
+                                        itemCount += 1
+                                        if (itemCount >= totalItemCount)
+                                            progressDialogFragment.dismiss()
+                                        showToast(
+                                            requireContext(),
+                                            getString(R.string.failed_to_load_image)
+                                        )
                                     }
-                                } ?: run {
-                                    showToast(requireContext(), getString(R.string.failed_to_load_image))
                                 }
                             }
                         }
                     } else if (data?.data != null) {
+                        progressDialogFragment.show(requireActivity().supportFragmentManager, tag)
                         data.data?.let { uri ->
-                            PhotoHelper.createImageFile(requireContext())?.let {
-                                copyFile(requireContext(), uri, it)?.let {
-                                    addMedia(MediaModel(MediaModel.Type.PHOTO, uri))
+                            CoroutineScope(Dispatchers.Main).launch {
+                                fileUtilities.copyFileToInternalStorage(uri)?.let { copiedUri ->
+                                    progressDialogFragment.dismiss()
+                                    addMedia(MediaModel(MediaModel.Type.PHOTO, copiedUri))
                                 } ?: run {
-                                    showToast(requireContext(), getString(R.string.failed_to_load_image))
+                                    progressDialogFragment.dismiss()
+                                    showToast(
+                                        requireContext(),
+                                        getString(R.string.failed_to_load_image)
+                                    )
                                 }
-                            } ?: run {
-                                showToast(requireContext(), getString(R.string.failed_to_load_image))
                             }
                         } ?: run {
+                            progressDialogFragment.dismiss()
                             showToast(requireContext(), getString(R.string.failed_to_load_image))
                         }
                     }
@@ -337,33 +383,135 @@ class DiaryWritingFragment: Fragment() {
                 }
                 MediaHelper.REQUEST_VIDEO_PICK -> {
                     if (data?.clipData != null) {
-                        for (i in 0 until (data.clipData?.itemCount ?: 0)) {
+                        progressDialogFragment.show(requireActivity().supportFragmentManager, tag)
+                        val totalItemCount = data.clipData?.itemCount ?: 0
+                        var itemCount = 0
+                        for (i in 0 until totalItemCount) {
                             data.clipData?.getItemAt(i)?.uri?.let { videoUri ->
-                                addMedia(MediaModel(MediaHelper.MediaType.VIDEO, uri = videoUri))
+                                CoroutineScope(Dispatchers.Main).launch {
+                                    fileUtilities.copyFileToInternalStorage(videoUri)
+                                        ?.let { copiedUri ->
+                                            itemCount += 1
+                                            if (itemCount >= totalItemCount)
+                                                progressDialogFragment.dismiss()
+                                            addMedia(
+                                                MediaModel(
+                                                    MediaHelper.MediaType.VIDEO,
+                                                    uri = copiedUri
+                                                )
+                                            )
+                                        } ?: run {
+                                        itemCount += 1
+                                        if (itemCount >= totalItemCount)
+                                            progressDialogFragment.dismiss()
+                                        showToast(
+                                            requireContext(),
+                                            getString(R.string.failed_to_load_video)
+                                        )
+                                    }
+                                }
                             } ?: run {
                                 // TODO: Change Message Image -> VIDEO
-                                showToast(requireContext(), getString(R.string.failed_to_load_image))
+                                progressDialogFragment.dismiss()
+                                showToast(requireContext(), getString(R.string.failed_to_load_video))
                             }
                         }
                     } else if (data?.data != null) {
                         data.data?.let { videoUri ->
-                            addMedia(MediaModel(MediaHelper.MediaType.VIDEO, uri = videoUri))
-                        } ?: run {
-                            // TODO: Change Message Image -> Video
-                            showToast(requireContext(), getString(R.string.failed_to_load_image))
+                            progressDialogFragment.show(
+                                requireActivity().supportFragmentManager,
+                                tag
+                            )
+                            CoroutineScope(Dispatchers.Main).launch {
+                                fileUtilities.copyFileToInternalStorage(videoUri)
+                                    ?.let { copiedUri ->
+                                        progressDialogFragment.dismiss()
+                                        addMedia(
+                                            MediaModel(
+                                                MediaHelper.MediaType.VIDEO,
+                                                uri = copiedUri
+                                            )
+                                        )
+                                    } ?: run {
+                                    progressDialogFragment.dismiss()
+                                    showToast(
+                                        requireContext(),
+                                        getString(R.string.failed_to_load_video)
+                                    )
+                                }
+                            }
                         }
                     }
+
+                    mediaAdapter.smoothScrollToEnd()
+                }
+                MediaHelper.REQUEST_AUDIO_PICK -> {
+                    if (data?.clipData != null) {
+                        progressDialogFragment.show(requireActivity().supportFragmentManager, tag)
+                        @Suppress("SpellCheckingInspection")
+                        val timestamp: String = SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault()).format(Date())
+                        val totalItemCount = data.clipData?.itemCount ?: 0
+                        var itemCount = 0
+                        for (i in 0 until totalItemCount) {
+                            data.clipData?.getItemAt(i)?.uri?.let { uri ->
+                                CoroutineScope(Dispatchers.Main).launch {
+                                    fileUtilities.copyFileToInternalStorage(
+                                        uri,
+                                        suffix = "_${timestamp}"
+                                    )?.let { copiedUri ->
+                                        itemCount += 1
+                                        if (itemCount >= totalItemCount)
+                                            progressDialogFragment.dismiss()
+                                        addMedia(MediaModel(MediaModel.Type.AUDIO, copiedUri))
+                                    } ?: run {
+                                        itemCount += 1
+                                        if (itemCount >= totalItemCount)
+                                            progressDialogFragment.dismiss()
+                                        showToast(
+                                            requireContext(),
+                                            getString(R.string.failed_to_load_audio)
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    } else if (data?.data != null) {
+                        progressDialogFragment.show(requireActivity().supportFragmentManager, tag)
+                        data.data?.let { uri ->
+                            CoroutineScope(Dispatchers.Main).launch {
+                                fileUtilities.copyFileToInternalStorage(uri)?.let { copiedUri ->
+                                    progressDialogFragment.dismiss()
+                                    addMedia(MediaModel(MediaModel.Type.AUDIO, copiedUri))
+                                } ?: run {
+                                    progressDialogFragment.dismiss()
+                                    showToast(
+                                        requireContext(),
+                                        getString(R.string.failed_to_load_audio)
+                                    )
+                                }
+                            }
+                        } ?: run {
+                            progressDialogFragment.dismiss()
+                            showToast(requireContext(), getString(R.string.failed_to_load_audio))
+                        }
+                    }
+
+                    mediaAdapter.smoothScrollToEnd()
                 }
                 MediaHelper.REQUEST_CODE_DRAW -> {
                     val result = data?.getByteArrayExtra("bitmap")
                     val bitmap = result?.size?.let { BitmapFactory.decodeByteArray(result, 0, it) }
+                    progressDialogFragment.show(requireActivity().supportFragmentManager, tag)
                     bitmap?.let {
                         PhotoHelper.saveBitmapToFile(requireContext(), it)?.toUri()?.let { uri ->
+                            progressDialogFragment.dismiss()
                             addMedia(MediaModel(MediaHelper.MediaType.PHOTO, uri))
                         } ?: run {
+                            progressDialogFragment.dismiss()
                             showToast(requireContext(), getString(R.string.failed_to_load_image))
                         }
                     } ?: run {
+                        progressDialogFragment.dismiss()
                         showToast(requireContext(), getString(R.string.failed_to_load_image))
                     }
                 }
@@ -371,40 +519,11 @@ class DiaryWritingFragment: Fragment() {
         }
     }
 
-    /*
-    private fun getBitmap(imageUri: Uri?): Bitmap? {
-        try {
-            imageUri?.let {
-                return if (Build.VERSION.SDK_INT < 28) {
-                    @Suppress("DEPRECATION")
-                    MediaStore.Images.Media.getBitmap(
-                        requireContext().contentResolver,
-                        imageUri
-                    ).setConfigure(Bitmap.Config.ARGB_8888)
-                } else {
-                    val source =
-                        ImageDecoder.createSource(
-                            requireActivity().contentResolver,
-                            imageUri
-                        )
-                    ImageDecoder.decodeBitmap(source)
-                        .setConfigure(Bitmap.Config.ARGB_8888)
-                }
-            } ?: run {
-                showToast(requireContext(), getString(R.string.image_not_found))
-                return null
-            }
-        } catch (e: Exception) {
-            showToast(requireContext(), getString(R.string.failed_to_load_image))
-            e.printStackTrace()
-            return null
-        }
-    }
-     */
-
     private fun addMedia(media: MediaModel) {
-        if (!recyclerViewMediaIsShown)
-            binding.recyclerViewMedia.visibility = View.VISIBLE
+        if (!recyclerViewMediaIsShown) {
+            binding.recyclerViewMedia.crossFadeIn(200L)
+            recyclerViewMediaIsShown = true
+        }
 
         viewModel.addMedia(media)
     }
@@ -415,7 +534,7 @@ class DiaryWritingFragment: Fragment() {
 
     override fun onDestroy() {
         super.onDestroy()
-        viewModel.deleteTempJpegFiles(requireContext())
+        PhotoHelper.deleteTempJpegFiles(requireContext())
     }
 
     private fun showOptionsMenu(view: View) {
@@ -464,5 +583,15 @@ class DiaryWritingFragment: Fragment() {
         findNavController().navigate(
             DiaryWritingFragmentDirections.actionDiaryWritingFragmentToPhotoEditorFragment(uri)
         )
+    }
+
+    private fun startVideoPlayerActivity(uri: Uri) {
+        startActivity(Intent(requireContext(), VideoPlayerActivity::class.java).apply {
+            putExtra(EXTRA_VIDEO_URI, uri.toString())
+        })
+    }
+
+    companion object {
+        const val EXTRA_VIDEO_URI = "extra_video_uri"
     }
 }

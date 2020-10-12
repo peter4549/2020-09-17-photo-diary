@@ -5,12 +5,10 @@ import android.app.Activity
 import android.content.Context
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
-import android.database.Cursor
 import android.graphics.*
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
-import android.provider.MediaStore
 import android.util.AttributeSet
 import android.util.DisplayMetrics
 import android.view.Surface
@@ -18,7 +16,6 @@ import android.widget.ImageView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
-import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bumptech.glide.Glide
@@ -35,10 +32,7 @@ import com.duke.elliot.kim.kotlin.photodiary.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
-import java.io.OutputStream
+import java.lang.StringBuilder
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -102,7 +96,6 @@ fun setImage(imageView: ImageView, bitmap: Bitmap, loadFailedCallback: (() -> Un
 fun setImage(imageView: ImageView, uri: Uri, loadFailedCallback: (() -> Unit)? = null) {
     Glide.with(imageView.context)
         .load(uri)
-        .disallowHardwareConfig()
         .diskCacheStrategy(DiskCacheStrategy.NONE)
         .error(R.drawable.ic_sharp_not_interested_112)
         .fallback(R.drawable.ic_sharp_not_interested_112)
@@ -138,29 +131,6 @@ fun getCurrentDateString(): String = SimpleDateFormat("yyyy년 M월 d일 EEEE", 
     Date()
 )
 fun getCurrentTimeString(): String = SimpleDateFormat("aa h:m", Locale.getDefault()).format(Date())
-
-
-fun showProgress(fragment: Fragment) {
-    val progressDialogFragment: ProgressDialogFragment = ProgressDialogFragment.instance
-    fragment.requireActivity().supportFragmentManager
-        .beginTransaction()
-        .add(progressDialogFragment, PROGRESS_DIALOG).commitAllowingStateLoss()
-}
-
-fun dismissProgress(fragment: Fragment) {
-    if (!fragment.isResumed)
-        return
-    val fragmentManager = fragment.activity?.supportFragmentManager ?: return
-
-    val progressDialogFragment: ProgressDialogFragment? =
-        fragmentManager.findFragmentByTag(PROGRESS_DIALOG) as? ProgressDialogFragment
-
-    if (progressDialogFragment != null) {
-        fragmentManager.beginTransaction()
-            .remove(progressDialogFragment)
-            .commitAllowingStateLoss()
-    }
-}
 
 fun Drawable.setColorFilter(color: Int, mode: Mode = Mode.SRC_ATOP) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -278,29 +248,12 @@ fun lockActivityOrientation(activity: Activity) {
     }
 }
 
-fun copyFile(context: Context, sourceUri: Uri, destinationFile: File): Uri? {
-    val inputStream = context.contentResolver?.openInputStream(sourceUri) ?: return null
-    val outputStream: OutputStream = FileOutputStream(destinationFile)
-    try {
-        try {
-            val buffer = ByteArray(1024)
-            var size: Int
-
-            while (inputStream.read(buffer).also { size = it } > 0)
-                outputStream.write(buffer, 0, size)
-        } catch (e: IOException) {
-            e.printStackTrace()
-        } finally {
-            outputStream.close()
-        }
-    } catch (e: IOException) {
-        e.printStackTrace()
-    } finally {
-        outputStream.close()
-        return destinationFile.toUri()
-    }
-}
-
 fun hasPermissions(context: Context, permissionRequired: Array<String>) = permissionRequired.all {
     ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
+}
+
+fun replaceLast(string: String, oldString: String, newString: String): String {
+    val stringBuilder = StringBuilder(string)
+    stringBuilder.replace(string.lastIndexOf(oldString), string.lastIndexOf(oldString) + oldString.length, newString)
+    return stringBuilder.toString()
 }

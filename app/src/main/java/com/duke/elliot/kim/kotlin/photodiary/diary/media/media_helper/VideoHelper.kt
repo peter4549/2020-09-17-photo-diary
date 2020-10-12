@@ -1,8 +1,15 @@
 package com.duke.elliot.kim.kotlin.photodiary.diary.media.media_helper
 
+import android.content.Context
 import android.content.Intent
 import androidx.fragment.app.Fragment
 import com.duke.elliot.kim.kotlin.photodiary.R
+import timber.log.Timber
+import java.io.File
+import java.io.FileNotFoundException
+import java.io.IOException
+import java.text.SimpleDateFormat
+import java.util.*
 
 object VideoHelper {
 
@@ -16,6 +23,27 @@ object VideoHelper {
                 Intent.createChooser(videoPickerIntent, fragment.getString(
                 R.string.select_album)), MediaHelper.REQUEST_VIDEO_PICK
             )
+        }
+    }
+
+    fun createVideoFile(context: Context, suffix: String = ""): File? {
+        try {
+            @Suppress("SpellCheckingInspection")
+            val timestamp: String = SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault()).format(
+                Date()
+            )
+            val path = File(context.filesDir, "videos")
+
+            if (!path.exists())
+                path.mkdirs()
+
+            return File(path, "JPEG_${timestamp}$suffix.jpg")
+        } catch (e: FileNotFoundException) {
+            Timber.e(e)
+            return null
+        } catch (e: IOException) {
+            Timber.e(e)
+            return null
         }
     }
 }

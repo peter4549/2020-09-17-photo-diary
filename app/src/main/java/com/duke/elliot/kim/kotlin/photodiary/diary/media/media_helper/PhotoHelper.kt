@@ -3,7 +3,6 @@ package com.duke.elliot.kim.kotlin.photodiary.diary.media.media_helper
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.net.Uri
 import android.os.Environment
@@ -12,6 +11,11 @@ import androidx.core.content.FileProvider
 import androidx.exifinterface.media.ExifInterface
 import androidx.fragment.app.Fragment
 import com.duke.elliot.kim.kotlin.photodiary.R
+import com.duke.elliot.kim.kotlin.photodiary.diary.media.photo_editor.PhotoEditorFragment
+import com.duke.elliot.kim.kotlin.photodiary.diary.media.simple_crop_view.SimpleCropViewFragment
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.io.File
 import java.io.FileNotFoundException
@@ -56,7 +60,7 @@ object PhotoHelper {
         }
     }
 
-    fun createImageFile(context: Context, suffix: String = ""): File? {
+    private fun createImageFile(context: Context, suffix: String = ""): File? {
         try {
             @Suppress("SpellCheckingInspection")
             val timestamp: String = SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault()).format(Date())
@@ -65,7 +69,7 @@ object PhotoHelper {
             if (!path.exists())
                 path.mkdirs()
 
-            return File(path, "JPEG_${timestamp}_$suffix.jpg")
+            return File(path, "JPEG_${timestamp}$suffix.jpg")
         } catch (e: FileNotFoundException) {
             Timber.e(e)
             return null
@@ -86,12 +90,18 @@ object PhotoHelper {
         }
     }
 
-    fun getCurrentPhotoBitmap(): Bitmap? {
-        val photoFile = File(currentPhotoPath)
-        return if (photoFile.exists())
-            BitmapFactory.decodeFile(photoFile.absolutePath).rotate(currentPhotoPath)
-        else
-            null
+    fun deleteImageFile(path: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            val file = File(path)
+            if (file.exists()) {
+                if (file.delete())
+                    Timber.d("File deleted: ${file.name}")
+                else
+                    Timber.e("Failed to delete file: ${file.name}")
+            } else {
+                Timber.e("File not found: ${file.name}")
+            }
+        }
     }
 
     fun dispatchImagePickerIntent(fragment: Fragment, getContent: Boolean) {
@@ -134,33 +144,9 @@ object PhotoHelper {
         }
     }
 
-    fun overrideBitmapToFile(bitmap: Bitmap, imageUri: Uri): File? {
-        try {
-            imageUri.path?.let { path ->
-                val outputFile = File(path)
-                val outputStream = FileOutputStream(outputFile)
-
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
-                outputStream.close()
-
-                return outputFile
-            } ?: run {
-                return null
-            }
-        } catch (e: FileNotFoundException) {
-            Timber.e(e)
-            return null
-        } catch (e: IOException) {
-            Timber.e(e)
-            return null
-        }
-    }
-
     fun bitmapToTempImageFile(context: Context, bitmap: Bitmap, fileName: String): File? {
         val imageFile: File? = try {
-            MediaHelper.photoHelper.createTempImageFile(context,
-                fileName
-            )
+            createTempImageFile(context, fileName)
         } catch (e: IOException) {
             return null
         }
@@ -182,6 +168,33 @@ object PhotoHelper {
         }
 
         return imageFile
+    }
+
+    fun deleteTempJpegFiles(context: Context) {
+        CoroutineScope(Dispatchers.IO).launch {
+            val tempJpegFileNames = arrayOf(
+                PhotoEditorFragment.PHOTO_EDITOR_IMAGE_FILE_NAME,
+                SimpleCropViewFragment.SIMPLE_CROP_VIEW_IMAGE_FILE_NAME
+            )
+            val picturesDirectory = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+            val files = picturesDirectory?.listFiles()?.filter {
+                it.name.endsWith(".jpg") && (
+                        it.name.startsWith(tempJpegFileNames[0])
+                                || it.name.startsWith(tempJpegFileNames[1])
+                        )
+            }?.filterNotNull()
+
+            if (files != null) {
+                for (file in files) {
+                    if (file.exists()) {
+                        if (file.delete())
+                            Timber.d("File deleted: ${file.name}")
+                        else
+                            Timber.e("Failed to delete file: ${file.name}")
+                    }
+                }
+            }
+        }
     }
 }
 
