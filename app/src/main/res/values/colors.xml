@@ -17,6 +17,10 @@
     <color name="colorTextDisabledDark">@color/colorSilver</color>
     <color name="colorTextEnabledDark">@color/colorBlueGrey900</color>
 
+    <color name="colorDialogText">@color/colorGhostWhite</color>
+    <color name="colorDialogBackgroundDark">@color/colorSemiBlackTransparent</color>
+    <color name="colorDialogBackgroundLight">@color/colorGhostWhite</color>
+
     <color name="colorOptionsBackground">@color/colorGhostWhite</color>
     <color name="colorOptionItemsBackground">@color/colorGhostWhite</color>
     <color name="colorFragmentBackgroundForBorder">@color/colorSilver</color>
@@ -26,8 +30,8 @@
     <color name="colorMediaRecyclerViewBackground">#40F8F8FF</color>
     <color name="colorSpinnerDivider">@color/colorSilver</color>
     <color name="colorTextOptionItemsIcon">@color/colorSilver</color>
-    <color name="colorTextOptionItemsSelected">@color/colorGrey700</color>
-    <color name="colorTextOptionItemsUnselected">@color/colorGrey600</color>
+    <color name="colorTextOptionItemsSelected">@color/colorGrey600</color>
+    <color name="colorTextOptionItemsUnselected">@color/colorSilver</color>
     <color name="colorTextViewBackground">@color/colorGhostWhite</color>
     <color name="colorToolbarBackground">@color/colorDefaultThemeDark</color>
     <color name="colorToolbarTitle">@color/colorWhite</color>
@@ -70,8 +74,6 @@
     <color name="colorBlueGrey500">#607D8B</color>
 
     <color name="colorDefaultBackgroundBlack">#151414</color>
-
-    <color name="colorDialogBackground">@color/colorGhostWhite</color>
 
     <!-- SimpleCropView -->
     <color name="colorSimpleCropViewWindowBackground">@color/colorDefaultBackgroundBlack</color>

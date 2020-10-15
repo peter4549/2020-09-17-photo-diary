@@ -14,7 +14,7 @@ import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.util.Util
 
 
-class VideoPlayerActivity: AppCompatActivity() {
+class ExoPlayerActivity: AppCompatActivity() {
     private lateinit var binding: ActivityVideoPlayerBinding
     private var currentWindow = 0
     private var playbackPosition = 0L
@@ -43,7 +43,7 @@ class VideoPlayerActivity: AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         if (Util.SDK_INT >= 24) {
-            val uriString = intent?.extras?.getString(DiaryWritingFragment.EXTRA_VIDEO_URI)
+            val uriString = intent?.extras?.getString(DiaryWritingFragment.EXTRA_MEDIA_URI)
             if (uriString != null) {
                 initializePlayer(uriString)
             }
@@ -54,7 +54,7 @@ class VideoPlayerActivity: AppCompatActivity() {
         super.onResume()
         hideSystemUi()
         if (Util.SDK_INT < 24) {
-            val uriString = intent?.extras?.getString(DiaryWritingFragment.EXTRA_VIDEO_URI)
+            val uriString = intent?.extras?.getString(DiaryWritingFragment.EXTRA_MEDIA_URI)
             if (uriString != null) {
                 initializePlayer(uriString)
             }

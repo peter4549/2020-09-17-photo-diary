@@ -16,7 +16,6 @@ import android.widget.ImageView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
@@ -35,8 +34,6 @@ import kotlinx.coroutines.launch
 import java.lang.StringBuilder
 import java.text.SimpleDateFormat
 import java.util.*
-
-const val PROGRESS_DIALOG = "ProgressDialog"
 
 @Suppress("unused")
 class GridLayoutManagerWrapper: GridLayoutManager {
@@ -96,6 +93,40 @@ fun setImage(imageView: ImageView, bitmap: Bitmap, loadFailedCallback: (() -> Un
 fun setImage(imageView: ImageView, uri: Uri, loadFailedCallback: (() -> Unit)? = null) {
     Glide.with(imageView.context)
         .load(uri)
+        .diskCacheStrategy(DiskCacheStrategy.NONE)
+        .error(R.drawable.ic_sharp_not_interested_112)
+        .fallback(R.drawable.ic_sharp_not_interested_112)
+        .listener(object : RequestListener<Drawable> {
+            override fun onLoadFailed(
+                e: GlideException?,
+                model: Any?,
+                target: Target<Drawable>?,
+                isFirstResource: Boolean
+            ): Boolean {
+                e?.printStackTrace()
+                loadFailedCallback?.invoke()
+                return false
+            }
+
+            override fun onResourceReady(
+                resource: Drawable?,
+                model: Any?,
+                target: Target<Drawable>?,
+                dataSource: DataSource?,
+                isFirstResource: Boolean
+            ): Boolean {
+                return false
+            }
+        })
+        .skipMemoryCache(false)
+        .transform(CenterCrop(), RoundedCorners(8))
+        .transition(DrawableTransitionOptions.withCrossFade())
+        .into(imageView)
+}
+
+fun setImage(imageView: ImageView, drawableId: Int, loadFailedCallback: (() -> Unit)? = null) {
+    Glide.with(imageView.context)
+        .load(drawableId)
         .diskCacheStrategy(DiskCacheStrategy.NONE)
         .error(R.drawable.ic_sharp_not_interested_112)
         .fallback(R.drawable.ic_sharp_not_interested_112)

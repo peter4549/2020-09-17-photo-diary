@@ -13,7 +13,8 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/colorDefaultThemeLight">
+        android:background="@color/colorDefaultThemeLight"
+        android:theme="@style/Theme.MaterialComponents.Light.NoActionBar">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
@@ -472,7 +473,7 @@
                         android:contentDescription="@string/set_text_color"
                         android:scaleType="fitCenter"
                         android:src="@drawable/ic_square_24"
-                        app:tint="@color/colorTextOptionItemsUnselected"/>
+                        app:tint="@color/colorTextEnabledDark"/>
                 </LinearLayout>
 
                 <LinearLayout
@@ -488,14 +489,12 @@
                     <Spinner
                         android:id="@+id/spinner_font"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@null" />
+                        android:layout_height="wrap_content" />
 
                     <Spinner
                         android:id="@+id/spinner_text_size"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@null"/>
+                        android:layout_height="wrap_content" />
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>

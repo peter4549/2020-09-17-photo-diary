@@ -34,14 +34,14 @@
     <string name="text_align_right">오른쪽 정렬</string>
     <string name="underline">Underline</string>
     <string-array name="fonts">
-        <item>나눔바른고딕</item>
-        <item>나눔바른펜</item>
-        <item>나눔손글씨 붓</item>
-        <item>나눔고딕</item>
-        <item>나눔명조</item>
-        <item>나눔손글씨 펜</item>
-        <item>나눔스퀘어</item>
-        <item>나눔스퀘어라운드</item>
+        <item>나눔바른고딕</item>  <!-- 0 -->
+        <item>나눔바른펜</item>  <!-- 1 -->
+        <item>나눔손글씨 붓</item>  <!-- 2 -->
+        <item>나눔고딕</item>  <!-- 3 -->
+        <item>나눔명조</item>  <!-- 4 -->
+        <item>나눔손글씨 펜</item>  <!-- 5 -->
+        <item>나눔스퀘어</item>  <!-- 6 -->
+        <item>나눔스퀘어라운드</item>  <!-- 7 -->
     </string-array>
 
     <!-- TabFragment -->
@@ -73,6 +73,8 @@
     <string name="filter">Filter</string>
     <string name="opacity">불투명도</string>
     <string name="size">크기</string>
+
+    <string name="select_text_color">텍스트 색상 선택</string>
 
     <!-- SimpleCropView -->
     <string name="fit_image">FIT IMAGE</string>

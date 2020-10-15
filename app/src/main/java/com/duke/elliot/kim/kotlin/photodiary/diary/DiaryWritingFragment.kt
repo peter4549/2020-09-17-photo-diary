@@ -4,16 +4,18 @@ import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
+import android.graphics.PorterDuff
+import android.graphics.Typeface
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.view.inputmethod.InputMethodManager
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.net.toUri
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -25,11 +27,13 @@ import com.duke.elliot.kim.kotlin.photodiary.R
 import com.duke.elliot.kim.kotlin.photodiary.databinding.FragmentDiaryWritingBinding
 import com.duke.elliot.kim.kotlin.photodiary.diary.media.MediaAdapter
 import com.duke.elliot.kim.kotlin.photodiary.diary.media.MediaModel
+import com.duke.elliot.kim.kotlin.photodiary.diary.media.media_helper.ExoPlayerActivity
 import com.duke.elliot.kim.kotlin.photodiary.diary.media.media_helper.MediaHelper
 import com.duke.elliot.kim.kotlin.photodiary.diary.media.media_helper.PhotoHelper
-import com.duke.elliot.kim.kotlin.photodiary.diary.media.media_helper.VideoPlayerActivity
 import com.duke.elliot.kim.kotlin.photodiary.diary.media.photo_editor.PhotoEditorFragment
 import com.duke.elliot.kim.kotlin.photodiary.utility.*
+import com.skydoves.colorpickerview.ColorPickerDialog
+import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -55,6 +59,13 @@ class DiaryWritingFragment: Fragment() {
     private var mediumAnimationDuration = 0
     private var recyclerViewMediaIsShown = false
     private var shortAnimationDuration = 0
+
+    private var textAlignment = Gravity.START
+    private var textColor = 0
+    private var textFont: Typeface? = null
+    private var textSize = 12F
+    private var textStyleBold = false
+    private var textStyleItalic = false
 
     private val optionsOnClickListener = View.OnClickListener { view ->
         when (view.id) {
@@ -99,7 +110,166 @@ class DiaryWritingFragment: Fragment() {
                 true
             )
             R.id.image_audio_item -> MediaHelper.audioHelper.dispatchAudioPickerIntent(this, false)
-            R.id.image_audio_library_item -> MediaHelper.audioHelper.dispatchAudioContentPickerIntent(this)
+            R.id.image_audio_library_item -> MediaHelper.audioHelper.dispatchAudioContentPickerIntent(
+                this
+            )
+        }
+    }
+
+    private val textOptionItemsOnClickListener = View.OnClickListener { view ->
+        when(view.id) {
+            R.id.image_bold -> {
+                binding.editTextTitle.typeface = null
+                binding.editTextContent.typeface = null
+                if (textStyleBold) {
+                    if (textStyleItalic) {
+                        binding.editTextTitle.setTypeface(textFont, Typeface.ITALIC)
+                        binding.editTextContent.setTypeface(textFont, Typeface.ITALIC)
+                    } else {
+                        binding.editTextTitle.setTypeface(textFont, Typeface.NORMAL)
+                        binding.editTextContent.setTypeface(textFont, Typeface.NORMAL)
+                    }
+                } else {
+                    if (textStyleItalic) {
+                        binding.editTextTitle.setTypeface(
+                            textFont,
+                            Typeface.BOLD_ITALIC
+                        )
+                        binding.editTextContent.setTypeface(
+                            textFont,
+                            Typeface.BOLD_ITALIC
+                        )
+                    } else {
+                        binding.editTextTitle.setTypeface(textFont, Typeface.BOLD)
+                        binding.editTextContent.setTypeface(textFont, Typeface.BOLD)
+                    }
+                }
+
+                textStyleBold = !textStyleBold
+                binding.imageBold.setColorFilter(
+                    if (textStyleBold)
+                        ContextCompat.getColor(
+                            requireContext(),
+                            R.color.colorTextOptionItemsSelected
+                        )
+                    else
+                        ContextCompat.getColor(
+                            requireContext(),
+                            R.color.colorTextOptionItemsUnselected
+                        ),
+                    PorterDuff.Mode.SRC_IN
+                )
+            }
+            R.id.image_italic -> {
+                if (textStyleItalic) {
+                    if (textStyleBold) {
+                        binding.editTextTitle.setTypeface(textFont, Typeface.BOLD)
+                        binding.editTextContent.setTypeface(textFont, Typeface.BOLD)
+                    } else {
+                        binding.editTextTitle.setTypeface(textFont, Typeface.NORMAL)
+                        binding.editTextContent.setTypeface(textFont, Typeface.NORMAL)
+                    }
+                } else {
+                    if (textStyleBold) {
+                        binding.editTextTitle.setTypeface(
+                            binding.editTextTitle.typeface,
+                            Typeface.BOLD_ITALIC
+                        )
+                        binding.editTextContent.setTypeface(
+                            binding.editTextContent.typeface,
+                            Typeface.BOLD_ITALIC
+                        )
+                    } else {
+                        binding.editTextTitle.setTypeface(textFont, Typeface.ITALIC)
+                        binding.editTextContent.setTypeface(textFont, Typeface.ITALIC)
+                    }
+                }
+
+                textStyleItalic = !textStyleItalic
+                binding.imageItalic.setColorFilter(
+                    if (textStyleItalic)
+                        ContextCompat.getColor(
+                            requireContext(),
+                            R.color.colorTextOptionItemsSelected
+                        )
+                    else
+                        ContextCompat.getColor(
+                            requireContext(),
+                            R.color.colorTextOptionItemsUnselected
+                        ),
+                    PorterDuff.Mode.SRC_IN
+                )
+            }
+            R.id.image_button_text_align_center -> {
+                binding.imageButtonTextAlignCenter.setColorFilter(
+                    ContextCompat.getColor(requireContext(), R.color.colorTextOptionItemsSelected),
+                    PorterDuff.Mode.SRC_IN
+                )
+                binding.imageButtonTextAlignLeft.setColorFilter(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.colorTextOptionItemsUnselected
+                    ),
+                    PorterDuff.Mode.SRC_IN
+                )
+                binding.imageButtonTextAlignRight.setColorFilter(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.colorTextOptionItemsUnselected
+                    ),
+                    PorterDuff.Mode.SRC_IN
+                )
+
+                binding.editTextContent.gravity = Gravity.CENTER_HORIZONTAL
+                textAlignment = Gravity.CENTER_HORIZONTAL
+            }
+            R.id.image_button_text_align_left -> {
+                binding.imageButtonTextAlignCenter.setColorFilter(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.colorTextOptionItemsUnselected
+                    ),
+                    PorterDuff.Mode.SRC_IN
+                )
+                binding.imageButtonTextAlignLeft.setColorFilter(
+                    ContextCompat.getColor(requireContext(), R.color.colorTextOptionItemsSelected),
+                    PorterDuff.Mode.SRC_IN
+                )
+                binding.imageButtonTextAlignRight.setColorFilter(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.colorTextOptionItemsUnselected
+                    ),
+                    PorterDuff.Mode.SRC_IN
+                )
+                binding.editTextContent.gravity = Gravity.START
+                textAlignment = Gravity.START
+            }
+            R.id.image_button_text_align_right -> {
+                binding.imageButtonTextAlignCenter.setColorFilter(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.colorTextOptionItemsUnselected
+                    ),
+                    PorterDuff.Mode.SRC_IN
+                )
+                binding.imageButtonTextAlignLeft.setColorFilter(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.colorTextOptionItemsUnselected
+                    ),
+                    PorterDuff.Mode.SRC_IN
+                )
+                binding.imageButtonTextAlignRight.setColorFilter(
+                    ContextCompat.getColor(requireContext(), R.color.colorTextOptionItemsSelected),
+                    PorterDuff.Mode.SRC_IN
+                )
+                binding.editTextContent.gravity = Gravity.END
+                textAlignment = Gravity.END
+            }
+            R.id.image_text_color -> {
+                showColorPickerDialog()
+            }
         }
     }
 
@@ -114,6 +284,14 @@ class DiaryWritingFragment: Fragment() {
             container,
             false
         )
+
+
+        // TODO: set font
+        textFont = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+            requireContext().resources.getFont(R.font.nanum_barun_pen_regular)
+        else ResourcesCompat.getFont(requireContext(), R.font.nanum_barun_pen_regular)
+
+        binding.editTextContent.typeface = textFont
 
         initializeToolbar(binding.toolbar)
 
@@ -143,10 +321,10 @@ class DiaryWritingFragment: Fragment() {
                     mediaAdapter = MediaAdapter(R.layout.item_media, mediaArrayList).apply {
                         setItemClickListener {
                             viewModel.selectedItemPosition = getSelectedPosition()
-                            when(it.type) {
+                            when (it.type) {
                                 MediaHelper.MediaType.PHOTO -> navigateToPhotoEditorFragment(it.uri)
-                                MediaHelper.MediaType.VIDEO -> startVideoPlayerActivity(it.uri)
-                                MediaHelper.MediaType.AUDIO -> { /* play audio */ }
+                                MediaHelper.MediaType.VIDEO -> startExoPlayerActivity(it.uri)
+                                MediaHelper.MediaType.AUDIO -> startExoPlayerActivity(it.uri)
                                 else -> {
                                     // TODO: Throw class cast exception
                                 }
@@ -227,6 +405,7 @@ class DiaryWritingFragment: Fragment() {
         binding.imageText.setOnClickListener(optionsOnClickListener)
 
         initializeOptionItems()
+        initializeTextItems()
 
         setEventListener(
             requireActivity(),
@@ -272,19 +451,32 @@ class DiaryWritingFragment: Fragment() {
     }
 
     private fun initializeSpinners() {
-        ArrayAdapter.createFromResource(
-            requireContext(),
-            R.array.fonts,
-            R.layout.item_spinner
-        ).also { adapter ->
-            binding.spinnerFont.adapter = adapter
-        }
-
-        val fontSizes = arrayOf(
-            12, 14, 16, 18, 20, 22, 24
+        binding.spinnerFont.adapter = FontSpinnerAdapter(
+            requireContext(), resources.getStringArray(R.array.fonts)
         )
+
         binding.spinnerTextSize.adapter =
-            ArrayAdapter(requireContext(), R.layout.item_spinner, fontSizes)
+           ArrayAdapter(requireContext(), R.layout.item_spinner, arrayOf(12, 14, 16, 18, 20, 22, 24))
+
+        binding.spinnerFont.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+                TODO("Not yet implemented")
+            }
+
+            override fun onNothingSelected(p0: AdapterView<*>?) {
+                TODO("Not yet implemented")
+            }
+
+        }
+    }
+
+    private fun initializeTextItems() {
+        binding.imageBold.setOnClickListener(textOptionItemsOnClickListener)
+        binding.imageItalic.setOnClickListener(textOptionItemsOnClickListener)
+        binding.imageButtonTextAlignCenter.setOnClickListener(textOptionItemsOnClickListener)
+        binding.imageButtonTextAlignLeft.setOnClickListener(textOptionItemsOnClickListener)
+        binding.imageButtonTextAlignRight.setOnClickListener(textOptionItemsOnClickListener)
+        binding.imageTextColor.setOnClickListener(textOptionItemsOnClickListener)
     }
 
     private fun showKeyboard(view: View, inputMethodManager: InputMethodManager) {
@@ -332,7 +524,10 @@ class DiaryWritingFragment: Fragment() {
                     if (data?.clipData != null) {
                         progressDialogFragment.show(requireActivity().supportFragmentManager, tag)
                         @Suppress("SpellCheckingInspection")
-                        val timestamp: String = SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault()).format(Date())
+                        val timestamp: String = SimpleDateFormat(
+                            "yyyyMMddHHmmss",
+                            Locale.getDefault()
+                        ).format(Date())
                         val totalItemCount = data.clipData?.itemCount ?: 0
                         var itemCount = 0
                         for (i in 0 until totalItemCount) {
@@ -413,7 +608,10 @@ class DiaryWritingFragment: Fragment() {
                             } ?: run {
                                 // TODO: Change Message Image -> VIDEO
                                 progressDialogFragment.dismiss()
-                                showToast(requireContext(), getString(R.string.failed_to_load_video))
+                                showToast(
+                                    requireContext(),
+                                    getString(R.string.failed_to_load_video)
+                                )
                             }
                         }
                     } else if (data?.data != null) {
@@ -449,7 +647,10 @@ class DiaryWritingFragment: Fragment() {
                     if (data?.clipData != null) {
                         progressDialogFragment.show(requireActivity().supportFragmentManager, tag)
                         @Suppress("SpellCheckingInspection")
-                        val timestamp: String = SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault()).format(Date())
+                        val timestamp: String = SimpleDateFormat(
+                            "yyyyMMddHHmmss",
+                            Locale.getDefault()
+                        ).format(Date())
                         val totalItemCount = data.clipData?.itemCount ?: 0
                         var itemCount = 0
                         for (i in 0 until totalItemCount) {
@@ -585,13 +786,41 @@ class DiaryWritingFragment: Fragment() {
         )
     }
 
-    private fun startVideoPlayerActivity(uri: Uri) {
-        startActivity(Intent(requireContext(), VideoPlayerActivity::class.java).apply {
-            putExtra(EXTRA_VIDEO_URI, uri.toString())
+    private fun showColorPickerDialog() {
+        ColorPickerDialog.Builder(requireContext())
+            .setTitle(getString(R.string.select_text_color))
+            .setPreferenceName(PREFERENCE_COLOR_PICKER_DIALOG)
+            .setPositiveButton(getString(R.string.ok),
+                ColorEnvelopeListener { envelope, _ ->
+                    val color = envelope.color
+                    binding.imageTextColor.setColorFilter(
+                        color,
+                        PorterDuff.Mode.SRC_IN
+                    )
+                    binding.editTextTitle.setTextColor(color)
+                    binding.editTextContent.setTextColor(color)
+                    textColor = color
+                }
+            )
+            .setNegativeButton(
+                getString(R.string.cancel)
+            ) { dialogInterface, _ ->
+                dialogInterface.dismiss()
+            }
+            .attachAlphaSlideBar(true)
+            .attachBrightnessSlideBar(true)
+            .setBottomSpace(12)
+            .show()
+    }
+
+    private fun startExoPlayerActivity(uri: Uri) {
+        startActivity(Intent(requireContext(), ExoPlayerActivity::class.java).apply {
+            putExtra(EXTRA_MEDIA_URI, uri.toString())
         })
     }
 
     companion object {
-        const val EXTRA_VIDEO_URI = "extra_video_uri"
+        const val EXTRA_MEDIA_URI = "extra_media_uri"
+        const val PREFERENCE_COLOR_PICKER_DIALOG = "photo_diary_preference_color_picker_dialog"
     }
 }

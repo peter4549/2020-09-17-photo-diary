@@ -1,5 +1,8 @@
 package com.duke.elliot.kim.kotlin.photodiary.diary.media
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.view.View
 import com.bumptech.glide.Glide
@@ -19,6 +22,7 @@ class MediaAdapter(layoutId: Int, mediaArrayList: ArrayList<MediaModel>)
     : BaseRecyclerViewAdapter<MediaModel>(layoutId, mediaArrayList) {
 
     private lateinit var fileUtilities: FileUtilities
+    private val coroutineScope = CoroutineScope(Dispatchers.IO)
     private var selectedItemPosition: Int? = null
     private var itemClickListener: ((media: MediaModel) -> Unit)? = null
 
@@ -41,9 +45,29 @@ class MediaAdapter(layoutId: Int, mediaArrayList: ArrayList<MediaModel>)
             }
             MediaHelper.MediaType.AUDIO -> {
                 Glide.with(holder.view.image.context).clear(holder.view.image)
+
+                val mediaMetadataRetriever = MediaMetadataRetriever()
+                val byteArray: ByteArray?
+                val albumArt: Bitmap
+                val bitmapFactoryOptions = BitmapFactory.Options()
+
+                mediaMetadataRetriever.setDataSource(holder.view.context, media.uri)
+                byteArray = mediaMetadataRetriever.embeddedPicture
+
+                byteArray?.size?.let {
+                    albumArt = BitmapFactory.decodeByteArray(
+                        byteArray,
+                        0,
+                        it,
+                        bitmapFactoryOptions
+                    )
+                    setImage(holder.view.image, albumArt)
+                } ?: run {
+                    setImage(holder.view.image, R.drawable.blue_gradation_background)
+                }
+
                 holder.view.image_audio.visibility = View.VISIBLE
-                //setImage
-            } // media.videoUri?.let { setImage(holder.view.image, it) }
+            }
         }
 
         holder.view.setOnClickListener {
@@ -59,7 +83,7 @@ class MediaAdapter(layoutId: Int, mediaArrayList: ArrayList<MediaModel>)
     override fun remove(position: Int) {
         val path = fileUtilities.getPath(items[position].uri)
         super.remove(position)
-        CoroutineScope(Dispatchers.IO).launch {
+        coroutineScope.launch {
             if (path != null)
                 PhotoHelper.deleteImageFile(path)
             else
