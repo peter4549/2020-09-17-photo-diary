@@ -3,26 +3,33 @@ package com.duke.elliot.kim.kotlin.photodiary
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.duke.elliot.kim.kotlin.photodiary.diary.DiaryModel
+import kotlinx.coroutines.*
 
 class MainViewModel: ViewModel() {
+    private val job = Job()
+    private val scope = CoroutineScope(Dispatchers.Main + job)
     var diariesFragmentAction = Action.UNINITIALIZED
     var photosFragmentAction = Action.UNINITIALIZED
 
     val diaries = MutableLiveData<ArrayList<DiaryModel>>()
 
     init {
-        diaries.value = arrayListOf(DiaryModel(date="a",title = "A",content="a",time=0L))
+
     }
 
     fun add(diary: DiaryModel) {
-        if (diariesFragmentAction != Action.UNINITIALIZED)
-            diariesFragmentAction = Action.ADDED
+        scope.launch {
+            withContext(Dispatchers.IO) {
+                if (diariesFragmentAction != Action.UNINITIALIZED)
+                    diariesFragmentAction = Action.ADDED
 
-        if (photosFragmentAction != Action.UNINITIALIZED)
-            photosFragmentAction = Action.ADDED
+                if (photosFragmentAction != Action.UNINITIALIZED)
+                    photosFragmentAction = Action.ADDED
 
-        diaries.value = diaries.value?.apply {
-            add(0, diary)
+                diaries.value = diaries.value?.apply {
+                    add(0, diary)
+                }
+            }
         }
     }
 

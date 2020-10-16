@@ -101,4 +101,6 @@ class MediaAdapter(layoutId: Int, mediaArrayList: ArrayList<MediaModel>)
     fun setItemClickListener(itemClickListener: ((media: MediaModel) -> Unit)) {
         this.itemClickListener = itemClickListener
     }
+
+    fun getUriList() = items.map { it.uri }
 }

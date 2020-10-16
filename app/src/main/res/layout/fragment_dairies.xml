@@ -6,8 +6,8 @@
 
     <data>
         <variable
-            name="mainViewModel"
-            type="com.duke.elliot.kim.kotlin.photodiary.MainViewModel" />
+            name="diariesViewModel"
+            type="com.duke.elliot.kim.kotlin.photodiary.tab.diary.DiariesViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

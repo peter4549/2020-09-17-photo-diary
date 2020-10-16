@@ -1,6 +1,5 @@
 package com.duke.elliot.kim.kotlin.photodiary.diary.media.photo_editor
 
-import android.graphics.Bitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 

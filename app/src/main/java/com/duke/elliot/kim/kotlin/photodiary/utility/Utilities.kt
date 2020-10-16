@@ -16,6 +16,7 @@ import android.widget.ImageView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
@@ -27,6 +28,7 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
+import com.duke.elliot.kim.kotlin.photodiary.MainActivity
 import com.duke.elliot.kim.kotlin.photodiary.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -162,6 +164,12 @@ fun getCurrentDateString(): String = SimpleDateFormat("yyyy년 M월 d일 EEEE", 
     Date()
 )
 fun getCurrentTimeString(): String = SimpleDateFormat("aa h:m", Locale.getDefault()).format(Date())
+
+fun getFont(context: Context, id: Int): Typeface? {
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+        context.resources.getFont(id)
+    else ResourcesCompat.getFont(context, id)
+}
 
 fun Drawable.setColorFilter(color: Int, mode: Mode = Mode.SRC_ATOP) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {

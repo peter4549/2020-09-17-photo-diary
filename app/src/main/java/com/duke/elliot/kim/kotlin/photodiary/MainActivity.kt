@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.duke.elliot.kim.kotlin.photodiary.diary.media.photo_editor.REQUEST_CODE_WRITE_EXTERNAL_STORAGE
 import com.duke.elliot.kim.kotlin.photodiary.fluid_keyboard_resize.FluidContentResize
@@ -28,6 +29,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         setupTimber()
+        setFontNameIdMap()
 
         FluidContentResize.listen(this)
 
@@ -40,26 +42,6 @@ class MainActivity : AppCompatActivity() {
 
         themeColorDark = ContextCompat.getColor(this, R.color.colorDefaultThemeDark)
         themeColorLight = ContextCompat.getColor(this, R.color.colorDefaultThemeLight)
-
-        /*
-        viewModel.diaries.observe(this, { diaries ->
-            when(viewModel.action) {
-                MainViewModel.Action.INITIALIZE -> {
-                    main_recycler_view.apply {
-                        adapter = DiaryRecyclerViewAdapter(diaries)
-                        layoutManager = LinearLayoutManager(this@MainActivity)
-                    }
-                    main_recycler_view.adapter?.notifyDataSetChanged()
-                    viewModel.action = MainViewModel.Action.INITIALIZED
-                }
-                MainViewModel.Action.ADD -> {
-                    Toast.makeText(this@MainActivity, "CALL!", Toast.LENGTH_SHORT).show()
-                    main_recycler_view.adapter?.notifyDataSetChanged()
-                }
-            }
-        })
-
-         */
     }
 
     inner class DiaryRecyclerViewAdapter(private val diaries: ArrayList<String>): RecyclerView.Adapter<DiaryRecyclerViewAdapter.ViewHolder>() {
@@ -88,7 +70,25 @@ class MainActivity : AppCompatActivity() {
         Timber.plant(Timber.DebugTree())
     }
 
+    private fun setFontNameIdMap() {
+        for ((i, fontName) in resources.getStringArray(R.array.fonts).withIndex()) {
+            fontNameIdMap[fontName] = fontIds[i]
+        }
+    }
+
     companion object {
+        const val DEFAULT_FONT_ID = R.font.nanum_barun_gothic_regular
+        var fontNameIdMap: MutableMap<String, Int> = mutableMapOf()
+        val fontIds = arrayOf(
+            R.font.nanum_barun_gothic_regular,
+            R.font.nanum_barun_pen_regular,
+            R.font.nanum_brush_regular,
+            R.font.nanum_gothic_regular,
+            R.font.nanum_myeongjo_regular,
+            R.font.nanum_pen_regular,
+            R.font.nanum_square_regular,
+            R.font.nanum_square_round_regular
+        )
         var themeColorDark = 0
         var themeColorLight = 0
     }

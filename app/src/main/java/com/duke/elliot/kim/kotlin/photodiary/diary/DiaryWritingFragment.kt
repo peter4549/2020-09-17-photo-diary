@@ -9,10 +9,12 @@ import android.graphics.Typeface
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
@@ -31,6 +33,7 @@ import com.duke.elliot.kim.kotlin.photodiary.diary.media.media_helper.ExoPlayerA
 import com.duke.elliot.kim.kotlin.photodiary.diary.media.media_helper.MediaHelper
 import com.duke.elliot.kim.kotlin.photodiary.diary.media.media_helper.PhotoHelper
 import com.duke.elliot.kim.kotlin.photodiary.diary.media.photo_editor.PhotoEditorFragment
+import com.duke.elliot.kim.kotlin.photodiary.diary.media.simple_crop_view.SimpleCropViewFragment
 import com.duke.elliot.kim.kotlin.photodiary.utility.*
 import com.skydoves.colorpickerview.ColorPickerDialog
 import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener
@@ -58,12 +61,15 @@ class DiaryWritingFragment: Fragment() {
     private var layoutOptionItemsIsShown = false
     private var mediumAnimationDuration = 0
     private var recyclerViewMediaIsShown = false
+    private var selectedItemView: View? = null
     private var shortAnimationDuration = 0
+    private var showOptionItemsScheduled = false
 
     private var textAlignment = Gravity.START
     private var textColor = 0
     private var textFont: Typeface? = null
-    private var textSize = 12F
+    private var textFontId = MainActivity.DEFAULT_FONT_ID
+    private var textSize = 18F
     private var textStyleBold = false
     private var textStyleItalic = false
 
@@ -71,8 +77,12 @@ class DiaryWritingFragment: Fragment() {
         when (view.id) {
             R.id.image_drawing -> MediaHelper.startDrawingActivity(this)
             else -> {
-                if (!keyboardShown)
-                    showOptionsMenu(view)
+                if (keyboardShown) {
+                    showOptionItemsScheduled = true
+                    selectedItemView = view
+                    hideKeyboard(view, inputMethodManager)
+                } else
+                    showOptionItems(view)
             }
         }
     }
@@ -285,12 +295,6 @@ class DiaryWritingFragment: Fragment() {
             false
         )
 
-
-        // TODO: set font
-        textFont = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-            requireContext().resources.getFont(R.font.nanum_barun_pen_regular)
-        else ResourcesCompat.getFont(requireContext(), R.font.nanum_barun_pen_regular)
-
         binding.editTextContent.typeface = textFont
 
         initializeToolbar(binding.toolbar)
@@ -300,6 +304,11 @@ class DiaryWritingFragment: Fragment() {
         // val scoreFragmentArgs by navArgs<ScoreFragmentArgs>() TODO 여기서 다이어리 정보 전달 받을 것. 팩토리로전달.
         viewModelFactory = DiaryWritingViewModelFactory(null) // null 나중에 대체되야함.
         viewModel = ViewModelProvider(viewModelStore, viewModelFactory)[DiaryWritingViewModel::class.java]
+
+        // TODO: set font 위의 팩토리에서 arg를 전달받은경우와 새로 만드는 경우 구분해야함.
+        textFont = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+            requireContext().resources.getFont(R.font.nanum_barun_pen_regular) // 디폴트 폰트에서 얻을 것.
+        else ResourcesCompat.getFont(requireContext(), R.font.nanum_barun_pen_regular)
 
         fileUtilities = FileUtilities(requireContext())
         initializeSpinners()
@@ -415,6 +424,11 @@ class DiaryWritingFragment: Fragment() {
                     if (!isOpen) {
                         binding.editTextTitle.clearFocus()
                         binding.editTextContent.clearFocus()
+
+                        if (showOptionItemsScheduled) {
+                            showOptionItemsScheduled = false
+                            selectedItemView?.let { showOptionItems(it) }
+                        }
                     }
 
                     keyboardShown = isOpen
@@ -455,18 +469,33 @@ class DiaryWritingFragment: Fragment() {
             requireContext(), resources.getStringArray(R.array.fonts)
         )
 
+        val fontSizes = arrayOf(12, 14, 16, 18, 20, 22, 24)
+
         binding.spinnerTextSize.adapter =
-           ArrayAdapter(requireContext(), R.layout.item_spinner, arrayOf(12, 14, 16, 18, 20, 22, 24))
+           ArrayAdapter(requireContext(), R.layout.item_spinner, fontSizes)
 
-        binding.spinnerFont.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-                TODO("Not yet implemented")
+        binding.spinnerTextSize.setSelection(3)  // 18sp
+
+        binding.spinnerTextSize.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parentView: AdapterView<*>?, selectedItemView: View?, position: Int, id: Long) {
+                textSize = fontSizes[position].toFloat()
+                binding.editTextTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, textSize)
+                binding.editTextContent.setTextSize(TypedValue.COMPLEX_UNIT_SP, textSize)
             }
 
-            override fun onNothingSelected(p0: AdapterView<*>?) {
-                TODO("Not yet implemented")
+            override fun onNothingSelected(parentView: AdapterView<*>?) {  }
+        }
+
+        binding.spinnerFont.onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parentView: AdapterView<*>?, selectedItemView: View?, position: Int, id: Long) {
+                val fontName = (selectedItemView as TextView).text.toString()
+                textFontId = MainActivity.fontNameIdMap[fontName] ?: MainActivity.DEFAULT_FONT_ID
+                textFont = getFont(requireContext(), textFontId)
+                binding.editTextTitle.typeface = textFont
+                binding.editTextContent.typeface = textFont
             }
 
+            override fun onNothingSelected(parentView: AdapterView<*>?) {  }
         }
     }
 
@@ -487,10 +516,19 @@ class DiaryWritingFragment: Fragment() {
         inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        menu.clear()
+        inflater.inflate(R.menu.save_diary, menu)
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId) {
             android.R.id.home -> {
                 // TODO save data and back. (ask about edit state...)
+            }
+            R.id.save_diary -> {
+                saveDiary(createDiary())
             }
         }
         return super.onOptionsItemSelected(item)
@@ -729,8 +767,21 @@ class DiaryWritingFragment: Fragment() {
         viewModel.addMedia(media)
     }
 
-    private fun storeDiary(diary: DiaryModel) {
+    private fun saveDiary(diary: DiaryModel) {
         (requireActivity() as MainActivity).viewModel.add(diary)
+        findNavController().popBackStack()
+    }
+
+    private fun checkChanges() {
+
+    }
+
+    private fun createDiary(): DiaryModel {
+        val title = binding.editTextTitle.text.toString()
+        val content = binding.editTextContent.text.toString()
+        return DiaryModel(title = title, content = content,
+            date = viewModel.date, time = viewModel.time,
+            uriList = mediaAdapter.getUriList().toMutableList())
     }
 
     override fun onDestroy() {
@@ -738,7 +789,7 @@ class DiaryWritingFragment: Fragment() {
         PhotoHelper.deleteTempJpegFiles(requireContext())
     }
 
-    private fun showOptionsMenu(view: View) {
+    private fun showOptionItems(view: View) {
         binding.layoutPhotoOptionItems.visibility = View.GONE
         binding.layoutVideoOptionItems.visibility = View.GONE
         binding.layoutAudioOptionItems.visibility = View.GONE

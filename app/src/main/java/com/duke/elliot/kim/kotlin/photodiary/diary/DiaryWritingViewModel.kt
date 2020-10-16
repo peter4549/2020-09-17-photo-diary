@@ -1,19 +1,11 @@
 package com.duke.elliot.kim.kotlin.photodiary.diary
 
-import android.content.Context
-import android.os.Environment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.duke.elliot.kim.kotlin.photodiary.diary.media.MediaModel
 import com.duke.elliot.kim.kotlin.photodiary.diary.media.media_helper.PhotoHelper
-import com.duke.elliot.kim.kotlin.photodiary.diary.media.photo_editor.PhotoEditorFragment
-import com.duke.elliot.kim.kotlin.photodiary.diary.media.simple_crop_view.SimpleCropViewFragment
 import com.duke.elliot.kim.kotlin.photodiary.utility.getCurrentDateString
 import com.duke.elliot.kim.kotlin.photodiary.utility.getCurrentTimeString
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import timber.log.Timber
 
 class DiaryWritingViewModel: ViewModel() {
 
@@ -54,7 +46,6 @@ class DiaryWritingViewModel: ViewModel() {
 
     fun getCurrentImageUri() = PhotoHelper.getCurrentImageUri()
 
-    // TODO: ListAdapter를 사용한 업데이트 로직으로 변경 해볼것. 다만 그리드 레이아웃도 가능한지 확인 필요. 되는것으로 확인!
     object Action {
         const val UNINITIALIZED = 0
         const val INITIALIZED = 1

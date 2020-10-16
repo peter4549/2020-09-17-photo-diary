@@ -25,25 +25,4 @@ object VideoHelper {
             )
         }
     }
-
-    fun createVideoFile(context: Context, suffix: String = ""): File? {
-        try {
-            @Suppress("SpellCheckingInspection")
-            val timestamp: String = SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault()).format(
-                Date()
-            )
-            val path = File(context.filesDir, "videos")
-
-            if (!path.exists())
-                path.mkdirs()
-
-            return File(path, "JPEG_${timestamp}$suffix.jpg")
-        } catch (e: FileNotFoundException) {
-            Timber.e(e)
-            return null
-        } catch (e: IOException) {
-            Timber.e(e)
-            return null
-        }
-    }
 }

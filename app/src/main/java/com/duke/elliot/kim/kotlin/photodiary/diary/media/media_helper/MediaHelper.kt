@@ -12,7 +12,6 @@ object MediaHelper {
     const val REQUEST_VIDEO_PICK = 1002
     const val REQUEST_AUDIO_PICK = 1003
     const val REQUEST_CODE_DRAW = 1004
-    private const val GOOGLE_PHOTOS_PACKAGE_NAME = "com.google.android.apps.photos"
 
     object MediaType {
         const val PHOTO = 0
