@@ -1,34 +1,35 @@
 package com.duke.elliot.kim.kotlin.photodiary
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.duke.elliot.kim.kotlin.photodiary.database.DiaryDao
+import com.duke.elliot.kim.kotlin.photodiary.database.DiaryDatabase
 import com.duke.elliot.kim.kotlin.photodiary.diary.DiaryModel
 import kotlinx.coroutines.*
 
-class MainViewModel: ViewModel() {
+class MainViewModel(application: Application): AndroidViewModel(application) {
     private val job = Job()
     private val scope = CoroutineScope(Dispatchers.Main + job)
     var diariesFragmentAction = Action.UNINITIALIZED
     var photosFragmentAction = Action.UNINITIALIZED
+    private lateinit var database: DiaryDao
+
+    init {
+        scope.launch {
+            withContext(Dispatchers.IO) {
+                database = DiaryDatabase.getInstance(application).dao()
+            }
+        }
+    }
 
     val diaries = MutableLiveData<ArrayList<DiaryModel>>()
 
-    init {
-
-    }
-
-    fun add(diary: DiaryModel) {
+    fun insert(diary: DiaryModel) {
         scope.launch {
             withContext(Dispatchers.IO) {
-                if (diariesFragmentAction != Action.UNINITIALIZED)
-                    diariesFragmentAction = Action.ADDED
-
-                if (photosFragmentAction != Action.UNINITIALIZED)
-                    photosFragmentAction = Action.ADDED
-
-                diaries.value = diaries.value?.apply {
-                    add(0, diary)
-                }
+                database.insert(diary)
             }
         }
     }

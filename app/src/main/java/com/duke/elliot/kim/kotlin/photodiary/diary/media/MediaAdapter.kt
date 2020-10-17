@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.view.View
+import androidx.core.net.toUri
 import com.bumptech.glide.Glide
 import com.duke.elliot.kim.kotlin.photodiary.R
 import com.duke.elliot.kim.kotlin.photodiary.base.BaseRecyclerViewAdapter
@@ -36,11 +37,11 @@ class MediaAdapter(layoutId: Int, mediaArrayList: ArrayList<MediaModel>)
         when (media.type) {
             MediaHelper.MediaType.PHOTO -> {
                 Glide.with(holder.view.image.context).clear(holder.view.image)
-                setImage(holder.view.image, media.uri)
+                setImage(holder.view.image, media.uriString.toUri())
             }
             MediaHelper.MediaType.VIDEO -> {
                 Glide.with(holder.view.image.context).clear(holder.view.image)
-                setImage(holder.view.image, media.uri)
+                setImage(holder.view.image, media.uriString.toUri())
                 holder.view.image_play.visibility = View.VISIBLE
             }
             MediaHelper.MediaType.AUDIO -> {
@@ -51,7 +52,7 @@ class MediaAdapter(layoutId: Int, mediaArrayList: ArrayList<MediaModel>)
                 val albumArt: Bitmap
                 val bitmapFactoryOptions = BitmapFactory.Options()
 
-                mediaMetadataRetriever.setDataSource(holder.view.context, media.uri)
+                mediaMetadataRetriever.setDataSource(holder.view.context, media.uriString.toUri())
                 byteArray = mediaMetadataRetriever.embeddedPicture
 
                 byteArray?.size?.let {
@@ -81,7 +82,7 @@ class MediaAdapter(layoutId: Int, mediaArrayList: ArrayList<MediaModel>)
     }
 
     override fun remove(position: Int) {
-        val path = fileUtilities.getPath(items[position].uri)
+        val path = fileUtilities.getPath(items[position].uriString.toUri())
         super.remove(position)
         coroutineScope.launch {
             if (path != null)
@@ -94,7 +95,7 @@ class MediaAdapter(layoutId: Int, mediaArrayList: ArrayList<MediaModel>)
     fun getSelectedPosition() = selectedItemPosition
 
     fun changeImageUri(position: Int, uri: Uri) {
-        items[position].uri = uri
+        items[position].uriString = uri.toString()
         notifyItemChanged(position)
     }
 
@@ -102,5 +103,5 @@ class MediaAdapter(layoutId: Int, mediaArrayList: ArrayList<MediaModel>)
         this.itemClickListener = itemClickListener
     }
 
-    fun getUriList() = items.map { it.uri }
+    fun getMediaArray() = items.map { it }.toTypedArray()
 }

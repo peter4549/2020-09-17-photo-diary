@@ -33,7 +33,6 @@ import com.duke.elliot.kim.kotlin.photodiary.diary.media.media_helper.ExoPlayerA
 import com.duke.elliot.kim.kotlin.photodiary.diary.media.media_helper.MediaHelper
 import com.duke.elliot.kim.kotlin.photodiary.diary.media.media_helper.PhotoHelper
 import com.duke.elliot.kim.kotlin.photodiary.diary.media.photo_editor.PhotoEditorFragment
-import com.duke.elliot.kim.kotlin.photodiary.diary.media.simple_crop_view.SimpleCropViewFragment
 import com.duke.elliot.kim.kotlin.photodiary.utility.*
 import com.skydoves.colorpickerview.ColorPickerDialog
 import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener
@@ -295,6 +294,7 @@ class DiaryWritingFragment: Fragment() {
             false
         )
 
+        textColor = ContextCompat.getColor(requireContext(), R.color.colorTextEnabledDark)
         binding.editTextContent.typeface = textFont
 
         initializeToolbar(binding.toolbar)
@@ -315,8 +315,8 @@ class DiaryWritingFragment: Fragment() {
         inputMethodManager = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         hideKeyboard(binding.root, inputMethodManager)
 
-        binding.textDate.text = viewModel.date
-        binding.textTime.text = viewModel.time
+        binding.textDate.text = viewModel.time.toDateFormat(getString(R.string.date_format))
+        binding.textTime.text = viewModel.time.toTimeFormat(getString(R.string.time_format))
 
         binding.diaryWritingViewModel = viewModel
         binding.lifecycleOwner = viewLifecycleOwner
@@ -331,9 +331,9 @@ class DiaryWritingFragment: Fragment() {
                         setItemClickListener {
                             viewModel.selectedItemPosition = getSelectedPosition()
                             when (it.type) {
-                                MediaHelper.MediaType.PHOTO -> navigateToPhotoEditorFragment(it.uri)
-                                MediaHelper.MediaType.VIDEO -> startExoPlayerActivity(it.uri)
-                                MediaHelper.MediaType.AUDIO -> startExoPlayerActivity(it.uri)
+                                MediaHelper.MediaType.PHOTO -> navigateToPhotoEditorFragment(it.uriString.toUri())
+                                MediaHelper.MediaType.VIDEO -> startExoPlayerActivity(it.uriString.toUri())
+                                MediaHelper.MediaType.AUDIO -> startExoPlayerActivity(it.uriString.toUri())
                                 else -> {
                                     // TODO: Throw class cast exception
                                 }
@@ -544,7 +544,7 @@ class DiaryWritingFragment: Fragment() {
                         CoroutineScope(Dispatchers.Main).launch {
                             fileUtilities.copyFileToInternalStorage(uri)?.let { copiedUri ->
                                 progressDialogFragment.dismiss()
-                                addMedia(MediaModel(MediaModel.Type.PHOTO, copiedUri))
+                                addMedia(MediaModel(MediaModel.Type.PHOTO, copiedUri.toString()))
                             } ?: run {
                                 progressDialogFragment.dismiss()
                                 showToast(
@@ -578,7 +578,7 @@ class DiaryWritingFragment: Fragment() {
                                         itemCount += 1
                                         if (itemCount >= totalItemCount)
                                             progressDialogFragment.dismiss()
-                                        addMedia(MediaModel(MediaModel.Type.PHOTO, copiedUri))
+                                        addMedia(MediaModel(MediaModel.Type.PHOTO, copiedUri.toString()))
                                     } ?: run {
                                         itemCount += 1
                                         if (itemCount >= totalItemCount)
@@ -597,7 +597,7 @@ class DiaryWritingFragment: Fragment() {
                             CoroutineScope(Dispatchers.Main).launch {
                                 fileUtilities.copyFileToInternalStorage(uri)?.let { copiedUri ->
                                     progressDialogFragment.dismiss()
-                                    addMedia(MediaModel(MediaModel.Type.PHOTO, copiedUri))
+                                    addMedia(MediaModel(MediaModel.Type.PHOTO, copiedUri.toString()))
                                 } ?: run {
                                     progressDialogFragment.dismiss()
                                     showToast(
@@ -630,7 +630,7 @@ class DiaryWritingFragment: Fragment() {
                                             addMedia(
                                                 MediaModel(
                                                     MediaHelper.MediaType.VIDEO,
-                                                    uri = copiedUri
+                                                    uriString = copiedUri.toString()
                                                 )
                                             )
                                         } ?: run {
@@ -665,7 +665,7 @@ class DiaryWritingFragment: Fragment() {
                                         addMedia(
                                             MediaModel(
                                                 MediaHelper.MediaType.VIDEO,
-                                                uri = copiedUri
+                                                uriString = copiedUri.toString()
                                             )
                                         )
                                     } ?: run {
@@ -701,7 +701,7 @@ class DiaryWritingFragment: Fragment() {
                                         itemCount += 1
                                         if (itemCount >= totalItemCount)
                                             progressDialogFragment.dismiss()
-                                        addMedia(MediaModel(MediaModel.Type.AUDIO, copiedUri))
+                                        addMedia(MediaModel(MediaModel.Type.AUDIO, copiedUri.toString()))
                                     } ?: run {
                                         itemCount += 1
                                         if (itemCount >= totalItemCount)
@@ -720,7 +720,7 @@ class DiaryWritingFragment: Fragment() {
                             CoroutineScope(Dispatchers.Main).launch {
                                 fileUtilities.copyFileToInternalStorage(uri)?.let { copiedUri ->
                                     progressDialogFragment.dismiss()
-                                    addMedia(MediaModel(MediaModel.Type.AUDIO, copiedUri))
+                                    addMedia(MediaModel(MediaModel.Type.AUDIO, copiedUri.toString()))
                                 } ?: run {
                                     progressDialogFragment.dismiss()
                                     showToast(
@@ -744,7 +744,7 @@ class DiaryWritingFragment: Fragment() {
                     bitmap?.let {
                         PhotoHelper.saveBitmapToFile(requireContext(), it)?.toUri()?.let { uri ->
                             progressDialogFragment.dismiss()
-                            addMedia(MediaModel(MediaHelper.MediaType.PHOTO, uri))
+                            addMedia(MediaModel(MediaHelper.MediaType.PHOTO, uri.toString()))
                         } ?: run {
                             progressDialogFragment.dismiss()
                             showToast(requireContext(), getString(R.string.failed_to_load_image))
@@ -768,7 +768,9 @@ class DiaryWritingFragment: Fragment() {
     }
 
     private fun saveDiary(diary: DiaryModel) {
-        (requireActivity() as MainActivity).viewModel.add(diary)
+        if (keyboardShown)
+            hideKeyboard(binding.root, inputMethodManager)
+        (requireActivity() as MainActivity).saveDiary(diary)
         findNavController().popBackStack()
     }
 
@@ -779,10 +781,22 @@ class DiaryWritingFragment: Fragment() {
     private fun createDiary(): DiaryModel {
         val title = binding.editTextTitle.text.toString()
         val content = binding.editTextContent.text.toString()
-        return DiaryModel(title = title, content = content,
-            date = viewModel.date, time = viewModel.time,
-            uriList = mediaAdapter.getUriList().toMutableList())
+        return DiaryModel(
+            title = title, content = content,
+            time = viewModel.time,
+            mediaArray = mediaAdapter.getMediaArray(),
+            textOptions = createTextOptions()
+        )
     }
+
+    private fun createTextOptions() = TextOptionsModel(
+        textAlignment = this.textAlignment,
+        textColor = this.textColor,
+        textFontId = this.textFontId,
+        textSize = this.textSize,
+        textStyleBold = this.textStyleBold,
+        textStyleItalic = this.textStyleItalic
+    )
 
     override fun onDestroy() {
         super.onDestroy()

@@ -160,10 +160,13 @@ fun setImage(imageView: ImageView, drawableId: Int, loadFailedCallback: (() -> U
         .into(imageView)
 }
 
-fun getCurrentDateString(): String = SimpleDateFormat("yyyy년 M월 d일 EEEE", Locale.getDefault()).format(
-    Date()
-)
-fun getCurrentTimeString(): String = SimpleDateFormat("aa h:m", Locale.getDefault()).format(Date())
+fun getCurrentTime() = Calendar.getInstance().timeInMillis
+
+fun Long.toDateFormat(pattern: String): String =
+    SimpleDateFormat(pattern, Locale.getDefault()).format(this)
+
+fun Long.toTimeFormat(pattern: String): String =
+    SimpleDateFormat(pattern, Locale.getDefault()).format(this)
 
 fun getFont(context: Context, id: Int): Typeface? {
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)

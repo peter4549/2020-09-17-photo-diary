@@ -4,7 +4,6 @@ import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.duke.elliot.kim.kotlin.photodiary.database.DiaryDao
-import com.duke.elliot.kim.kotlin.photodiary.diary.DiaryModel
 
 class DiariesViewModelFactory(private val dataSource: DiaryDao,
                               private val application: Application): ViewModelProvider.Factory {

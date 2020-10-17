@@ -351,6 +351,7 @@ class FileUtilities(private val context: Context) {
                 outputStream.close()
             } catch (e: Exception) {
                 Timber.e(e)
+                return@withContext null
             }
 
 

@@ -1,5 +1,6 @@
 package com.duke.elliot.kim.kotlin.photodiary.tab.diary
 
+import android.graphics.Typeface
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,10 +9,13 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.duke.elliot.kim.kotlin.photodiary.R
 import com.duke.elliot.kim.kotlin.photodiary.diary.DiaryModel
+import com.duke.elliot.kim.kotlin.photodiary.utility.getFont
 import kotlinx.android.synthetic.main.item_diary.view.*
+
 
 class DiaryAdapter
     : ListAdapter<DiaryModel, DiaryAdapter.ViewHolder>(DiaryDiffCallback()) {
+
     class ViewHolder private constructor(val view: View): RecyclerView.ViewHolder(view) {
         companion object {
             fun from(parent: ViewGroup): ViewHolder {
@@ -27,7 +31,30 @@ class DiaryAdapter
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val diary = getItem(position)
+        val font = getFont(holder.view.context, diary.textOptions.textFontId)
+
         holder.view.text_title.text = diary.title
+        holder.view.text_content.text = diary.content
+
+        holder.view.text_title.setTextColor(diary.textOptions.textColor)
+        holder.view.text_content.setTextColor(diary.textOptions.textColor)
+
+        holder.view.text_content.gravity = diary.textOptions.textAlignment
+
+        holder.view.text_title.typeface = font
+        holder.view.text_content.typeface = font
+
+        if (diary.textOptions.textStyleBold && diary.textOptions.textStyleItalic)
+            holder.view.text_content.setTypeface(font, Typeface.BOLD_ITALIC)
+        else if (diary.textOptions.textStyleBold)
+            holder.view.text_content.setTypeface(font, Typeface.BOLD)
+        else if (diary.textOptions.textStyleItalic)
+            holder.view.text_content.setTypeface(font, Typeface.ITALIC)
+
+        holder.view.view_pager.adapter = MediaPagerAdapter().apply {
+            setContext(holder.view.context)
+            setMediaList(diary.mediaArray.toList())
+        }
     }
 }
 
@@ -39,5 +66,4 @@ class DiaryDiffCallback: DiffUtil.ItemCallback<DiaryModel>() {
     override fun areContentsTheSame(oldItem: DiaryModel, newItem: DiaryModel): Boolean {
         return oldItem == newItem
     }
-
 }

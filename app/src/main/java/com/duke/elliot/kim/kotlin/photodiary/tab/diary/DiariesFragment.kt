@@ -8,11 +8,9 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.duke.elliot.kim.kotlin.photodiary.*
-import com.duke.elliot.kim.kotlin.photodiary.base.BaseRecyclerViewAdapter
 import com.duke.elliot.kim.kotlin.photodiary.database.DiaryDatabase
 import com.duke.elliot.kim.kotlin.photodiary.databinding.FragmentDairiesBinding
-import com.duke.elliot.kim.kotlin.photodiary.diary.DiaryModel
-import kotlinx.android.synthetic.main.item_diary.view.*
+import com.duke.elliot.kim.kotlin.photodiary.utility.GridLayoutManagerWrapper
 
 class DiariesFragment: Fragment() {
 
@@ -35,6 +33,7 @@ class DiariesFragment: Fragment() {
         binding.diariesViewModel = viewModel
 
         diaryAdapter = DiaryAdapter()
+        binding.recyclerViewDiary.layoutManager = GridLayoutManagerWrapper(requireContext(), 1)
         binding.recyclerViewDiary.adapter = diaryAdapter
 
         viewModel.diaries.observe(requireActivity()) { diaries ->
@@ -42,14 +41,5 @@ class DiariesFragment: Fragment() {
         }
 
         return binding.root
-    }
-
-    class DiaryRecyclerViewAdapter(layoutId: Int, diaries: ArrayList<DiaryModel>)
-        : BaseRecyclerViewAdapter<DiaryModel>(layoutId, diaries) {
-
-        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            val diary = items[position]
-            holder.view.text_title.text = diary.title
-        }
     }
 }

@@ -1,62 +1,145 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:layout_margin="4dp">
 
-    <TextView
-        android:id="@+id/text_date"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:background="@color/colorDefaultThemeLight"
+        android:theme="@style/Theme.MaterialComponents.Light.NoActionBar">
 
-    <TextView
-        android:id="@+id/text_title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/text_date"/>
+        <TextView
+            android:id="@+id/text_date"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:background="@drawable/white_background_rounded_corners"
+            android:gravity="center_vertical"
+            android:padding="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="2020년 10월 17일 토요일 띄우는게 나은듯. 날씨추가 고려. 오후 8시 20분"/>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_view_media"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/text_title"/>
+        <TextView
+            android:id="@+id/text_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:background="@drawable/white_background_rounded_corners"
+            android:padding="8dp"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@color/color_text_dark"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/text_date"
+            tools:text="시원한 이이스커피"/>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/recycler_view_media">
+        <RelativeLayout
+            android:id="@+id/media_container"
+            android:layout_width="240dp"
+            android:layout_height="240dp"
+            android:layout_margin="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/text_title">
 
-        <ImageView
-            android:id="@+id/image_edit"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            <androidx.viewpager.widget.ViewPager
+                android:id="@+id/view_pager"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
 
-        <ImageView
-            android:id="@+id/image_star"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            <com.rd.PageIndicatorView
+                android:id="@+id/page_indicator_view"
+                app:piv_viewPager="@id/view_pager"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="16dp"
+                tools:piv_padding="12dp"
+                tools:piv_radius="8dp" />
 
-        <ImageView
-            android:id="@+id/image_export"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+        </RelativeLayout>
 
-        <ImageView
-            android:id="@+id/image_delete"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+        <TextView
+            android:id="@+id/text_content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:background="@drawable/white_background_rounded_corners"
+            android:minHeight="80dp"
+            android:maxHeight="160dp"
+            android:padding="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/media_container" />
 
-    </LinearLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:orientation="horizontal"
+            android:background="@drawable/white_background_rounded_corners"
+            android:padding="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/text_content">
+
+            <ImageView
+                android:id="@+id/image_edit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                app:srcCompat="@drawable/ic_sharp_create_24"
+                tools:ignore="ContentDescription" />
+
+            <com.like.LikeButton
+                android:id="@+id/button_star"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                app:icon_type="Star"
+                app:circle_start_color="@color/colorPrimary"
+                app:like_drawable="@drawable/star_on"
+                app:unlike_drawable="@drawable/star_off"
+                app:dots_primary_color="@color/colorAccent"
+                app:dots_secondary_color="@color/colorPrimary"
+                app:circle_end_color="@color/colorAccent"
+                app:icon_size="24dp"
+                app:liked="false"
+                app:anim_scale_factor="2"
+                app:is_enabled="false" />
+
+            <ImageView
+                android:id="@+id/image_export"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                app:srcCompat="@drawable/ic_right_arrow_50px"
+                tools:ignore="ContentDescription" />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
+
+            <ImageView
+                android:id="@+id/image_delete"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                app:srcCompat="@drawable/ic_round_delete_24"
+                app:tint="@color/colorIconTint"
+                tools:ignore="ContentDescription"/>
+
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>

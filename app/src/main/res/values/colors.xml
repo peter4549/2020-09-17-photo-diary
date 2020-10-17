@@ -10,12 +10,12 @@
         <item>@color/colorDefaultThemeLight</item>
     </array>
 
-    <color name="colorTextCalendar">@color/colorGrey700</color>
+    <color name="colorTextCalendar">@color/colorJet</color>
 
     <color name="colorDefaultThemeDark">#B39DDB</color>
     <color name="colorDefaultThemeLight">#EDE7F6</color>
     <color name="colorTextDisabledDark">@color/colorSilver</color>
-    <color name="colorTextEnabledDark">@color/colorBlueGrey900</color>
+    <color name="colorTextEnabledDark">@color/colorJet</color>
 
     <color name="colorDialogText">@color/colorGhostWhite</color>
     <color name="colorDialogBackgroundDark">@color/colorSemiBlackTransparent</color>
@@ -42,6 +42,7 @@
     <color name="colorGrey600">#757575</color>
     <color name="colorGrey700">#455A64</color>
     <color name="colorDarkGreyTransparent">#809E9E9E</color>
+    <color name="colorJet">#343434</color>
     <color name="colorSilver">#C0C0C0</color>
     <color name="colorWhite">#FEFEFE</color>
 

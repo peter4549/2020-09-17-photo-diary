@@ -1,4 +1,4 @@
-package com.duke.elliot.kim.kotlin.photodiary.tab
+package com.duke.elliot.kim.kotlin.photodiary.tab.media
 
 import android.os.Bundle
 import android.view.LayoutInflater

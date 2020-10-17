@@ -13,10 +13,10 @@ interface DiaryDao {
     fun getAll(): LiveData<MutableList<DiaryModel>>
 
     @Insert
-    fun insert(note: DiaryModel)
+    fun insert(dairy: DiaryModel)
 
     @Delete
-    fun delete(note: DiaryModel)
+    fun delete(diary: DiaryModel)
 
     @Query("DELETE FROM diary")
     fun nukeTable()

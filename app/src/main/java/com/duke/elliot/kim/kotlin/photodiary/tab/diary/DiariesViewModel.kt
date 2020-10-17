@@ -13,9 +13,5 @@ class DiariesViewModel(val database: DiaryDao, application: Application): Androi
     private val job = Job()
     private val coroutineScope = CoroutineScope(Dispatchers.Main + job)
 
-    val diaries = MutableLiveData<ArrayList<DiaryModel>>()
-
-    companion object {
-        const val UNINITIALIZED = 0
-    }
+    val diaries = database.getAll()
 }

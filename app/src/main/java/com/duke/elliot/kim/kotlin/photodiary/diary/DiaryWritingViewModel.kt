@@ -4,19 +4,14 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.duke.elliot.kim.kotlin.photodiary.diary.media.MediaModel
 import com.duke.elliot.kim.kotlin.photodiary.diary.media.media_helper.PhotoHelper
-import com.duke.elliot.kim.kotlin.photodiary.utility.getCurrentDateString
-import com.duke.elliot.kim.kotlin.photodiary.utility.getCurrentTimeString
+import com.duke.elliot.kim.kotlin.photodiary.utility.getCurrentTime
 
 class DiaryWritingViewModel: ViewModel() {
 
     // 얘가 기존의 데이터를 받아서 불러오는 방식. 즉 아래의 데이터들은, diary data class로 부터 파싱될 예정.
 
-    private val _date: String = getCurrentDateString()
-    val date: String
-        get() = _date
-
-    private val _time: String = getCurrentTimeString()
-    val time: String
+    private val _time: Long = getCurrentTime()
+    val time: Long
         get() = _time
 
     var title: String = ""
