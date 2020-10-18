@@ -30,6 +30,13 @@
             app:exitAnim="@anim/anim_slide_out_to_left"
             app:popEnterAnim="@anim/anim_slide_in_from_left"
             app:popExitAnim="@anim/anim_slide_out_to_right" />
+        <argument
+            android:name="diary"
+            app:argType="com.duke.elliot.kim.kotlin.photodiary.diary.DiaryModel"
+            app:nullable="true" />
+        <argument
+            android:name="mode"
+            app:argType="integer" />
     </fragment>
     <fragment
         android:id="@+id/photoEditorFragment"

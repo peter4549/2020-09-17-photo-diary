@@ -5,12 +5,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="4dp">
+    android:layout_marginBottom="16dp"
+    android:layout_marginEnd="2dp"
+    android:layout_marginStart="2dp"
+    android:backgroundTint="@color/colorDefaultThemeLight"
+    app:cardCornerRadius="8dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorDefaultThemeLight"
         android:theme="@style/Theme.MaterialComponents.Light.NoActionBar">
 
         <TextView
@@ -18,51 +21,52 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
-            android:background="@drawable/white_background_rounded_corners"
+            android:background="@drawable/background_white_rounded_corners"
             android:gravity="center_vertical"
             android:padding="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="2020년 10월 17일 토요일 띄우는게 나은듯. 날씨추가 고려. 오후 8시 20분"/>
+            tools:text="2020년 10월 17일 토요일 띄우는게 나은듯. 날씨추가 고려. 오후 8시 20분" />
 
         <TextView
             android:id="@+id/text_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
-            android:background="@drawable/white_background_rounded_corners"
+            android:background="@drawable/background_white_rounded_corners"
             android:padding="8dp"
+            android:textColor="@color/color_text_dark"
             android:textSize="20sp"
             android:textStyle="bold"
-            android:textColor="@color/color_text_dark"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/text_date"
-            tools:text="시원한 이이스커피"/>
+            tools:text="시원한 이이스커피" />
 
         <RelativeLayout
             android:id="@+id/media_container"
             android:layout_width="240dp"
             android:layout_height="240dp"
             android:layout_margin="8dp"
+            android:elevation="2dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/text_title">
 
-            <androidx.viewpager.widget.ViewPager
+            <com.duke.elliot.kim.kotlin.photodiary.view.ClickableViewPager
                 android:id="@+id/view_pager"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
 
             <com.rd.PageIndicatorView
                 android:id="@+id/page_indicator_view"
-                app:piv_viewPager="@id/view_pager"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
                 android:layout_centerHorizontal="true"
                 android:layout_marginBottom="16dp"
+                app:piv_viewPager="@id/view_pager"
                 tools:piv_padding="12dp"
                 tools:piv_radius="8dp" />
 
@@ -73,9 +77,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
-            android:background="@drawable/white_background_rounded_corners"
-            android:minHeight="80dp"
+            android:background="@drawable/background_white_rounded_corners"
             android:maxHeight="160dp"
+            android:minHeight="80dp"
             android:padding="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -86,8 +90,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
+            android:background="@drawable/background_white_rounded_corners"
             android:orientation="horizontal"
-            android:background="@drawable/white_background_rounded_corners"
             android:padding="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -106,17 +110,17 @@
                 android:id="@+id/button_star"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                app:icon_type="Star"
+                app:anim_scale_factor="2"
+                app:circle_end_color="@color/colorAccent"
                 app:circle_start_color="@color/colorPrimary"
-                app:like_drawable="@drawable/star_on"
-                app:unlike_drawable="@drawable/star_off"
                 app:dots_primary_color="@color/colorAccent"
                 app:dots_secondary_color="@color/colorPrimary"
-                app:circle_end_color="@color/colorAccent"
                 app:icon_size="24dp"
+                app:icon_type="Star"
+                app:is_enabled="false"
+                app:like_drawable="@drawable/star_on"
                 app:liked="false"
-                app:anim_scale_factor="2"
-                app:is_enabled="false" />
+                app:unlike_drawable="@drawable/star_off" />
 
             <ImageView
                 android:id="@+id/image_export"
@@ -137,7 +141,7 @@
                 android:layout_marginEnd="8dp"
                 app:srcCompat="@drawable/ic_round_delete_24"
                 app:tint="@color/colorIconTint"
-                tools:ignore="ContentDescription"/>
+                tools:ignore="ContentDescription" />
 
         </LinearLayout>
 

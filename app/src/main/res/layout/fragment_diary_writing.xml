@@ -49,7 +49,7 @@
                     android:layout_marginTop="64dp"
                     android:layout_marginEnd="8dp"
                     android:orientation="horizontal"
-                    android:background="@drawable/white_background_rounded_corners"
+                    android:background="@drawable/background_white_rounded_corners"
                     android:gravity="center_vertical">
 
                     <TextView
@@ -97,7 +97,7 @@
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="8dp"
                     android:layout_marginEnd="8dp"
-                    android:background="@drawable/white_background_rounded_corners"
+                    android:background="@drawable/background_white_rounded_corners"
                     android:ellipsize="end"
                     android:ems="10"
                     android:hint="@string/title"
@@ -127,7 +127,7 @@
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="8dp"
                     android:layout_marginEnd="8dp"
-                    android:background="@drawable/white_background_rounded_corners"
+                    android:background="@drawable/background_white_rounded_corners"
                     android:ellipsize="end"
                     android:ems="10"
                     android:gravity="top"

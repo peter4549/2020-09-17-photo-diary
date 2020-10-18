@@ -23,6 +23,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.duke.elliot.kim.kotlin.photodiary.MainActivity
 import com.duke.elliot.kim.kotlin.photodiary.R
@@ -44,6 +45,9 @@ import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventList
 import java.text.SimpleDateFormat
 import java.util.*
 
+const val CREATE_MODE = 0
+const val EDIT_MODE = 1
+
 class DiaryWritingFragment: Fragment() {
 
     private lateinit var binding: FragmentDiaryWritingBinding
@@ -63,14 +67,6 @@ class DiaryWritingFragment: Fragment() {
     private var selectedItemView: View? = null
     private var shortAnimationDuration = 0
     private var showOptionItemsScheduled = false
-
-    private var textAlignment = Gravity.START
-    private var textColor = 0
-    private var textFont: Typeface? = null
-    private var textFontId = MainActivity.DEFAULT_FONT_ID
-    private var textSize = 18F
-    private var textStyleBold = false
-    private var textStyleItalic = false
 
     private val optionsOnClickListener = View.OnClickListener { view ->
         when (view.id) {
@@ -130,33 +126,33 @@ class DiaryWritingFragment: Fragment() {
             R.id.image_bold -> {
                 binding.editTextTitle.typeface = null
                 binding.editTextContent.typeface = null
-                if (textStyleBold) {
-                    if (textStyleItalic) {
-                        binding.editTextTitle.setTypeface(textFont, Typeface.ITALIC)
-                        binding.editTextContent.setTypeface(textFont, Typeface.ITALIC)
+                if (viewModel.textStyleBold) {
+                    if (viewModel.textStyleItalic) {
+                        binding.editTextTitle.setTypeface(viewModel.textFont, Typeface.ITALIC)
+                        binding.editTextContent.setTypeface(viewModel.textFont, Typeface.ITALIC)
                     } else {
-                        binding.editTextTitle.setTypeface(textFont, Typeface.NORMAL)
-                        binding.editTextContent.setTypeface(textFont, Typeface.NORMAL)
+                        binding.editTextTitle.setTypeface(viewModel.textFont, Typeface.NORMAL)
+                        binding.editTextContent.setTypeface(viewModel.textFont, Typeface.NORMAL)
                     }
                 } else {
-                    if (textStyleItalic) {
+                    if (viewModel.textStyleItalic) {
                         binding.editTextTitle.setTypeface(
-                            textFont,
+                            viewModel.textFont,
                             Typeface.BOLD_ITALIC
                         )
                         binding.editTextContent.setTypeface(
-                            textFont,
+                            viewModel.textFont,
                             Typeface.BOLD_ITALIC
                         )
                     } else {
-                        binding.editTextTitle.setTypeface(textFont, Typeface.BOLD)
-                        binding.editTextContent.setTypeface(textFont, Typeface.BOLD)
+                        binding.editTextTitle.setTypeface(viewModel.textFont, Typeface.BOLD)
+                        binding.editTextContent.setTypeface(viewModel.textFont, Typeface.BOLD)
                     }
                 }
 
-                textStyleBold = !textStyleBold
+                viewModel.textStyleBold = !viewModel.textStyleBold
                 binding.imageBold.setColorFilter(
-                    if (textStyleBold)
+                    if (viewModel.textStyleBold)
                         ContextCompat.getColor(
                             requireContext(),
                             R.color.colorTextOptionItemsSelected
@@ -170,16 +166,16 @@ class DiaryWritingFragment: Fragment() {
                 )
             }
             R.id.image_italic -> {
-                if (textStyleItalic) {
-                    if (textStyleBold) {
-                        binding.editTextTitle.setTypeface(textFont, Typeface.BOLD)
-                        binding.editTextContent.setTypeface(textFont, Typeface.BOLD)
+                if (viewModel.textStyleItalic) {
+                    if (viewModel.textStyleBold) {
+                        binding.editTextTitle.setTypeface(viewModel.textFont, Typeface.BOLD)
+                        binding.editTextContent.setTypeface(viewModel.textFont, Typeface.BOLD)
                     } else {
-                        binding.editTextTitle.setTypeface(textFont, Typeface.NORMAL)
-                        binding.editTextContent.setTypeface(textFont, Typeface.NORMAL)
+                        binding.editTextTitle.setTypeface(viewModel.textFont, Typeface.NORMAL)
+                        binding.editTextContent.setTypeface(viewModel.textFont, Typeface.NORMAL)
                     }
                 } else {
-                    if (textStyleBold) {
+                    if (viewModel.textStyleBold) {
                         binding.editTextTitle.setTypeface(
                             binding.editTextTitle.typeface,
                             Typeface.BOLD_ITALIC
@@ -189,14 +185,14 @@ class DiaryWritingFragment: Fragment() {
                             Typeface.BOLD_ITALIC
                         )
                     } else {
-                        binding.editTextTitle.setTypeface(textFont, Typeface.ITALIC)
-                        binding.editTextContent.setTypeface(textFont, Typeface.ITALIC)
+                        binding.editTextTitle.setTypeface(viewModel.textFont, Typeface.ITALIC)
+                        binding.editTextContent.setTypeface(viewModel.textFont, Typeface.ITALIC)
                     }
                 }
 
-                textStyleItalic = !textStyleItalic
+                viewModel.textStyleItalic = !viewModel.textStyleItalic
                 binding.imageItalic.setColorFilter(
-                    if (textStyleItalic)
+                    if (viewModel.textStyleItalic)
                         ContextCompat.getColor(
                             requireContext(),
                             R.color.colorTextOptionItemsSelected
@@ -230,7 +226,7 @@ class DiaryWritingFragment: Fragment() {
                 )
 
                 binding.editTextContent.gravity = Gravity.CENTER_HORIZONTAL
-                textAlignment = Gravity.CENTER_HORIZONTAL
+                viewModel.textAlignment = Gravity.CENTER_HORIZONTAL
             }
             R.id.image_button_text_align_left -> {
                 binding.imageButtonTextAlignCenter.setColorFilter(
@@ -252,7 +248,7 @@ class DiaryWritingFragment: Fragment() {
                     PorterDuff.Mode.SRC_IN
                 )
                 binding.editTextContent.gravity = Gravity.START
-                textAlignment = Gravity.START
+                viewModel.textAlignment = Gravity.START
             }
             R.id.image_button_text_align_right -> {
                 binding.imageButtonTextAlignCenter.setColorFilter(
@@ -274,7 +270,7 @@ class DiaryWritingFragment: Fragment() {
                     PorterDuff.Mode.SRC_IN
                 )
                 binding.editTextContent.gravity = Gravity.END
-                textAlignment = Gravity.END
+                viewModel.textAlignment = Gravity.END
             }
             R.id.image_text_color -> {
                 showColorPickerDialog()
@@ -294,21 +290,14 @@ class DiaryWritingFragment: Fragment() {
             false
         )
 
-        textColor = ContextCompat.getColor(requireContext(), R.color.colorTextEnabledDark)
-        binding.editTextContent.typeface = textFont
-
         initializeToolbar(binding.toolbar)
 
         progressDialogFragment = ProgressDialogFragment.instance
 
-        // val scoreFragmentArgs by navArgs<ScoreFragmentArgs>() TODO 여기서 다이어리 정보 전달 받을 것. 팩토리로전달.
-        viewModelFactory = DiaryWritingViewModelFactory(null) // null 나중에 대체되야함.
-        viewModel = ViewModelProvider(viewModelStore, viewModelFactory)[DiaryWritingViewModel::class.java]
+        val diaryWritingFragmentArgs by navArgs<DiaryWritingFragmentArgs>()
 
-        // TODO: set font 위의 팩토리에서 arg를 전달받은경우와 새로 만드는 경우 구분해야함.
-        textFont = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-            requireContext().resources.getFont(R.font.nanum_barun_pen_regular) // 디폴트 폰트에서 얻을 것.
-        else ResourcesCompat.getFont(requireContext(), R.font.nanum_barun_pen_regular)
+        viewModelFactory = DiaryWritingViewModelFactory(requireActivity().application, diaryWritingFragmentArgs.diary)
+        viewModel = ViewModelProvider(viewModelStore, viewModelFactory)[DiaryWritingViewModel::class.java]
 
         fileUtilities = FileUtilities(requireContext())
         initializeSpinners()
@@ -415,6 +404,7 @@ class DiaryWritingFragment: Fragment() {
 
         initializeOptionItems()
         initializeTextItems()
+        viewModel.originDiary?.let { fetchOriginDiary(it) }
 
         setEventListener(
             requireActivity(),
@@ -454,6 +444,12 @@ class DiaryWritingFragment: Fragment() {
         setHasOptionsMenu(true)
     }
 
+    private fun fetchOriginDiary(originDiary: DiaryModel) {
+        binding.editTextTitle.setText(originDiary.title)
+        binding.editTextContent.setText(originDiary.content)
+
+    }
+
     private fun initializeOptionItems() {
         binding.imageCameraItem.setOnClickListener(optionItemsOnClickListener)
         binding.imagePhotoItem.setOnClickListener(optionItemsOnClickListener)
@@ -474,13 +470,13 @@ class DiaryWritingFragment: Fragment() {
         binding.spinnerTextSize.adapter =
            ArrayAdapter(requireContext(), R.layout.item_spinner, fontSizes)
 
-        binding.spinnerTextSize.setSelection(3)  // 18sp
+        binding.spinnerTextSize.setSelection(fontSizes.indexOf(viewModel.textSize.toInt()))  // 18sp
 
         binding.spinnerTextSize.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parentView: AdapterView<*>?, selectedItemView: View?, position: Int, id: Long) {
-                textSize = fontSizes[position].toFloat()
-                binding.editTextTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, textSize)
-                binding.editTextContent.setTextSize(TypedValue.COMPLEX_UNIT_SP, textSize)
+                viewModel.textSize = fontSizes[position].toFloat()
+                binding.editTextTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, viewModel.textSize)
+                binding.editTextContent.setTextSize(TypedValue.COMPLEX_UNIT_SP, viewModel.textSize)
             }
 
             override fun onNothingSelected(parentView: AdapterView<*>?) {  }
@@ -489,10 +485,10 @@ class DiaryWritingFragment: Fragment() {
         binding.spinnerFont.onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parentView: AdapterView<*>?, selectedItemView: View?, position: Int, id: Long) {
                 val fontName = (selectedItemView as TextView).text.toString()
-                textFontId = MainActivity.fontNameIdMap[fontName] ?: MainActivity.DEFAULT_FONT_ID
-                textFont = getFont(requireContext(), textFontId)
-                binding.editTextTitle.typeface = textFont
-                binding.editTextContent.typeface = textFont
+                viewModel.textFontId = MainActivity.fontNameIdMap[fontName] ?: MainActivity.DEFAULT_FONT_ID
+                viewModel.textFont = getFont(requireContext(), viewModel.textFontId)
+                binding.editTextTitle.typeface = viewModel.textFont
+                binding.editTextContent.typeface = viewModel.textFont
             }
 
             override fun onNothingSelected(parentView: AdapterView<*>?) {  }
@@ -790,12 +786,12 @@ class DiaryWritingFragment: Fragment() {
     }
 
     private fun createTextOptions() = TextOptionsModel(
-        textAlignment = this.textAlignment,
-        textColor = this.textColor,
-        textFontId = this.textFontId,
-        textSize = this.textSize,
-        textStyleBold = this.textStyleBold,
-        textStyleItalic = this.textStyleItalic
+        textAlignment = viewModel.textAlignment,
+        textColor = viewModel.textColor,
+        textFontId = viewModel.textFontId,
+        textSize = viewModel.textSize,
+        textStyleBold = viewModel.textStyleBold,
+        textStyleItalic = viewModel.textStyleItalic
     )
 
     override fun onDestroy() {
@@ -864,7 +860,7 @@ class DiaryWritingFragment: Fragment() {
                     )
                     binding.editTextTitle.setTextColor(color)
                     binding.editTextContent.setTextColor(color)
-                    textColor = color
+                    viewModel.textColor = color
                 }
             )
             .setNegativeButton(

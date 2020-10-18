@@ -7,9 +7,12 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import com.duke.elliot.kim.kotlin.photodiary.*
 import com.duke.elliot.kim.kotlin.photodiary.database.DiaryDatabase
 import com.duke.elliot.kim.kotlin.photodiary.databinding.FragmentDairiesBinding
+import com.duke.elliot.kim.kotlin.photodiary.diary.EDIT_MODE
+import com.duke.elliot.kim.kotlin.photodiary.tab.TabFragmentDirections
 import com.duke.elliot.kim.kotlin.photodiary.utility.GridLayoutManagerWrapper
 
 class DiariesFragment: Fragment() {
@@ -32,7 +35,12 @@ class DiariesFragment: Fragment() {
 
         binding.diariesViewModel = viewModel
 
-        diaryAdapter = DiaryAdapter()
+        diaryAdapter = DiaryAdapter().apply {
+            setViewClickListener {
+                findNavController().navigate(TabFragmentDirections
+                    .actionTabFragmentToDiaryWritingFragment(getCurrentDiary(), EDIT_MODE))
+            }
+        }
         binding.recyclerViewDiary.layoutManager = GridLayoutManagerWrapper(requireContext(), 1)
         binding.recyclerViewDiary.adapter = diaryAdapter
 

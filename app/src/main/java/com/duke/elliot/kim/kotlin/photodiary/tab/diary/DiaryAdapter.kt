@@ -1,7 +1,9 @@
 package com.duke.elliot.kim.kotlin.photodiary.tab.diary
 
+import android.annotation.SuppressLint
 import android.graphics.Typeface
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -13,8 +15,17 @@ import com.duke.elliot.kim.kotlin.photodiary.utility.getFont
 import kotlinx.android.synthetic.main.item_diary.view.*
 
 
-class DiaryAdapter
-    : ListAdapter<DiaryModel, DiaryAdapter.ViewHolder>(DiaryDiffCallback()) {
+class DiaryAdapter : ListAdapter<DiaryModel, DiaryAdapter.ViewHolder>(DiaryDiffCallback()) {
+
+    private lateinit var viewClickListener: () -> Unit
+    private var currentItemPosition = 0
+
+    fun setViewClickListener(viewClickListener: () -> Unit) {
+        this.viewClickListener = viewClickListener
+    }
+
+    fun getCurrentDiary(): DiaryModel = getItem(currentItemPosition)
+
 
     class ViewHolder private constructor(val view: View): RecyclerView.ViewHolder(view) {
         companion object {
@@ -55,6 +66,21 @@ class DiaryAdapter
             setContext(holder.view.context)
             setMediaList(diary.mediaArray.toList())
         }
+
+        holder.view.setOnClickListener {
+            currentItemPosition = position
+
+            if (::viewClickListener.isInitialized)
+                viewClickListener.invoke()
+        }
+
+        holder.view.view_pager.setSingleTapUpListener {
+            holder.view.callOnClick()
+        }
+    }
+
+    private fun setBottomIconOnClickListeners() {
+
     }
 }
 

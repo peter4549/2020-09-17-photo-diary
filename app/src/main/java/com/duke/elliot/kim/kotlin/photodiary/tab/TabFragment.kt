@@ -10,6 +10,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.navigation.findNavController
 import androidx.viewpager2.widget.ViewPager2
 import com.duke.elliot.kim.kotlin.photodiary.R
+import com.duke.elliot.kim.kotlin.photodiary.diary.CREATE_MODE
 import com.duke.elliot.kim.kotlin.photodiary.tab.diary.DiariesFragment
 import com.duke.elliot.kim.kotlin.photodiary.tab.media.PhotosFragment
 import com.google.android.material.tabs.TabLayout
@@ -33,7 +34,7 @@ class TabFragment: Fragment() {
         initializeTabLayoutViewPager(view.tab_layout, view.view_pager)
 
         view.fab_write_diary.setOnClickListener {
-            view.findNavController().navigate(TabFragmentDirections.actionTabFragmentToDiaryWritingFragment())
+            view.findNavController().navigate(TabFragmentDirections.actionTabFragmentToDiaryWritingFragment(null, CREATE_MODE))
         }
 
         return view
