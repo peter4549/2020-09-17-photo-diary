@@ -11,9 +11,11 @@ import androidx.navigation.fragment.findNavController
 import com.duke.elliot.kim.kotlin.photodiary.*
 import com.duke.elliot.kim.kotlin.photodiary.database.DiaryDatabase
 import com.duke.elliot.kim.kotlin.photodiary.databinding.FragmentDairiesBinding
-import com.duke.elliot.kim.kotlin.photodiary.diary.EDIT_MODE
 import com.duke.elliot.kim.kotlin.photodiary.tab.TabFragmentDirections
 import com.duke.elliot.kim.kotlin.photodiary.utility.GridLayoutManagerWrapper
+import com.duke.elliot.kim.kotlin.photodiary.utility.showToast
+import kotlinx.coroutines.*
+import timber.log.Timber
 
 class DiariesFragment: Fragment() {
 
@@ -36,16 +38,49 @@ class DiariesFragment: Fragment() {
         binding.diariesViewModel = viewModel
 
         diaryAdapter = DiaryAdapter().apply {
-            setViewClickListener {
-                findNavController().navigate(TabFragmentDirections
-                    .actionTabFragmentToDiaryWritingFragment(getCurrentDiary(), EDIT_MODE))
+            setViewOnClickListener {
+                getCurrentDiary()?.let { diary ->
+                    viewModel.diaries.value?.let { diaries ->
+                        findNavController().navigate(TabFragmentDirections
+                            .actionTabFragmentToDiaryViewPagerFragment(diaries.toTypedArray(), diary))
+                    }
+                } ?: run {
+                    Timber.e("Diary not found.")
+                    showToast(requireContext(), getString(R.string.diary_not_found))
+                }
+            }
+
+            setDeleteOnClickListener {
+                getCurrentDiary()?.let { viewModel.delete(it) }
+            }
+
+            setUpdateListener {
+                getCurrentDiary()?.let { viewModel.update(it) }
             }
         }
+
         binding.recyclerViewDiary.layoutManager = GridLayoutManagerWrapper(requireContext(), 1)
+
         binding.recyclerViewDiary.adapter = diaryAdapter
 
         viewModel.diaries.observe(requireActivity()) { diaries ->
             diaryAdapter.submitList(diaries)
+
+            if (viewModel.status == DiariesViewModel.UNINITIALIZED) {
+                binding.recyclerViewDiary.scrollToPosition(0)
+                viewModel.status = DiariesViewModel.INITIALIZED
+            }
+
+            if (MainViewModel.inserted) {
+                CoroutineScope(Dispatchers.Default).launch {
+                    delay(200L)
+                    withContext(Dispatchers.Main) {
+                        binding.recyclerViewDiary.smoothScrollToPosition(0)
+                    }
+                }
+
+                MainViewModel.inserted = false
+            }
         }
 
         return binding.root

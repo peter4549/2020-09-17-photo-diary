@@ -4,6 +4,15 @@
     <string name="cancel">취소</string>
     <string name="ok">확인</string>
 
+    <!-- DiariesFragment -->
+    <string name="diary_not_found">다이어리를 찾지 못했습니다.</string>
+
+    <!-- DiaryViewPagerFragment -->
+    <string name="view_larger">크게 보기</string>
+    <string name="edit">편집</string>
+    <string name="set_category">카테고리 설정</string>
+    <string name="export">내보내기</string>
+
     <!-- DiaryWritingFragment -->
     <string name="album">앨범</string>
     <string name="bold">Bold</string>

@@ -7,7 +7,7 @@
     <data>
         <variable
             name="diaryWritingViewModel"
-            type="com.duke.elliot.kim.kotlin.photodiary.diary.DiaryWritingViewModel" />
+            type="com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryWritingViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -87,6 +87,15 @@
                         app:drawableStartCompat="@drawable/ic_round_access_time_16"
                         app:drawableTint="@color/colorDefaultThemeDark"
                         tools:text="오후 3시 30분" />
+
+                    <Spinner
+                        android:id="@+id/spinner_weather"
+                        android:layout_width="40dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="4dp"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="4dp"
+                        android:background="@android:color/transparent"/>
 
             </LinearLayout>
 

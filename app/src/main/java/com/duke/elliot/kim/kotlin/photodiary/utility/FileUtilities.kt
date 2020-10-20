@@ -13,7 +13,9 @@ import android.provider.MediaStore
 import android.provider.OpenableColumns
 import android.text.TextUtils
 import androidx.core.net.toUri
-import com.duke.elliot.kim.kotlin.photodiary.diary.media.media_helper.setConfigure
+import androidx.room.Room
+import com.duke.elliot.kim.kotlin.photodiary.database.DiaryDatabase
+import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.media_helper.setConfigure
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -21,7 +23,7 @@ import java.io.File
 import java.io.FileOutputStream
 import kotlin.math.min
 
-class FileUtilities(private val context: Context) {
+class FileUtilities private constructor (private val context: Context) {
 
     @SuppressLint("NewApi", "ObsoleteSdkInt", "Recycle")
     fun getPath(uri: Uri): String? {
@@ -445,5 +447,22 @@ class FileUtilities(private val context: Context) {
 
     companion object {
         private var contentUri: Uri? = null
+
+        @Volatile
+        private var INSTANCE: FileUtilities? = null
+
+        fun getInstance(context: Context): FileUtilities {
+            synchronized(this) {
+                var instance = INSTANCE
+
+                if (instance == null) {
+                    instance = FileUtilities(context)
+
+                    INSTANCE = instance
+                }
+
+                return instance
+            }
+        }
     }
 }

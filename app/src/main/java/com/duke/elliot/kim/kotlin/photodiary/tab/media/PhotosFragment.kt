@@ -10,7 +10,7 @@ import com.duke.elliot.kim.kotlin.photodiary.MainActivity
 import com.duke.elliot.kim.kotlin.photodiary.MainViewModel
 import com.duke.elliot.kim.kotlin.photodiary.R
 import com.duke.elliot.kim.kotlin.photodiary.base.BaseRecyclerViewAdapter
-import com.duke.elliot.kim.kotlin.photodiary.diary.DiaryModel
+import com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryModel
 import kotlinx.android.synthetic.main.fragment_photos.view.*
 import kotlinx.android.synthetic.main.item_diary.view.*
 
@@ -23,11 +23,11 @@ class PhotosFragment: Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_photos, container, false)
 
-        (requireActivity() as MainActivity).viewModel.diaries.observe(requireActivity()) { photos ->
+        (requireActivity() as MainActivity).getDiaries()?.observe(requireActivity()) { photos ->
             when((requireActivity() as MainActivity).viewModel.photosFragmentAction) {
                 MainViewModel.Action.UNINITIALIZED -> {
                     view.recycler_view_photo.apply {
-                        adapter = PhotoRecyclerViewAdapter(R.layout.item_diary, photos)  /**test layout. */
+                        adapter = PhotoRecyclerViewAdapter(R.layout.item_diary, photos as ArrayList<DiaryModel>)  /**test layout. */
                         layoutManager = GridLayoutManagerWrapper(requireContext(), 1)
                     }
                     view.recycler_view_photo.adapter?.notifyDataSetChanged()

@@ -9,7 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
-import com.duke.elliot.kim.kotlin.photodiary.diary.DiaryModel
+import com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryModel
 import com.duke.elliot.kim.kotlin.photodiary.fluid_keyboard_resize.FluidContentResize
 import kotlinx.android.synthetic.main.item_diary.view.*
 import kotlinx.coroutines.CoroutineScope
@@ -26,7 +26,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        setupTimber()
         setFontNameIdMap()
 
         FluidContentResize.listen(this)
@@ -63,15 +62,13 @@ class MainActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
     }
 
-    private fun setupTimber() {
-        Timber.plant(Timber.DebugTree())
-    }
-
     private fun setFontNameIdMap() {
         for ((i, fontName) in resources.getStringArray(R.array.fonts).withIndex()) {
             fontNameIdMap[fontName] = fontIds[i]
         }
     }
+
+    fun getDiaries() = viewModel.getDiaries()
 
     fun saveDiary(diary: DiaryModel) {
         CoroutineScope(Dispatchers.IO).launch {

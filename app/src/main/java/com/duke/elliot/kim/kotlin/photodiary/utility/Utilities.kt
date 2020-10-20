@@ -165,9 +165,6 @@ fun getCurrentTime() = Calendar.getInstance().timeInMillis
 fun Long.toDateFormat(pattern: String): String =
     SimpleDateFormat(pattern, Locale.getDefault()).format(this)
 
-fun Long.toTimeFormat(pattern: String): String =
-    SimpleDateFormat(pattern, Locale.getDefault()).format(this)
-
 fun getFont(context: Context, id: Int): Typeface? {
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
         context.resources.getFont(id)

@@ -10,7 +10,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.navigation.findNavController
 import androidx.viewpager2.widget.ViewPager2
 import com.duke.elliot.kim.kotlin.photodiary.R
-import com.duke.elliot.kim.kotlin.photodiary.diary.CREATE_MODE
+import com.duke.elliot.kim.kotlin.photodiary.diary_writing.CREATE_MODE
 import com.duke.elliot.kim.kotlin.photodiary.tab.diary.DiariesFragment
 import com.duke.elliot.kim.kotlin.photodiary.tab.media.PhotosFragment
 import com.google.android.material.tabs.TabLayout

@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="diaryViewViewModel"
+            type="com.duke.elliot.kim.kotlin.photodiary.tab.diary.diary_view.DiaryViewViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorDefaultThemeLight"
+        android:theme="@style/Theme.MaterialComponents.Light.NoActionBar">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="8dp"
+            android:fillViewport="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:orientation="horizontal"
+                    android:background="@drawable/background_white_rounded_corners"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:id="@+id/text_date"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:drawablePadding="6dp"
+                        android:gravity="bottom"
+                        android:includeFontPadding="false"
+                        android:padding="8dp"
+                        android:textColor="@color/colorTextCalendar"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/toolbar"
+                        app:drawableStartCompat="@drawable/ic_round_date_range_16"
+                        app:drawableTint="@color/colorDefaultThemeDark"
+                        tools:text="2020년 9월 17일 금요일" />
+
+                    <TextView
+                        android:id="@+id/text_time"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:drawablePadding="6dp"
+                        android:gravity="bottom"
+                        android:includeFontPadding="false"
+                        android:padding="8dp"
+                        android:textColor="@color/colorTextCalendar"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/toolbar"
+                        app:drawableStartCompat="@drawable/ic_round_access_time_16"
+                        app:drawableTint="@color/colorDefaultThemeDark"
+                        tools:text="오후 3시 30분" />
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/text_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:background="@drawable/background_white_rounded_corners"
+                    android:ellipsize="end"
+                    android:ems="10"
+                    android:maxLines="1"
+                    android:padding="8dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/text_date_time" />
+
+                <RelativeLayout
+                    android:id="@+id/media_container"
+                    android:layout_width="320dp"
+                    android:layout_height="320dp"
+                    android:layout_gravity="center_horizontal"
+                    android:elevation="2dp"
+                    app:layout_constraintBottom_toTopOf="@+id/text_content"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/text_title">
+
+                    <com.duke.elliot.kim.kotlin.photodiary.view.ClickableViewPager
+                        android:id="@+id/view_pager"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginTop="8dp"/>
+
+                    <com.rd.PageIndicatorView
+                        android:id="@+id/page_indicator_view"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentBottom="true"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginBottom="16dp"
+                        app:piv_viewPager="@id/view_pager"
+                        tools:piv_padding="12dp"
+                        tools:piv_radius="8dp" />
+
+                </RelativeLayout>
+
+                <TextView
+                    android:id="@+id/text_content"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:background="@drawable/background_white_rounded_corners"
+                    android:ellipsize="end"
+                    android:ems="10"
+                    android:gravity="top"
+                    android:lineSpacingMultiplier="1.1"
+                    android:minHeight="@dimen/dimen_edit_text_content_min_height"
+                    android:overScrollMode="always"
+                    android:padding="8dp"
+                    android:scrollbars="vertical"
+                    app:layout_constraintBottom_toTopOf="@+id/layout_options_container"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/view_pager" />
+
+            </LinearLayout>
+        </ScrollView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

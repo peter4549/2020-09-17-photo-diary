@@ -17,10 +17,13 @@
             app:popEnterAnim="@anim/anim_slide_in_from_top"
             app:popExitAnim="@anim/anim_slide_out_to_bottom"
             app:popUpToInclusive="false" />
+        <action
+            android:id="@+id/action_tabFragment_to_diaryViewPagerFragment"
+            app:destination="@id/diaryViewPagerFragment" />
     </fragment>
     <fragment
         android:id="@+id/diaryWritingFragment"
-        android:name="com.duke.elliot.kim.kotlin.photodiary.diary.DiaryWritingFragment"
+        android:name="com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryWritingFragment"
         android:label="DiaryWritingFragment"
         tools:layout="@layout/fragment_diary_writing">
         <action
@@ -32,7 +35,7 @@
             app:popExitAnim="@anim/anim_slide_out_to_right" />
         <argument
             android:name="diary"
-            app:argType="com.duke.elliot.kim.kotlin.photodiary.diary.DiaryModel"
+            app:argType="com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryModel"
             app:nullable="true" />
         <argument
             android:name="mode"
@@ -40,7 +43,7 @@
     </fragment>
     <fragment
         android:id="@+id/photoEditorFragment"
-        android:name="com.duke.elliot.kim.kotlin.photodiary.diary.media.photo_editor.PhotoEditorFragment"
+        android:name="com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.photo_editor.PhotoEditorFragment"
         android:label="PhotoEditorFragment" >
         <action
             android:id="@+id/action_photoEditorFragment_to_simpleCropViewFragment"
@@ -55,10 +58,24 @@
     </fragment>
     <fragment
         android:id="@+id/simpleCropViewFragment"
-        android:name="com.duke.elliot.kim.kotlin.photodiary.diary.media.simple_crop_view.SimpleCropViewFragment"
+        android:name="com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.simple_crop_view.SimpleCropViewFragment"
         android:label="SimpleCropViewFragment">
         <argument android:name="imageUri"
             app:argType="android.net.Uri"
             app:nullable="true"/>
+    </fragment>
+    <fragment
+        android:id="@+id/diaryViewPagerFragment"
+        android:name="com.duke.elliot.kim.kotlin.photodiary.tab.diary.diary_view.DiaryViewPagerFragment"
+        android:label="DiaryViewPagerFragment" >
+        <action
+            android:id="@+id/action_diaryViewPagerFragment_to_diaryWritingFragment"
+            app:destination="@id/diaryWritingFragment" />
+        <argument
+            android:name="diaries"
+            app:argType="com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryModel[]" />
+        <argument
+            android:name="selectedDiary"
+            app:argType="com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryModel" />
     </fragment>
 </navigation>

@@ -1,8 +1,8 @@
 package com.duke.elliot.kim.kotlin.photodiary.database
 
 import androidx.room.TypeConverter
-import com.duke.elliot.kim.kotlin.photodiary.diary.TextOptionsModel
-import com.duke.elliot.kim.kotlin.photodiary.diary.media.MediaModel
+import com.duke.elliot.kim.kotlin.photodiary.diary_writing.TextOptionsModel
+import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.MediaModel
 import com.google.gson.Gson
 
 class Converters {

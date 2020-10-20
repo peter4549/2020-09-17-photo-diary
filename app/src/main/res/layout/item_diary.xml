@@ -1,149 +1,169 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginBottom="16dp"
-    android:layout_marginEnd="2dp"
-    android:layout_marginStart="2dp"
-    android:backgroundTint="@color/colorDefaultThemeLight"
-    app:cardCornerRadius="8dp">
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <data>
+        <variable
+            name="diary"
+            type="com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryModel" />
+    </data>
+
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/Theme.MaterialComponents.Light.NoActionBar">
+        android:layout_marginBottom="16dp"
+        android:layout_marginEnd="2dp"
+        android:layout_marginStart="2dp"
+        android:backgroundTint="@color/colorDefaultThemeLight"
+        app:cardCornerRadius="8dp">
 
-        <TextView
-            android:id="@+id/text_date"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            android:background="@drawable/background_white_rounded_corners"
-            android:gravity="center_vertical"
-            android:padding="8dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="2020년 10월 17일 토요일 띄우는게 나은듯. 날씨추가 고려. 오후 8시 20분" />
+            android:theme="@style/Theme.MaterialComponents.Light.NoActionBar">
 
-        <TextView
-            android:id="@+id/text_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            android:background="@drawable/background_white_rounded_corners"
-            android:padding="8dp"
-            android:textColor="@color/color_text_dark"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/text_date"
-            tools:text="시원한 이이스커피" />
-
-        <RelativeLayout
-            android:id="@+id/media_container"
-            android:layout_width="240dp"
-            android:layout_height="240dp"
-            android:layout_margin="8dp"
-            android:elevation="2dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/text_title">
-
-            <com.duke.elliot.kim.kotlin.photodiary.view.ClickableViewPager
-                android:id="@+id/view_pager"
+            <TextView
+                android:id="@+id/text_date"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
-
-            <com.rd.PageIndicatorView
-                android:id="@+id/page_indicator_view"
-                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_centerHorizontal="true"
-                android:layout_marginBottom="16dp"
-                app:piv_viewPager="@id/view_pager"
-                tools:piv_padding="12dp"
-                tools:piv_radius="8dp" />
+                android:layout_margin="8dp"
+                android:background="@drawable/background_white_rounded_corners"
+                android:gravity="center_vertical"
+                android:padding="8dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="2020년 10월 17일 토요일 띄우는게 나은듯. 날씨추가 고려. 오후 8시 20분" />
 
-        </RelativeLayout>
-
-        <TextView
-            android:id="@+id/text_content"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            android:background="@drawable/background_white_rounded_corners"
-            android:maxHeight="160dp"
-            android:minHeight="80dp"
-            android:padding="8dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/media_container" />
-
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            android:background="@drawable/background_white_rounded_corners"
-            android:orientation="horizontal"
-            android:padding="8dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/text_content">
-
-            <ImageView
-                android:id="@+id/image_edit"
-                android:layout_width="wrap_content"
+            <TextView
+                android:id="@+id/text_title"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                app:srcCompat="@drawable/ic_sharp_create_24"
-                tools:ignore="ContentDescription" />
+                android:layout_margin="8dp"
+                android:background="@drawable/background_white_rounded_corners"
+                android:padding="8dp"
+                android:textColor="@color/color_text_dark"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/text_date"
+                tools:text="시원한 이이스커피" />
 
-            <com.like.LikeButton
-                android:id="@+id/button_star"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                app:anim_scale_factor="2"
-                app:circle_end_color="@color/colorAccent"
-                app:circle_start_color="@color/colorPrimary"
-                app:dots_primary_color="@color/colorAccent"
-                app:dots_secondary_color="@color/colorPrimary"
-                app:icon_size="24dp"
-                app:icon_type="Star"
-                app:is_enabled="false"
-                app:like_drawable="@drawable/star_on"
-                app:liked="false"
-                app:unlike_drawable="@drawable/star_off" />
+            <RelativeLayout
+                android:id="@+id/media_container"
+                android:layout_width="240dp"
+                android:layout_height="240dp"
+                android:elevation="2dp"
+                app:layout_constraintBottom_toTopOf="@+id/text_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/text_title">
 
-            <ImageView
-                android:id="@+id/image_export"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                app:srcCompat="@drawable/ic_right_arrow_50px"
-                tools:ignore="ContentDescription" />
+                <com.duke.elliot.kim.kotlin.photodiary.view.ClickableViewPager
+                    android:id="@+id/view_pager"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"/>
 
-            <Space
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:layout_weight="1" />
+                <com.rd.PageIndicatorView
+                    android:id="@+id/page_indicator_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginBottom="16dp"
+                    app:piv_viewPager="@id/view_pager"
+                    tools:piv_padding="12dp"
+                    tools:piv_radius="8dp" />
 
-            <ImageView
-                android:id="@+id/image_delete"
-                android:layout_width="wrap_content"
+            </RelativeLayout>
+
+            <TextView
+                android:id="@+id/text_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                app:srcCompat="@drawable/ic_round_delete_24"
-                app:tint="@color/colorIconTint"
-                tools:ignore="ContentDescription" />
+                android:layout_margin="8dp"
+                android:background="@drawable/background_white_rounded_corners"
+                android:maxHeight="160dp"
+                android:minHeight="80dp"
+                android:padding="8dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/media_container" />
 
-        </LinearLayout>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</androidx.cardview.widget.CardView>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:orientation="horizontal"
+                android:background="@drawable/background_white_rounded_corners"
+                android:gravity="center_vertical"
+                android:padding="8dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/text_content">
+
+                <ImageView
+                    android:id="@+id/image_edit"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:layout_marginStart="8dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    app:srcCompat="@drawable/ic_sharp_create_24"
+                    tools:ignore="ContentDescription" />
+
+                <com.like.LikeButton
+                    android:id="@+id/button_star"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:layout_marginEnd="2dp"
+                    android:layout_marginStart="8dp"
+                    app:anim_scale_factor="2"
+                    app:circle_end_color="@color/colorAccent"
+                    app:circle_start_color="@color/colorPrimary"
+                    app:dots_primary_color="@color/colorAccent"
+                    app:dots_secondary_color="@color/colorPrimary"
+                    app:icon_size="28dp"
+                    app:icon_type="Star"
+                    app:is_enabled="true"
+                    app:like_drawable="@drawable/ic_round_star_liked_32"
+                    app:liked="false"
+                    app:unlike_drawable="@drawable/ic_round_star_un_liked_32"
+                    app:tint="@color/colorIconTint"/>
+
+                <ImageView
+                    android:id="@+id/image_export"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginStart="8dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    app:srcCompat="@drawable/ic_right_arrow_50px"
+                    app:tint="@color/colorIconTint"
+                    tools:ignore="ContentDescription" />
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1" />
+
+                <ImageView
+                    android:id="@+id/image_delete"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:layout_marginEnd="8dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    app:srcCompat="@drawable/ic_round_delete_24"
+                    app:tint="@color/colorIconTint"
+                    tools:ignore="ContentDescription" />
+
+            </LinearLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
+</layout>

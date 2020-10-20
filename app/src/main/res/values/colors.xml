@@ -74,6 +74,8 @@
     <color name="colorGrey500">#9E9E9E</color>
     <color name="colorBlueGrey500">#607D8B</color>
 
+    <color name="colorGold">#FFD700</color>
+
     <color name="colorDefaultBackgroundBlack">#151414</color>
 
     <!-- SimpleCropView -->

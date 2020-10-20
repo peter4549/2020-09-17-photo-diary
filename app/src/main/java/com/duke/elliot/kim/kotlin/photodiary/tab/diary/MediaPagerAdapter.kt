@@ -5,7 +5,7 @@ import android.view.*
 import androidx.core.net.toUri
 import androidx.viewpager.widget.PagerAdapter
 import com.duke.elliot.kim.kotlin.photodiary.R
-import com.duke.elliot.kim.kotlin.photodiary.diary.media.MediaModel
+import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.MediaModel
 import com.duke.elliot.kim.kotlin.photodiary.utility.setImage
 import kotlinx.android.synthetic.main.image_pager_view.view.*
 

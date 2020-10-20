@@ -5,7 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.duke.elliot.kim.kotlin.photodiary.diary.DiaryModel
+import com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryModel
 
 @Database(entities = [DiaryModel::class], version = 1, exportSchema = false)
 @TypeConverters(Converters::class)
@@ -24,7 +24,7 @@ abstract class DiaryDatabase : RoomDatabase() {
                     instance = Room.databaseBuilder(
                         context.applicationContext,
                         DiaryDatabase::class.java,
-                        "diary_database_debug_05"
+                        "diary_database_debug_06"
                     )
                         .fallbackToDestructiveMigration()
                         .build()
