@@ -55,7 +55,7 @@
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/toolbar"
-                        app:drawableStartCompat="@drawable/ic_round_date_range_16"
+                        app:drawableStartCompat="@drawable/ic_round_date_range_24"
                         app:drawableTint="@color/colorDefaultThemeDark"
                         tools:text="2020년 9월 17일 금요일" />
 
@@ -73,7 +73,7 @@
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/toolbar"
-                        app:drawableStartCompat="@drawable/ic_round_access_time_16"
+                        app:drawableStartCompat="@drawable/ic_round_access_time_24"
                         app:drawableTint="@color/colorDefaultThemeDark"
                         tools:text="오후 3시 30분" />
 

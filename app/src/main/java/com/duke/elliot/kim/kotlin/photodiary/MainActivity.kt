@@ -71,15 +71,18 @@ class MainActivity : AppCompatActivity() {
     fun getDiaries() = viewModel.getDiaries()
 
     fun saveDiary(diary: DiaryModel) {
-        CoroutineScope(Dispatchers.IO).launch {
-            viewModel.insert(diary)
-        }
+        viewModel.insert(diary)
+    }
+
+    fun updateDiary(diary: DiaryModel) {
+        viewModel.update(diary)
     }
 
     companion object {
-        const val DEFAULT_FONT_ID = R.font.nanum_square_round_regular
+        const val DEFAULT_FONT_ID = R.font.cookie_run_regular
         var fontNameIdMap: MutableMap<String, Int> = mutableMapOf()
         val fontIds = arrayOf(
+            R.font.cookie_run_regular,
             R.font.nanum_barun_gothic_regular,
             R.font.nanum_barun_pen_regular,
             R.font.nanum_brush_regular,

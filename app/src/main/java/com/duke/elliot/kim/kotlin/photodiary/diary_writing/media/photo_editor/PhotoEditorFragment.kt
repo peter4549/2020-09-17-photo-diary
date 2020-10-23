@@ -214,6 +214,15 @@ class PhotoEditorFragment: Fragment(),
                 popBackStackWithSaveImage()
                 this.dismiss()
             }
+
+            setCancelClickEvent {
+                findNavController().popBackStack()
+            }
+
+            setButtonTexts(
+                okButtonText = binding.root.context.getString(R.string.yes),
+                cancelButtonText = binding.root.context.getString(R.string.no)
+            )
         }
 
         requestPermissionsDialogFragment = OkCancelDialogFragment().apply {
@@ -271,9 +280,10 @@ class PhotoEditorFragment: Fragment(),
                         val styleBuilder = TextStyleBuilder()
                         styleBuilder.withTextColor(colorCode)
                         photoEditor.addText(inputText, styleBuilder)
-                        binding.textCurrentTool.setText(R.string.editing_tool_text)
                     }
                 })
+
+                binding.textCurrentTool.setText(R.string.editing_tool_text)
             }
 
             ToolType.ERASER -> {
@@ -312,7 +322,9 @@ class PhotoEditorFragment: Fragment(),
 
     private fun showFilter(isVisible: Boolean) {
         isFilterVisible = isVisible
-        constraintSet.clone(binding.layoutFragmentPhotoEditor)
+        val childView = binding.layoutFragmentPhotoEditor
+        childView.id = View.generateViewId()
+        constraintSet.clone(childView)
         if (isVisible) {
             constraintSet.clear(binding.recyclerViewFilter.id, ConstraintSet.START)
             constraintSet.connect(
@@ -334,8 +346,8 @@ class PhotoEditorFragment: Fragment(),
         val changeBounds = ChangeBounds()
         changeBounds.duration = 320
         changeBounds.interpolator = AnticipateOvershootInterpolator(1.0F)
-        TransitionManager.beginDelayedTransition(binding.layoutFragmentPhotoEditor, changeBounds)
-        constraintSet.applyTo(binding.layoutFragmentPhotoEditor)
+        TransitionManager.beginDelayedTransition(childView, changeBounds)
+        constraintSet.applyTo(childView)
     }
 
     override fun onColorChanged(colorCode: Int) {

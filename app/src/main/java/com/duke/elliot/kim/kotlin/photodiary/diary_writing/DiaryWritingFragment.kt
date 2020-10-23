@@ -13,7 +13,8 @@ import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
+import androidx.annotation.ColorInt
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
@@ -60,6 +61,7 @@ class DiaryWritingFragment: Fragment() {
     private var layoutOptionsIsShown = true
     private var layoutOptionItemsHeight = 0F
     private var layoutOptionItemsIsShown = false
+    private var layoutOptionsWasShown = false
     private var mediumAnimationDuration = 0
     private var recyclerViewMediaIsShown = false
     private var selectedItemView: View? = null
@@ -289,15 +291,21 @@ class DiaryWritingFragment: Fragment() {
         )
 
         initializeToolbar(binding.toolbar)
+        // TODO Implement setThemeColor()...
 
         progressDialogFragment = ProgressDialogFragment.instance
 
         val diaryWritingFragmentArgs by navArgs<DiaryWritingFragmentArgs>()
 
-        viewModelFactory = DiaryWritingViewModelFactory(requireActivity().application, diaryWritingFragmentArgs.diary)
+        viewModelFactory = DiaryWritingViewModelFactory(
+            requireActivity().application,
+            diaryWritingFragmentArgs.diary,
+            diaryWritingFragmentArgs.mode
+        )
         viewModel = ViewModelProvider(viewModelStore, viewModelFactory)[DiaryWritingViewModel::class.java]
 
         fileUtilities = FileUtilities.getInstance(requireContext())
+
         initializeSpinners()
         inputMethodManager = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         hideKeyboard(binding.root, inputMethodManager)
@@ -321,9 +329,7 @@ class DiaryWritingFragment: Fragment() {
                                 MediaHelper.MediaType.PHOTO -> navigateToPhotoEditorFragment(it.uriString.toUri())
                                 MediaHelper.MediaType.VIDEO -> startExoPlayerActivity(it.uriString.toUri())
                                 MediaHelper.MediaType.AUDIO -> startExoPlayerActivity(it.uriString.toUri())
-                                else -> {
-                                    // TODO: Throw class cast exception
-                                }
+                                else -> throw ClassCastException("Invalid media type.")
                             }
                         }
 
@@ -402,7 +408,9 @@ class DiaryWritingFragment: Fragment() {
 
         initializeOptionItems()
         initializeTextItems()
+        // TODO fetch는 한 번만 수행되도록 뷰모델에서 스위치 변수 사용할 것.
         viewModel.originDiary?.let { fetchOriginDiary(it) }
+        setCursorColor(viewModel.textColor)
 
         setEventListener(
             requireActivity(),
@@ -417,8 +425,18 @@ class DiaryWritingFragment: Fragment() {
                             showOptionItemsScheduled = false
                             selectedItemView?.let { showOptionItems(it) }
                         }
+
+                        if (layoutOptionsWasShown) {
+                            binding.imageDropdown.rotate(0F, shortAnimationDuration)
+                            binding.layoutOptionsContainer
+                                .showUp(shortAnimationDuration, layoutOptionsHeight)
+                            layoutOptionsIsShown = true
+                            layoutOptionsWasShown = false
+                        }
+
                     } else {  // isOpen == true
                         if (layoutOptionsIsShown) {
+                            layoutOptionsWasShown = true
                             binding.imageDropdown.rotate(180F, shortAnimationDuration)
                             binding.layoutOptionsContainer
                                 .hideDown(shortAnimationDuration, layoutOptionsHeight)
@@ -440,7 +458,54 @@ class DiaryWritingFragment: Fragment() {
                 }
             }
 
+        val onBackPressedCallback: OnBackPressedCallback =
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    backPressed()
+                }
+            }
+
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            onBackPressedCallback
+        )
+
         return binding.root
+    }
+
+    private fun backPressed() {
+        if (isChanged()) {
+            val saveDiaryDialogFragment = OkCancelDialogFragment().apply {
+                val message = if (viewModel.mode == CREATE_MODE)
+                    binding.root.context.getString(R.string.save_diary_message)
+                else
+                    binding.root.context.getString(R.string.save_edited_diary_message)
+
+                setDialogParameters(
+                    binding.root.context.getString(R.string.save_diary_title),
+                    message
+                ) {
+                    if (viewModel.mode == CREATE_MODE)
+                        saveDiary(createDiary())
+                    else
+                        updateDiary()
+
+                    this.dismiss()
+                }
+
+                setCancelClickEvent {
+                    findNavController().popBackStack()
+                }
+
+                setButtonTexts(
+                    okButtonText = binding.root.context.getString(R.string.yes),
+                    cancelButtonText = binding.root.context.getString(R.string.no)
+                )
+            }
+
+            saveDiaryDialogFragment.show(requireActivity().supportFragmentManager, tag)
+        } else
+            findNavController().popBackStack()
     }
 
     private fun initializeToolbar(toolbar: Toolbar) {
@@ -453,6 +518,10 @@ class DiaryWritingFragment: Fragment() {
         binding.editTextTitle.setText(originDiary.title)
         binding.editTextContent.setText(originDiary.content)
 
+        /** The mediaArray and spinner options are assigned as the value of the live data of the view model,
+         *  so there is no need to fetch it here. */
+
+        applyTextOptions()
     }
 
     private fun initializeOptionItems() {
@@ -476,7 +545,12 @@ class DiaryWritingFragment: Fragment() {
            ArrayAdapter(requireContext(), R.layout.item_spinner, fontSizes)
 
         binding.spinnerTextSize.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parentView: AdapterView<*>?, selectedItemView: View?, position: Int, id: Long) {
+            override fun onItemSelected(
+                parentView: AdapterView<*>?,
+                selectedItemView: View?,
+                position: Int,
+                id: Long
+            ) {
                 viewModel.textSize = fontSizes[position].toFloat()
                 binding.editTextTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, viewModel.textSize)
                 binding.editTextContent.setTextSize(TypedValue.COMPLEX_UNIT_SP, viewModel.textSize)
@@ -486,12 +560,29 @@ class DiaryWritingFragment: Fragment() {
         }
 
         binding.spinnerFont.onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parentView: AdapterView<*>?, selectedItemView: View?, position: Int, id: Long) {
-                val fontName = (selectedItemView as TextView).text.toString()
+            override fun onItemSelected(
+                parentView: AdapterView<*>?,
+                selectedItemView: View?,
+                position: Int,
+                id: Long
+            ) {
+                val fontName = binding.spinnerFont.selectedItem.toString()
                 viewModel.textFontId = MainActivity.fontNameIdMap[fontName] ?: MainActivity.DEFAULT_FONT_ID
                 viewModel.textFont = getFont(requireContext(), viewModel.textFontId)
                 binding.editTextTitle.typeface = viewModel.textFont
                 binding.editTextContent.typeface = viewModel.textFont
+
+                if (viewModel.textStyleBold && viewModel.textStyleItalic) {
+                    binding.editTextTitle.setTypeface(viewModel.textFont, Typeface.BOLD_ITALIC)
+                    binding.editTextContent.setTypeface(viewModel.textFont, Typeface.BOLD_ITALIC)
+                } else if (viewModel.textStyleBold) {
+                    binding.editTextTitle.setTypeface(viewModel.textFont, Typeface.BOLD)
+                    binding.editTextContent.setTypeface(viewModel.textFont, Typeface.BOLD)
+                } else if (viewModel.textStyleItalic) {
+                    binding.editTextTitle.setTypeface(viewModel.textFont, Typeface.ITALIC)
+                    binding.editTextContent.setTypeface(viewModel.textFont, Typeface.ITALIC)
+                }
+
             }
 
             override fun onNothingSelected(parentView: AdapterView<*>?) {  }
@@ -500,7 +591,12 @@ class DiaryWritingFragment: Fragment() {
         binding.spinnerWeather.apply {
             adapter = WeatherSpinnerAdapter(requireContext(), DiaryWritingViewModel.weatherIconIds)
             onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-                override fun onItemSelected(parentView: AdapterView<*>?, selectedItemView: View?, position: Int, id: Long) {
+                override fun onItemSelected(
+                    parentView: AdapterView<*>?,
+                    selectedItemView: View?,
+                    position: Int,
+                    id: Long
+                ) {
                     viewModel.weatherIconId = DiaryWritingViewModel.weatherIconIds[position]
                 }
 
@@ -522,6 +618,45 @@ class DiaryWritingFragment: Fragment() {
         binding.imageTextColor.setOnClickListener(textOptionItemsOnClickListener)
     }
 
+    private fun applyTextOptions() {
+        val textOptions = viewModel.originDiary?.textOptions ?: return
+        val font = getFont(requireContext(), textOptions.textFontId)
+
+        binding.editTextTitle.setTextColor(textOptions.textColor)
+        binding.editTextContent.setTextColor(textOptions.textColor)
+
+        binding.editTextTitle.gravity = textOptions.textAlignment
+        binding.editTextContent.gravity = textOptions.textAlignment
+
+        binding.editTextTitle.typeface = font
+        binding.editTextContent.typeface = font
+
+        binding.editTextTitle.textSize = textOptions.textSize
+        binding.editTextContent.textSize = textOptions.textSize
+
+        if (textOptions.textStyleBold && textOptions.textStyleItalic)
+            binding.editTextContent.setTypeface(font, Typeface.BOLD_ITALIC)
+        else if (textOptions.textStyleBold)
+            binding.editTextContent.setTypeface(font, Typeface.BOLD)
+        else if (textOptions.textStyleItalic)
+            binding.editTextContent.setTypeface(font, Typeface.ITALIC)
+
+        setCursorColor(textOptions.textColor)
+    }
+
+    private fun setCursorColor(@ColorInt color: Int) {
+        val objectColor = ColorUtilities.lightenColor(color, 0.175F)
+        var highlightColor = ColorUtilities.lightenColor(ColorUtilities.getComplementaryColor(color), 0.350F)
+        highlightColor = ColorUtilities.whiteToGrey(highlightColor)
+
+        ColorUtilities.setCursorDrawableColor(binding.editTextTitle, objectColor)
+        ColorUtilities.setCursorDrawableColor(binding.editTextContent, objectColor)
+        binding.editTextTitle.highlightColor = highlightColor
+        binding.editTextContent.highlightColor = highlightColor
+        ColorUtilities.setCursorPointerColor(binding.editTextTitle, objectColor)
+        ColorUtilities.setCursorPointerColor(binding.editTextContent, objectColor)
+    }
+
     private fun showKeyboard(view: View, inputMethodManager: InputMethodManager) {
         inputMethodManager.showSoftInput(view, 0)
     }
@@ -540,6 +675,7 @@ class DiaryWritingFragment: Fragment() {
         when(item.itemId) {
             android.R.id.home -> {
                 // TODO save data and back. (ask about edit state...)
+                // 변경사항이 있으면 ask.
             }
             R.id.save_diary -> {
                 saveDiary(createDiary())
@@ -592,7 +728,12 @@ class DiaryWritingFragment: Fragment() {
                                         itemCount += 1
                                         if (itemCount >= totalItemCount)
                                             progressDialogFragment.dismiss()
-                                        addMedia(MediaModel(MediaModel.Type.PHOTO, copiedUri.toString()))
+                                        addMedia(
+                                            MediaModel(
+                                                MediaModel.Type.PHOTO,
+                                                copiedUri.toString()
+                                            )
+                                        )
                                     } ?: run {
                                         itemCount += 1
                                         if (itemCount >= totalItemCount)
@@ -611,7 +752,12 @@ class DiaryWritingFragment: Fragment() {
                             CoroutineScope(Dispatchers.Main).launch {
                                 fileUtilities.copyFileToInternalStorage(uri)?.let { copiedUri ->
                                     progressDialogFragment.dismiss()
-                                    addMedia(MediaModel(MediaModel.Type.PHOTO, copiedUri.toString()))
+                                    addMedia(
+                                        MediaModel(
+                                            MediaModel.Type.PHOTO,
+                                            copiedUri.toString()
+                                        )
+                                    )
                                 } ?: run {
                                     progressDialogFragment.dismiss()
                                     showToast(
@@ -715,7 +861,12 @@ class DiaryWritingFragment: Fragment() {
                                         itemCount += 1
                                         if (itemCount >= totalItemCount)
                                             progressDialogFragment.dismiss()
-                                        addMedia(MediaModel(MediaModel.Type.AUDIO, copiedUri.toString()))
+                                        addMedia(
+                                            MediaModel(
+                                                MediaModel.Type.AUDIO,
+                                                copiedUri.toString()
+                                            )
+                                        )
                                     } ?: run {
                                         itemCount += 1
                                         if (itemCount >= totalItemCount)
@@ -734,7 +885,12 @@ class DiaryWritingFragment: Fragment() {
                             CoroutineScope(Dispatchers.Main).launch {
                                 fileUtilities.copyFileToInternalStorage(uri)?.let { copiedUri ->
                                     progressDialogFragment.dismiss()
-                                    addMedia(MediaModel(MediaModel.Type.AUDIO, copiedUri.toString()))
+                                    addMedia(
+                                        MediaModel(
+                                            MediaModel.Type.AUDIO,
+                                            copiedUri.toString()
+                                        )
+                                    )
                                 } ?: run {
                                     progressDialogFragment.dismiss()
                                     showToast(
@@ -788,8 +944,46 @@ class DiaryWritingFragment: Fragment() {
         findNavController().popBackStack()
     }
 
-    private fun checkChanges() {
+    private fun updateDiary() {
+        viewModel.originDiary?.let { diary ->
+            diary.title = binding.editTextTitle.text.toString()
+            diary.content = binding.editTextContent.text.toString()
+            diary.textOptions = createTextOptions()
+            diary.mediaArray = mediaAdapter.getMediaArray()
+            diary.weatherIconId = viewModel.weatherIconId
+            (requireActivity() as MainActivity).updateDiary(diary)
+        } ?: run {
+            showToast(requireContext(), "원본 다이어리가 손상되었습니다.")
+            saveDiary(createDiary())
+        }
 
+        findNavController().popBackStack()
+    }
+
+    private fun isChanged(): Boolean {
+        if (viewModel.originDiary == null) {
+            if (binding.editTextTitle.text.isNotBlank() || binding.editTextContent.text.isNotBlank())
+                return true
+
+            if (mediaAdapter.getMediaArray().isNotEmpty())
+                return true
+
+            return false
+        } else {
+            val originDiary = viewModel.originDiary!!
+            if (originDiary.title != binding.editTextTitle.text.toString() ||
+                    originDiary.content != binding.editTextContent.text.toString() ||
+                    originDiary.weatherIconId != viewModel.weatherIconId)
+                return true
+
+            if (!originDiary.mediaArray.contentEquals(mediaAdapter.getMediaArray()))
+                return true
+
+            if (originDiary.textOptions != createTextOptions())
+                return true
+
+            return false
+        }
     }
 
     private fun createDiary(): DiaryModel {
@@ -800,7 +994,8 @@ class DiaryWritingFragment: Fragment() {
             time = viewModel.time,
             mediaArray = mediaAdapter.getMediaArray(),
             textOptions = createTextOptions(),
-            liked = false
+            liked = false,
+            weatherIconId = viewModel.weatherIconId
         )
     }
 
@@ -824,6 +1019,31 @@ class DiaryWritingFragment: Fragment() {
         binding.layoutAudioOptionItems.visibility = View.GONE
         binding.layoutTextOptionItems.visibility = View.GONE
 
+        binding.imagePhoto.setColorFilter(
+            ContextCompat.getColor(
+                requireContext(),
+                R.color.colorTextOptionItemsUnselected
+            )
+        )
+        binding.imageVideo.setColorFilter(
+            ContextCompat.getColor(
+                requireContext(),
+                R.color.colorTextOptionItemsUnselected
+            )
+        )
+        binding.imageAudio.setColorFilter(
+            ContextCompat.getColor(
+                requireContext(),
+                R.color.colorTextOptionItemsUnselected
+            )
+        )
+        binding.imageText.setColorFilter(
+            ContextCompat.getColor(
+                requireContext(),
+                R.color.colorTextOptionItemsUnselected
+            )
+        )
+
         if (!layoutOptionItemsIsShown) {
             binding.layoutOptionsContainer.translateUp(
                 shortAnimationDuration,
@@ -843,10 +1063,42 @@ class DiaryWritingFragment: Fragment() {
         }
 
         when(view.id) {
-            R.id.image_photo -> binding.layoutPhotoOptionItems.visibility = View.VISIBLE
-            R.id.image_video -> binding.layoutVideoOptionItems.visibility = View.VISIBLE
-            R.id.image_audio -> binding.layoutAudioOptionItems.visibility = View.VISIBLE
-            R.id.image_text -> binding.layoutTextOptionItems.visibility = View.VISIBLE
+            R.id.image_photo -> {
+                binding.layoutPhotoOptionItems.visibility = View.VISIBLE
+                binding.imagePhoto.setColorFilter(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.colorTextOptionItemsSelected
+                    )
+                )
+            }
+            R.id.image_video -> {
+                binding.layoutVideoOptionItems.visibility = View.VISIBLE
+                binding.imageVideo.setColorFilter(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.colorTextOptionItemsSelected
+                    )
+                )
+            }
+            R.id.image_audio -> {
+                binding.layoutAudioOptionItems.visibility = View.VISIBLE
+                binding.imageAudio.setColorFilter(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.colorTextOptionItemsSelected
+                    )
+                )
+            }
+            R.id.image_text -> {
+                binding.layoutTextOptionItems.visibility = View.VISIBLE
+                binding.imageText.setColorFilter(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.colorTextOptionItemsSelected
+                    )
+                )
+            }
         }
     }
 
@@ -879,6 +1131,7 @@ class DiaryWritingFragment: Fragment() {
                     )
                     binding.editTextTitle.setTextColor(color)
                     binding.editTextContent.setTextColor(color)
+                    setCursorColor(color)
                     viewModel.textColor = color
                 }
             )

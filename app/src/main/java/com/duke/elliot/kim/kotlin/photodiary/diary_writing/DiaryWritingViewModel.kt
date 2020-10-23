@@ -14,7 +14,7 @@ import com.duke.elliot.kim.kotlin.photodiary.utility.getCurrentTime
 import com.duke.elliot.kim.kotlin.photodiary.utility.getFont
 import kotlin.collections.ArrayList
 
-class DiaryWritingViewModel(application: Application, val originDiary: DiaryModel?): ViewModel() {
+class DiaryWritingViewModel(application: Application, val originDiary: DiaryModel?, val mode: Int): ViewModel() {
 
     // 얘가 기존의 데이터를 받아서 불러오는 방식. 즉 아래의 데이터들은, diary data class로 부터 파싱될 예정.
     // private
@@ -38,6 +38,12 @@ class DiaryWritingViewModel(application: Application, val originDiary: DiaryMode
     var action = Action.UNINITIALIZED
 
     val mediaArrayList = MutableLiveData<ArrayList<MediaModel>>()
+
+    init {
+        if (originDiary != null)
+            mediaArrayList.value = originDiary.mediaArray.toList() as ArrayList<MediaModel>
+    }
+
     private var _mediaArrayListSize = 0
 
     val mediaArrayListSize: Int

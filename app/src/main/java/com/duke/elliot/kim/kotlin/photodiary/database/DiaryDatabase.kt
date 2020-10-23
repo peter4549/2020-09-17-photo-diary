@@ -24,7 +24,7 @@ abstract class DiaryDatabase : RoomDatabase() {
                     instance = Room.databaseBuilder(
                         context.applicationContext,
                         DiaryDatabase::class.java,
-                        "diary_database_debug_06"
+                        "diary_database_debug_07"
                     )
                         .fallbackToDestructiveMigration()
                         .build()

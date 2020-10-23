@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
 import androidx.annotation.ColorInt
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -19,6 +20,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.duke.elliot.kim.kotlin.photodiary.R
 import com.duke.elliot.kim.kotlin.photodiary.databinding.FragmentTextEditorDialogBinding
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.photo_editor.ColorPickerAdapter.OnColorPickerClickListener
+import com.duke.elliot.kim.kotlin.photodiary.utility.ColorUtilities
 import com.duke.elliot.kim.kotlin.photodiary.utility.GridLayoutManagerWrapper
 import com.duke.elliot.kim.kotlin.photodiary.utility.crossFadeIn
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent
@@ -89,6 +91,7 @@ class TextEditorDialogFragment : DialogFragment() {
                     override fun onColorPickerClickListener(colorCode: Int) {
                         this@TextEditorDialogFragment.colorCode = colorCode
                         binding.editTextAddText.setTextColor(colorCode)
+                        setCursorColor(binding.editTextAddText, colorCode)
                     }
                 })
             }
@@ -108,6 +111,7 @@ class TextEditorDialogFragment : DialogFragment() {
 
         binding.editTextAddText.setText(arguments?.getString(EXTRA_INPUT_TEXT))
         binding.editTextAddText.setTextColor(colorCode)
+        setCursorColor(binding.editTextAddText, colorCode)
         binding.editTextAddText.requestFocus()
 
         binding.textDone.setOnClickListener {
@@ -149,5 +153,15 @@ class TextEditorDialogFragment : DialogFragment() {
 
             return fragment
         }
+    }
+
+    private fun setCursorColor(editText: EditText, @ColorInt color: Int) {
+        val objectColor = ColorUtilities.lightenColor(color, 0.175F)
+        var highlightColor = ColorUtilities.lightenColor(ColorUtilities.getComplementaryColor(color), 0.350F)
+        highlightColor = ColorUtilities.whiteToGrey(highlightColor)
+
+        ColorUtilities.setCursorDrawableColor(editText, objectColor)
+        editText.highlightColor = highlightColor
+        ColorUtilities.setCursorPointerColor(editText, objectColor)
     }
 }

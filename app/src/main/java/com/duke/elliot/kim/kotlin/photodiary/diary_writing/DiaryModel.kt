@@ -15,7 +15,8 @@ data class DiaryModel(@PrimaryKey(autoGenerate = true)
                       var content: String,
                       var mediaArray: Array<MediaModel> = arrayOf(),
                       var textOptions: TextOptionsModel,
-                      var liked: Boolean) : Parcelable {
+                      var liked: Boolean,
+                      var weatherIconId: Int) : Parcelable {
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -24,11 +25,26 @@ data class DiaryModel(@PrimaryKey(autoGenerate = true)
         other as DiaryModel
 
         if (id != other.id) return false
+        if (time != other.time) return false
+        if (title != other.title) return false
+        if (content != other.content) return false
+        if (!mediaArray.contentEquals(other.mediaArray)) return false
+        if (textOptions != other.textOptions) return false
+        if (liked != other.liked) return false
+        if (weatherIconId != other.weatherIconId) return false
 
         return true
     }
 
     override fun hashCode(): Int {
-        return id.hashCode()
+        var result = id.hashCode()
+        result = 31 * result + time.hashCode()
+        result = 31 * result + title.hashCode()
+        result = 31 * result + content.hashCode()
+        result = 31 * result + mediaArray.contentHashCode()
+        result = 31 * result + textOptions.hashCode()
+        result = 31 * result + liked.hashCode()
+        result = 31 * result + weatherIconId
+        return result
     }
 }

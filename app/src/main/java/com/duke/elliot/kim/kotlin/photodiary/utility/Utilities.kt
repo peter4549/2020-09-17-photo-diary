@@ -14,7 +14,9 @@ import android.util.DisplayMetrics
 import android.view.Surface
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.annotation.ColorInt
 import androidx.annotation.RequiresApi
+import androidx.annotation.Size
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.GridLayoutManager
@@ -36,6 +38,8 @@ import kotlinx.coroutines.launch
 import java.lang.StringBuilder
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.math.max
+import kotlin.math.min
 
 @Suppress("unused")
 class GridLayoutManagerWrapper: GridLayoutManager {

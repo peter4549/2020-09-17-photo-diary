@@ -14,6 +14,7 @@ import com.duke.elliot.kim.kotlin.photodiary.R
 import com.duke.elliot.kim.kotlin.photodiary.database.DiaryDatabase
 import com.duke.elliot.kim.kotlin.photodiary.databinding.FragmentDiaryViewPagerBinding
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryModel
+import com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryWritingFragmentDirections
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.EDIT_MODE
 import com.duke.elliot.kim.kotlin.photodiary.utility.showToast
 
@@ -78,14 +79,7 @@ class DiaryViewPagerFragment: Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId) {
             android.R.id.home -> findNavController().popBackStack()
-            R.id.edit -> findNavController()
-                .navigate(
-                    DiaryViewPagerFragmentDirections
-                        .actionDiaryViewPagerFragmentToDiaryWritingFragment(
-                            viewModel.getItem(binding.viewPager.currentItem),
-                            EDIT_MODE
-                        )
-                )
+            R.id.edit -> navigateToDiaryWritingFragment()
             R.id.set_category -> {
             }
             R.id.export -> {
@@ -101,12 +95,20 @@ class DiaryViewPagerFragment: Fragment() {
         return super.onOptionsItemSelected(item)
     }
 
+    private fun navigateToDiaryWritingFragment() {
+        val diary = viewModel.getItem(binding.viewPager.currentItem)
+        diary?.let {
+            findNavController().navigate(DiaryViewPagerFragmentDirections
+                .actionDiaryViewPagerFragmentToDiaryWritingFragment(it, EDIT_MODE))
+        } ?: run {
+            showToast(requireContext(), getString(R.string.diary_not_found))
+        }
+    }
+
     class ViewPagerAdapter(
         fragmentActivity: FragmentActivity,
         private val diaries: ArrayList<DiaryModel>
     ) : FragmentStateAdapter(fragmentActivity) {
-
-        private val fragmentFactory = fragmentActivity.supportFragmentManager.fragmentFactory
         private val pageIds= diaries.map { it.hashCode().toLong() }
 
         override fun getItemCount(): Int {
@@ -126,7 +128,7 @@ class DiaryViewPagerFragment: Fragment() {
         }
 
         override fun getItemId(position: Int): Long {
-            return diaries[position].hashCode().toLong() // make sure notifyDataSetChanged() works
+            return diaries[position].hashCode().toLong()
         }
 
         override fun containsItem(itemId: Long): Boolean {

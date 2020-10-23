@@ -1,14 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#6200EE</color>
-    <color name="colorPrimaryDark">#3700B3</color>
-    <color name="colorAccent">#03DAC5</color>
+    <color name="colorPrimary">@color/colorSilver</color>
+    <color name="colorPrimaryDark">@color/colorSilver</color>
+    <color name="colorAccent">@color/colorSilver</color>
 
-    <array name="colorAudioVisualizationView">
-        <item>@color/colorFragmentBackgroundLight</item>
-        <item>@color/colorFragmentBackgroundLight</item>
-        <item>@color/colorDefaultThemeLight</item>
-    </array>
+    <color name="colorControlHighlight">@color/colorAluminum</color>
 
     <color name="colorTextCalendar">@color/colorJet</color>
 
@@ -74,7 +70,11 @@
     <color name="colorGrey500">#9E9E9E</color>
     <color name="colorBlueGrey500">#607D8B</color>
 
+    <color name="colorBabyBlue">#89CFF0</color>
+    <color name="colorCrushedIce">#C4FFF7</color>
     <color name="colorGold">#FFD700</color>
+
+    <color name="colorAluminum">#D6D6D6</color>
 
     <color name="colorDefaultBackgroundBlack">#151414</color>
 
@@ -88,4 +88,13 @@
     <color name="colorSimpleCropViewFrameBlue">#2196F3</color>
     <color name="colorSimpleCropViewFrameGrey">#424242</color>
     <color name="colorSimpleCropViewFrameWhite">#FFFFFB</color>
+
+    <!-- Weather Icon Colors -->
+    <color name="colorSunOrange">#FDB813</color>
+    <color name="colorWinterWizard">#93E7FB</color>
+    <color name="colorCloudStroke">#d8d8d3</color>
+    <color name="colorLightingYellow">#FDD023</color>
+    <color name="colorWater">#C5E2F7</color>
+    <color name="colorLuminousVividGold">#FFFF00</color>
+    <color name="colorTropicalIndigo">#9683EC</color>
 </resources>
