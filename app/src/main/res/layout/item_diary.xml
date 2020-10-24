@@ -28,7 +28,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="64dp"
+                android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
                 android:orientation="horizontal"
                 android:background="@drawable/background_white_rounded_corners"
@@ -74,8 +74,10 @@
                     tools:text="오후 3시 30분" />
 
                 <ImageView
+                    android:id="@+id/image_weather_icon"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="match_parent"
+                    tools:ignore="ContentDescription" />
 
             </LinearLayout>
 

@@ -7,9 +7,11 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.duke.elliot.kim.kotlin.photodiary.R
 import com.duke.elliot.kim.kotlin.photodiary.databinding.ItemDiaryBinding
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryModel
 import com.duke.elliot.kim.kotlin.photodiary.utility.getFont
+import com.duke.elliot.kim.kotlin.photodiary.utility.toDateFormat
 import com.like.LikeButton
 import com.like.OnLikeListener
 
@@ -40,11 +42,14 @@ class DiaryAdapter : ListAdapter<DiaryModel, DiaryAdapter.ViewHolder>(DiaryDiffC
 
     fun getCurrentDiary(): DiaryModel? = currentItem
 
-
     inner class ViewHolder constructor(val binding: ItemDiaryBinding): RecyclerView.ViewHolder(binding.root) {
 
         fun bind(diary: DiaryModel) {
             val font = getFont(itemView.context, diary.textOptions.textFontId)
+
+            binding.textDate.text = diary.time.toDateFormat(binding.root.context.getString(R.string.date_format_short))
+            binding.textTime.text = diary.time.toDateFormat(binding.root.context.getString(R.string.time_format_short))
+            binding.imageWeatherIcon.setImageResource(diary.weatherIconId)
 
             binding.textTitle.text = diary.title
             binding.textContent.text = diary.content

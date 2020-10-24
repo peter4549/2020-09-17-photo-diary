@@ -73,6 +73,7 @@ class DiaryWritingFragment: Fragment() {
             R.id.image_drawing -> MediaHelper.startDrawingActivity(this)
             else -> {
                 if (keyboardShown) {
+                    layoutOptionsWasShown = false
                     showOptionItemsScheduled = true
                     selectedItemView = view
                     hideKeyboard(view, inputMethodManager)
@@ -306,7 +307,6 @@ class DiaryWritingFragment: Fragment() {
 
         fileUtilities = FileUtilities.getInstance(requireContext())
 
-        initializeSpinners()
         inputMethodManager = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         hideKeyboard(binding.root, inputMethodManager)
 
@@ -406,11 +406,17 @@ class DiaryWritingFragment: Fragment() {
         binding.imageDrawing.setOnClickListener(optionsOnClickListener)
         binding.imageText.setOnClickListener(optionsOnClickListener)
 
+        initializeSpinners()
         initializeOptionItems()
         initializeTextItems()
-        // TODO fetch는 한 번만 수행되도록 뷰모델에서 스위치 변수 사용할 것.
-        viewModel.originDiary?.let { fetchOriginDiary(it) }
+
+        if (!viewModel.initialized) {
+            viewModel.originDiary?.let { fetchOriginDiary(it) }
+            viewModel.initialized = true
+        }
+
         setCursorColor(viewModel.textColor)
+        applyTextOptions()  // TODO 여기서 bold, alignment, 색상 다시 할당할 것.
 
         setEventListener(
             requireActivity(),
@@ -508,6 +514,18 @@ class DiaryWritingFragment: Fragment() {
             findNavController().popBackStack()
     }
 
+    override fun onStart() {
+        super.onStart()
+        binding.editTextTitle.setText(viewModel.title)
+        binding.editTextContent.setText(viewModel.content)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        viewModel.title = binding.editTextTitle.text.toString()
+        viewModel.content = binding.editTextContent.text.toString()
+    }
+
     private fun initializeToolbar(toolbar: Toolbar) {
         (requireActivity() as MainActivity).setSupportActionBar(toolbar)
         (requireActivity() as MainActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -515,13 +533,11 @@ class DiaryWritingFragment: Fragment() {
     }
 
     private fun fetchOriginDiary(originDiary: DiaryModel) {
-        binding.editTextTitle.setText(originDiary.title)
-        binding.editTextContent.setText(originDiary.content)
+        viewModel.title = originDiary.title
+        viewModel.content = originDiary.content
 
         /** The mediaArray and spinner options are assigned as the value of the live data of the view model,
          *  so there is no need to fetch it here. */
-
-        applyTextOptions()
     }
 
     private fun initializeOptionItems() {
@@ -604,7 +620,7 @@ class DiaryWritingFragment: Fragment() {
             }
         }
 
-        binding.spinnerWeather.setSelection(DiaryWritingViewModel.weatherIconIds.indexOf(R.drawable.ic_sun_24))
+        binding.spinnerWeather.setSelection(DiaryWritingViewModel.weatherIconIds.indexOf(viewModel.weatherIconId))
         binding.spinnerTextSize.setSelection(fontSizes.indexOf(viewModel.textSize.toInt()))  // 18sp
         binding.spinnerFont.setSelection(MainActivity.fontIds.indexOf(viewModel.textFontId))
     }
@@ -616,32 +632,54 @@ class DiaryWritingFragment: Fragment() {
         binding.imageButtonTextAlignLeft.setOnClickListener(textOptionItemsOnClickListener)
         binding.imageButtonTextAlignRight.setOnClickListener(textOptionItemsOnClickListener)
         binding.imageTextColor.setOnClickListener(textOptionItemsOnClickListener)
+
+        if (viewModel.textStyleBold)
+            binding.imageBold.setColorFilter(ContextCompat.getColor(requireContext(), R.color.colorTextOptionItemsSelected))
+
+        if (viewModel.textStyleItalic)
+            binding.imageItalic.setColorFilter(ContextCompat.getColor(requireContext(), R.color.colorTextOptionItemsSelected))
+
+        binding.imageButtonTextAlignCenter.setColorFilter(ContextCompat.getColor(requireContext(), R.color.colorTextOptionItemsUnselected))
+        binding.imageButtonTextAlignLeft.setColorFilter(ContextCompat.getColor(requireContext(), R.color.colorTextOptionItemsUnselected))
+        binding.imageButtonTextAlignRight.setColorFilter(ContextCompat.getColor(requireContext(), R.color.colorTextOptionItemsUnselected))
+
+        when(viewModel.textAlignment) {
+            Gravity.CENTER_HORIZONTAL ->  binding.imageButtonTextAlignCenter
+                .setColorFilter(ContextCompat.getColor(requireContext(), R.color.colorTextOptionItemsSelected))
+            Gravity.START ->  binding.imageButtonTextAlignLeft
+                .setColorFilter(ContextCompat.getColor(requireContext(), R.color.colorTextOptionItemsSelected))
+            Gravity.END ->  binding.imageButtonTextAlignRight
+                .setColorFilter(ContextCompat.getColor(requireContext(), R.color.colorTextOptionItemsSelected))
+        }
+
+        binding.imageTextColor.setColorFilter(viewModel.textColor)
     }
 
     private fun applyTextOptions() {
-        val textOptions = viewModel.originDiary?.textOptions ?: return
-        val font = getFont(requireContext(), textOptions.textFontId)
+        binding.editTextTitle.setTextColor(viewModel.textColor)
+        binding.editTextContent.setTextColor(viewModel.textColor)
 
-        binding.editTextTitle.setTextColor(textOptions.textColor)
-        binding.editTextContent.setTextColor(textOptions.textColor)
+        // binding.editTextTitle.gravity = viewModel.textAlignment
+        binding.editTextContent.gravity = viewModel.textAlignment
 
-        binding.editTextTitle.gravity = textOptions.textAlignment
-        binding.editTextContent.gravity = textOptions.textAlignment
+        binding.editTextTitle.typeface = viewModel.textFont
+        binding.editTextContent.typeface = viewModel.textFont
 
-        binding.editTextTitle.typeface = font
-        binding.editTextContent.typeface = font
+        binding.editTextTitle.textSize = viewModel.textSize
+        binding.editTextContent.textSize = viewModel.textSize
 
-        binding.editTextTitle.textSize = textOptions.textSize
-        binding.editTextContent.textSize = textOptions.textSize
+        if (viewModel.textStyleBold && viewModel.textStyleItalic) {
+            binding.editTextTitle.setTypeface(viewModel.textFont, Typeface.BOLD_ITALIC)
+            binding.editTextContent.setTypeface(viewModel.textFont, Typeface.BOLD_ITALIC)
+        } else if (viewModel.textStyleBold) {
+            binding.editTextTitle.setTypeface(viewModel.textFont, Typeface.BOLD)
+            binding.editTextContent.setTypeface(viewModel.textFont, Typeface.BOLD)
+        } else if (viewModel.textStyleItalic) {
+            binding.editTextTitle.setTypeface(viewModel.textFont, Typeface.ITALIC)
+            binding.editTextContent.setTypeface(viewModel.textFont, Typeface.ITALIC)
+        }
 
-        if (textOptions.textStyleBold && textOptions.textStyleItalic)
-            binding.editTextContent.setTypeface(font, Typeface.BOLD_ITALIC)
-        else if (textOptions.textStyleBold)
-            binding.editTextContent.setTypeface(font, Typeface.BOLD)
-        else if (textOptions.textStyleItalic)
-            binding.editTextContent.setTypeface(font, Typeface.ITALIC)
-
-        setCursorColor(textOptions.textColor)
+        setCursorColor(viewModel.textColor)
     }
 
     private fun setCursorColor(@ColorInt color: Int) {
@@ -673,12 +711,15 @@ class DiaryWritingFragment: Fragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId) {
-            android.R.id.home -> {
-                // TODO save data and back. (ask about edit state...)
-                // 변경사항이 있으면 ask.
-            }
+            android.R.id.home -> backPressed()
             R.id.save_diary -> {
-                saveDiary(createDiary())
+                if (keyboardShown)
+                    hideKeyboard(binding.root, inputMethodManager)
+
+                when(viewModel.mode) {
+                    CREATE_MODE -> saveDiary(createDiary())
+                    EDIT_MODE -> updateDiary()
+                }
             }
         }
         return super.onOptionsItemSelected(item)
@@ -953,7 +994,7 @@ class DiaryWritingFragment: Fragment() {
             diary.weatherIconId = viewModel.weatherIconId
             (requireActivity() as MainActivity).updateDiary(diary)
         } ?: run {
-            showToast(requireContext(), "원본 다이어리가 손상되었습니다.")
+            showToast(requireContext(), "원본 다이어리가 손상되었습니다.") // TODO change to resource
             saveDiary(createDiary())
         }
 

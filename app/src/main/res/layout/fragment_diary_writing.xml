@@ -116,6 +116,7 @@
                     android:background="@drawable/background_white_rounded_corners"
                     android:ellipsize="end"
                     android:ems="10"
+                    android:gravity="start"
                     android:hint="@string/title"
                     android:inputType="text"
                     android:importantForAutofill="no"

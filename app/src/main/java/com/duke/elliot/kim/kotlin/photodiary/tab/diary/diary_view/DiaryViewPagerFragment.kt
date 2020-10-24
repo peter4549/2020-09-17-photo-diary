@@ -14,10 +14,9 @@ import com.duke.elliot.kim.kotlin.photodiary.R
 import com.duke.elliot.kim.kotlin.photodiary.database.DiaryDatabase
 import com.duke.elliot.kim.kotlin.photodiary.databinding.FragmentDiaryViewPagerBinding
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryModel
-import com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryWritingFragmentDirections
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.EDIT_MODE
+import com.duke.elliot.kim.kotlin.photodiary.utility.FileUtilities
 import com.duke.elliot.kim.kotlin.photodiary.utility.showToast
-
 
 class DiaryViewPagerFragment: Fragment() {
 
@@ -41,7 +40,7 @@ class DiaryViewPagerFragment: Fragment() {
 
         val database = DiaryDatabase.getInstance(requireContext()).dao()
 
-        val viewModelFactory = DiaryViewPagerViewModelFactory(database)
+        val viewModelFactory = DiaryViewPagerViewModelFactory(database, FileUtilities.getInstance(requireActivity().application))
         viewModel = ViewModelProvider(viewModelStore, viewModelFactory)[DiaryViewPagerViewModel::class.java]
         viewModel.initialDiary = diaryViewPagerFragmentArgs.selectedDiary
 
@@ -60,8 +59,11 @@ class DiaryViewPagerFragment: Fragment() {
                 binding.viewPager.setCurrentItem(viewModel.getInitialDiaryPosition(), false)
                 viewModel.initialized = true
             } else {
-                println("HOHOHO : ${diaries.map { it.title }}")
-                viewPagerAdapter.removeFragment(0) // TODO change!
+                when(viewModel.status) {
+                    DiaryViewPagerViewModel.DELETED -> viewPagerAdapter.removeFragment(binding.viewPager.currentItem)
+                    DiaryViewPagerViewModel.UPDATED -> viewPagerAdapter.updateFragment(binding.viewPager.currentItem)
+                }
+
             }
         }
 
@@ -85,8 +87,7 @@ class DiaryViewPagerFragment: Fragment() {
             R.id.export -> {
             }
             R.id.delete -> viewModel.getItem(binding.viewPager.currentItem)?.let {
-                (requireActivity() as MainActivity).viewModel
-                    .delete(it)
+                viewModel.delete(it)
             } ?: run {
                 showToast(requireContext(), getString(R.string.diary_not_found))
             }
@@ -117,6 +118,11 @@ class DiaryViewPagerFragment: Fragment() {
 
         fun removeFragment(position: Int) {
             diaries.removeAt(position)
+            notifyItemRangeChanged(position, diaries.size)
+            notifyDataSetChanged()
+        }
+
+        fun updateFragment(position: Int) {
             notifyItemRangeChanged(position, diaries.size)
             notifyDataSetChanged()
         }

@@ -34,10 +34,15 @@ class DiaryViewFragment: Fragment() {
     ): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_diary_view, container, false)
 
-        val viewModelFactory = DiaryViewViewModelFactory(diary)
+        val viewModelFactory = DiaryViewViewModelFactory()
         viewModel = ViewModelProvider(viewModelStore, viewModelFactory)[DiaryViewViewModel::class.java]
 
-        bind(viewModel.diary)
+        if (!viewModel.initialized) {
+            viewModel.setDiary(diary)
+            viewModel.initialized = true
+        }
+
+        bind(viewModel.getDiary())
 
         return binding.root
     }

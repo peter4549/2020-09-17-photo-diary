@@ -2,4 +2,7 @@
 <resources>
     <string name="date_format">M월 d일 EEEE</string>
     <string name="time_format">aa h시 m분</string>
+
+    <string name="date_format_short">yyyy. M. d. EE</string>
+    <string name="time_format_short">aa h:m</string>
 </resources>

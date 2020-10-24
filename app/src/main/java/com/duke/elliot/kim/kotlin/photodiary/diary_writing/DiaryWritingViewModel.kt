@@ -12,12 +12,14 @@ import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.MediaModel
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.media_helper.PhotoHelper
 import com.duke.elliot.kim.kotlin.photodiary.utility.getCurrentTime
 import com.duke.elliot.kim.kotlin.photodiary.utility.getFont
+import java.util.*
 import kotlin.collections.ArrayList
 
 class DiaryWritingViewModel(application: Application, val originDiary: DiaryModel?, val mode: Int): ViewModel() {
 
     // 얘가 기존의 데이터를 받아서 불러오는 방식. 즉 아래의 데이터들은, diary data class로 부터 파싱될 예정.
     // private
+    var initialized = false
 
     var textAlignment = Gravity.START
     var textColor = ContextCompat.getColor(application, R.color.colorTextEnabledDark)
@@ -37,12 +39,10 @@ class DiaryWritingViewModel(application: Application, val originDiary: DiaryMode
     var content = ""
     var action = Action.UNINITIALIZED
 
-    val mediaArrayList = MutableLiveData<ArrayList<MediaModel>>()
-
-    init {
-        if (originDiary != null)
-            mediaArrayList.value = originDiary.mediaArray.toList() as ArrayList<MediaModel>
-    }
+    val mediaArrayList: MutableLiveData<ArrayList<MediaModel>> = if (originDiary != null)
+        MutableLiveData(ArrayList(originDiary.mediaArray.toList()))
+    else
+        MutableLiveData(ArrayList())
 
     private var _mediaArrayListSize = 0
 
@@ -64,7 +64,6 @@ class DiaryWritingViewModel(application: Application, val originDiary: DiaryMode
 
         textFont = getFont(application, textFontId)
 
-        mediaArrayList.value = originDiary?.mediaArray?.toList() as? ArrayList<MediaModel> ?: arrayListOf()
         _mediaArrayListSize = mediaArrayList.value?.size ?: 0
     }
 
