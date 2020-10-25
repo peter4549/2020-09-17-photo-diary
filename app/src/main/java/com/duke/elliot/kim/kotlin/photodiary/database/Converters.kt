@@ -10,7 +10,7 @@ class Converters {
     fun arrayToJson(value: Array<MediaModel>): String = Gson().toJson(value)
 
     @TypeConverter
-    fun jsonToArrayList(value: String): Array<MediaModel> = Gson().fromJson(value, Array<MediaModel>::class.java)
+    fun jsonToArray(value: String): Array<MediaModel> = Gson().fromJson(value, Array<MediaModel>::class.java)
 
     @TypeConverter
     fun textOptionsToJson(value: TextOptionsModel): String {
@@ -21,4 +21,10 @@ class Converters {
     fun jsonToTextOptions(value: String): TextOptionsModel {
         return Gson().fromJson(value, TextOptionsModel::class.java)
     }
+
+    @TypeConverter
+    fun stringArrayToJson(value: Array<String>): String = Gson().toJson(value)
+
+    @TypeConverter
+    fun jsonToStringArray(value: String): Array<String> = Gson().fromJson(value, Array<String>::class.java)
 }

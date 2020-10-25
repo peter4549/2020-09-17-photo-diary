@@ -8,6 +8,7 @@ import android.view.GestureDetector.SimpleOnGestureListener
 import android.view.MotionEvent
 import androidx.viewpager.widget.ViewPager
 import timber.log.Timber
+import java.lang.Math.abs
 
 class ClickableViewPager : ViewPager {
     private lateinit var gestureDetector: GestureDetector
@@ -60,6 +61,18 @@ class ClickableViewPager : ViewPager {
                 singleTapUpListener.invoke()
             else
                 Timber.e("singleTapUpListener not initialized.")
+            return true
+        }
+
+        override fun onScroll(
+            e1: MotionEvent?,
+            e2: MotionEvent?,
+            distanceX: Float,
+            distanceY: Float
+        ): Boolean {
+            if (kotlin.math.abs(distanceY) > kotlin.math.abs(distanceX))
+                requestDisallowInterceptTouchEvent(false)
+
             return true
         }
     }

@@ -1,7 +1,9 @@
 package com.duke.elliot.kim.kotlin.photodiary.diary_writing
 
 import android.app.Activity.RESULT_OK
+import android.app.AlertDialog
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.graphics.PorterDuff
@@ -13,6 +15,7 @@ import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.EditText
 import androidx.activity.OnBackPressedCallback
 import androidx.annotation.ColorInt
 import androidx.appcompat.widget.Toolbar
@@ -34,6 +37,7 @@ import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.media_helper.Me
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.media_helper.PhotoHelper
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.photo_editor.PhotoEditorFragment
 import com.duke.elliot.kim.kotlin.photodiary.utility.*
+import com.google.android.material.chip.Chip
 import com.skydoves.colorpickerview.ColorPickerDialog
 import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener
 import kotlinx.coroutines.CoroutineScope
@@ -43,6 +47,7 @@ import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent.set
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
 const val CREATE_MODE = 0
 const val EDIT_MODE = 1
@@ -292,7 +297,7 @@ class DiaryWritingFragment: Fragment() {
         )
 
         initializeToolbar(binding.toolbar)
-        // TODO Implement setThemeColor()...
+        // TODO: Implement setThemeColor()...
 
         progressDialogFragment = ProgressDialogFragment.instance
 
@@ -620,6 +625,28 @@ class DiaryWritingFragment: Fragment() {
             }
         }
 
+        binding.spinnerHashTag.apply {
+            adapter = HashTagSpinnerAdapter(requireContext(), viewModel.hashTags)
+            isSelected = false
+            setSelection(0,true)
+            onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(
+                    parentView: AdapterView<*>?,
+                    selectedItemView: View?,
+                    position: Int,
+                    id: Long
+                ) {
+                    println("ABCD: $position")
+                    if (position == 0)
+                        showHashTagInputDialog()
+                    else
+                        addHashTagChip(viewModel.hashTags[position])
+                }
+
+                override fun onNothingSelected(parentView: AdapterView<*>?) {  }
+            }
+        }
+
         binding.spinnerWeather.setSelection(DiaryWritingViewModel.weatherIconIds.indexOf(viewModel.weatherIconId))
         binding.spinnerTextSize.setSelection(fontSizes.indexOf(viewModel.textSize.toInt()))  // 18sp
         binding.spinnerFont.setSelection(MainActivity.fontIds.indexOf(viewModel.textFontId))
@@ -634,22 +661,62 @@ class DiaryWritingFragment: Fragment() {
         binding.imageTextColor.setOnClickListener(textOptionItemsOnClickListener)
 
         if (viewModel.textStyleBold)
-            binding.imageBold.setColorFilter(ContextCompat.getColor(requireContext(), R.color.colorTextOptionItemsSelected))
+            binding.imageBold.setColorFilter(
+                ContextCompat.getColor(
+                    requireContext(),
+                    R.color.colorTextOptionItemsSelected
+                )
+            )
 
         if (viewModel.textStyleItalic)
-            binding.imageItalic.setColorFilter(ContextCompat.getColor(requireContext(), R.color.colorTextOptionItemsSelected))
+            binding.imageItalic.setColorFilter(
+                ContextCompat.getColor(
+                    requireContext(),
+                    R.color.colorTextOptionItemsSelected
+                )
+            )
 
-        binding.imageButtonTextAlignCenter.setColorFilter(ContextCompat.getColor(requireContext(), R.color.colorTextOptionItemsUnselected))
-        binding.imageButtonTextAlignLeft.setColorFilter(ContextCompat.getColor(requireContext(), R.color.colorTextOptionItemsUnselected))
-        binding.imageButtonTextAlignRight.setColorFilter(ContextCompat.getColor(requireContext(), R.color.colorTextOptionItemsUnselected))
+        binding.imageButtonTextAlignCenter.setColorFilter(
+            ContextCompat.getColor(
+                requireContext(),
+                R.color.colorTextOptionItemsUnselected
+            )
+        )
+        binding.imageButtonTextAlignLeft.setColorFilter(
+            ContextCompat.getColor(
+                requireContext(),
+                R.color.colorTextOptionItemsUnselected
+            )
+        )
+        binding.imageButtonTextAlignRight.setColorFilter(
+            ContextCompat.getColor(
+                requireContext(),
+                R.color.colorTextOptionItemsUnselected
+            )
+        )
 
         when(viewModel.textAlignment) {
-            Gravity.CENTER_HORIZONTAL ->  binding.imageButtonTextAlignCenter
-                .setColorFilter(ContextCompat.getColor(requireContext(), R.color.colorTextOptionItemsSelected))
-            Gravity.START ->  binding.imageButtonTextAlignLeft
-                .setColorFilter(ContextCompat.getColor(requireContext(), R.color.colorTextOptionItemsSelected))
-            Gravity.END ->  binding.imageButtonTextAlignRight
-                .setColorFilter(ContextCompat.getColor(requireContext(), R.color.colorTextOptionItemsSelected))
+            Gravity.CENTER_HORIZONTAL -> binding.imageButtonTextAlignCenter
+                .setColorFilter(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.colorTextOptionItemsSelected
+                    )
+                )
+            Gravity.START -> binding.imageButtonTextAlignLeft
+                .setColorFilter(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.colorTextOptionItemsSelected
+                    )
+                )
+            Gravity.END -> binding.imageButtonTextAlignRight
+                .setColorFilter(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.colorTextOptionItemsSelected
+                    )
+                )
         }
 
         binding.imageTextColor.setColorFilter(viewModel.textColor)
@@ -684,7 +751,10 @@ class DiaryWritingFragment: Fragment() {
 
     private fun setCursorColor(@ColorInt color: Int) {
         val objectColor = ColorUtilities.lightenColor(color, 0.175F)
-        var highlightColor = ColorUtilities.lightenColor(ColorUtilities.getComplementaryColor(color), 0.350F)
+        var highlightColor = ColorUtilities.lightenColor(
+            ColorUtilities.getComplementaryColor(color),
+            0.350F
+        )
         highlightColor = ColorUtilities.whiteToGrey(highlightColor)
 
         ColorUtilities.setCursorDrawableColor(binding.editTextTitle, objectColor)
@@ -716,7 +786,7 @@ class DiaryWritingFragment: Fragment() {
                 if (keyboardShown)
                     hideKeyboard(binding.root, inputMethodManager)
 
-                when(viewModel.mode) {
+                when (viewModel.mode) {
                     CREATE_MODE -> saveDiary(createDiary())
                     EDIT_MODE -> updateDiary()
                 }
@@ -1036,7 +1106,10 @@ class DiaryWritingFragment: Fragment() {
             mediaArray = mediaAdapter.getMediaArray(),
             textOptions = createTextOptions(),
             liked = false,
-            weatherIconId = viewModel.weatherIconId
+            weatherIconId = viewModel.weatherIconId,
+            hashTags = viewModel.hashTags.apply {
+                removeAt(0)
+            }.toTypedArray()
         )
     }
 
@@ -1191,6 +1264,36 @@ class DiaryWritingFragment: Fragment() {
         startActivity(Intent(requireContext(), ExoPlayerActivity::class.java).apply {
             putExtra(EXTRA_MEDIA_URI, uri.toString())
         })
+    }
+
+    private fun showHashTagInputDialog() {
+        val alert: AlertDialog.Builder = AlertDialog.Builder(requireContext())
+
+        alert.setTitle("해시태그 입력")
+        alert.setMessage("해시태그를 입력하세요.")
+
+        val editText = EditText(requireContext())
+        alert.setView(editText)
+
+        alert.setPositiveButton(getString(R.string.ok)) { dialog, _ ->
+            val hashTag = "#${editText.text}"
+            viewModel.storeHashTagsToPreferences(hashTag)
+            hideKeyboard(binding.root, inputMethodManager)
+            dialog.dismiss()
+        }
+
+        alert.setNegativeButton(getString(R.string.cancel)) { dialog, _ ->
+           dialog.dismiss()
+        }
+
+        alert.show()
+    }
+
+    private fun addHashTagChip(hashTag: String) {
+        val chip = Chip(requireContext())
+        chip.text = hashTag
+        chip.setTextAppearanceResource(R.style.ChipFontStyle)
+        binding.chipGroup.addView(chip)
     }
 
     companion object {

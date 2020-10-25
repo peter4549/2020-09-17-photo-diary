@@ -8,9 +8,11 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.SimpleItemAnimator
 import com.duke.elliot.kim.kotlin.photodiary.*
 import com.duke.elliot.kim.kotlin.photodiary.database.DiaryDatabase
 import com.duke.elliot.kim.kotlin.photodiary.databinding.FragmentDairiesBinding
+import com.duke.elliot.kim.kotlin.photodiary.diary_writing.EDIT_MODE
 import com.duke.elliot.kim.kotlin.photodiary.tab.TabFragmentDirections
 import com.duke.elliot.kim.kotlin.photodiary.utility.GridLayoutManagerWrapper
 import com.duke.elliot.kim.kotlin.photodiary.utility.showToast
@@ -50,12 +52,25 @@ class DiariesFragment: Fragment() {
                 }
             }
 
+            setEditOnClickListener {
+                getCurrentDiary()?.let {
+                    findNavController().navigate(TabFragmentDirections
+                        .actionTabFragmentToDiaryWritingFragment(it, EDIT_MODE))
+                }
+            }
+
             setDeleteOnClickListener {
-                getCurrentDiary()?.let { viewModel.delete(it) }
+                getCurrentDiary()?.let {
+                    viewModel.delete(it)
+                }
             }
 
             setUpdateListener {
-                getCurrentDiary()?.let { viewModel.update(it) }
+                getCurrentDiary()?.let {
+                    (binding.recyclerViewDiary.itemAnimator as SimpleItemAnimator)
+                        .supportsChangeAnimations = false
+                    viewModel.update(it)
+                }
             }
         }
 
@@ -65,6 +80,12 @@ class DiariesFragment: Fragment() {
 
         viewModel.diaries.observe(requireActivity()) { diaries ->
             diaryAdapter.submitList(diaries)
+            CoroutineScope(Dispatchers.Main).launch {
+                delay(200L)
+                (binding.recyclerViewDiary.itemAnimator as SimpleItemAnimator)
+                    .supportsChangeAnimations = true
+            }
+
 
             if (viewModel.status == DiariesViewModel.UNINITIALIZED) {
                 binding.recyclerViewDiary.scrollToPosition(0)

@@ -41,8 +41,9 @@
                     android:id="@+id/text_date"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:drawablePadding="6dp"
-                    android:gravity="bottom"
+                    android:layout_marginStart="8dp"
+                    android:drawablePadding="8dp"
+                    android:gravity="center_vertical"
                     android:includeFontPadding="false"
                     android:padding="8dp"
                     android:textColor="@color/colorTextCalendar"
@@ -53,14 +54,14 @@
                     app:layout_constraintTop_toBottomOf="@+id/toolbar"
                     app:drawableStartCompat="@drawable/ic_round_date_range_24"
                     app:drawableTint="@color/colorDefaultThemeDark"
-                    tools:text="2020년 9월 17일 금요일" />
+                    tools:text="2020. 9. 17. 금" />
 
                 <TextView
                     android:id="@+id/text_time"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:drawablePadding="6dp"
-                    android:gravity="bottom"
+                    android:drawablePadding="8dp"
+                    android:gravity="center_vertical"
                     android:includeFontPadding="false"
                     android:padding="8dp"
                     android:textColor="@color/colorTextCalendar"
@@ -71,21 +72,32 @@
                     app:layout_constraintTop_toBottomOf="@+id/toolbar"
                     app:drawableStartCompat="@drawable/ic_round_access_time_24"
                     app:drawableTint="@color/colorDefaultThemeDark"
-                    tools:text="오후 3시 30분" />
+                    tools:text="오후 3:30" />
 
-                <ImageView
-                    android:id="@+id/image_weather_icon"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    tools:ignore="ContentDescription" />
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical|end">
 
+                    <ImageView
+                        android:id="@+id/image_weather_icon"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_marginBottom="4dp"
+                        android:layout_marginEnd="24dp"
+                        android:layout_marginTop="4dp"
+                        tools:ignore="ContentDescription" />
+                </RelativeLayout>
             </LinearLayout>
 
             <TextView
                 android:id="@+id/text_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="8dp"
+                android:layout_marginBottom="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="4dp"
                 android:background="@drawable/background_white_rounded_corners"
                 android:padding="8dp"
                 android:textColor="@color/color_text_dark"
@@ -165,16 +177,16 @@
 
                 <com.like.LikeButton
                     android:id="@+id/button_star"
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
                     android:layout_marginEnd="2dp"
                     android:layout_marginStart="8dp"
                     app:anim_scale_factor="2"
-                    app:circle_end_color="@color/colorAccent"
-                    app:circle_start_color="@color/colorPrimary"
-                    app:dots_primary_color="@color/colorAccent"
-                    app:dots_secondary_color="@color/colorPrimary"
-                    app:icon_size="28dp"
+                    app:circle_end_color="@color/colorLikeButtonEnd"
+                    app:circle_start_color="@color/colorLikeButtonStart"
+                    app:dots_primary_color="@color/colorOrange500"
+                    app:dots_secondary_color="@color/colorDeepOrange500"
+                    app:icon_size="32dp"
                     app:icon_type="Star"
                     app:is_enabled="true"
                     app:like_drawable="@drawable/ic_round_star_liked_32"

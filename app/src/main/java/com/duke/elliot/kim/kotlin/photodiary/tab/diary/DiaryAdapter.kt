@@ -14,10 +14,15 @@ import com.duke.elliot.kim.kotlin.photodiary.utility.getFont
 import com.duke.elliot.kim.kotlin.photodiary.utility.toDateFormat
 import com.like.LikeButton
 import com.like.OnLikeListener
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class DiaryAdapter : ListAdapter<DiaryModel, DiaryAdapter.ViewHolder>(DiaryDiffCallback()) {
 
     private lateinit var deleteOnClickListener: () -> Unit
+    private lateinit var editOnClickListener: () -> Unit
     private lateinit var updateListener: () -> Unit
     private lateinit var viewOnClickListener: () -> Unit
     private var currentItem: DiaryModel? = null
@@ -30,6 +35,10 @@ class DiaryAdapter : ListAdapter<DiaryModel, DiaryAdapter.ViewHolder>(DiaryDiffC
 
     fun setViewOnClickListener(viewOnClickListener: () -> Unit) {
         this.viewOnClickListener = viewOnClickListener
+    }
+
+    fun setEditOnClickListener(editOnClickListener: () -> Unit) {
+        this.editOnClickListener = editOnClickListener
     }
 
     fun setDeleteOnClickListener(deleteOnClickListener: () -> Unit) {
@@ -99,21 +108,41 @@ class DiaryAdapter : ListAdapter<DiaryModel, DiaryAdapter.ViewHolder>(DiaryDiffC
                     deleteOnClickListener.invoke()
             }
 
+            binding.imageEdit.setOnClickListener {
+                currentItem = diary
+
+                if (::editOnClickListener.isInitialized)
+                    editOnClickListener.invoke()
+            }
+
             binding.buttonStar.setOnLikeListener(object: OnLikeListener {
                 override fun liked(likeButton: LikeButton?) {
+                    binding.buttonStar.isEnabled = false
                     diary.liked = true
                     currentItem = diary
 
                     if (::updateListener.isInitialized)
                         updateListener.invoke()
+
+                    CoroutineScope(Dispatchers.Main).launch {
+                        delay(200)
+                        binding.buttonStar.isEnabled = true
+                    }
                 }
 
                 override fun unLiked(likeButton: LikeButton?) {
+                    binding.buttonStar.isEnabled = false
                     diary.liked = false
                     currentItem = diary
 
-                    if (::updateListener.isInitialized)
+                    if (::updateListener.isInitialized) {
                         updateListener.invoke()
+                    }
+
+                    CoroutineScope(Dispatchers.Main).launch {
+                        delay(200)
+                        binding.buttonStar.isEnabled = true
+                    }
                 }
 
             })

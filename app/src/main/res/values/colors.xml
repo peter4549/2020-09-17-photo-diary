@@ -7,6 +7,7 @@
     <color name="colorControlHighlight">@color/colorAluminum</color>
 
     <color name="colorTextCalendar">@color/colorJet</color>
+    <color name="colorTextSpinnerItem">@color/colorDavyGrey</color>
 
     <color name="colorDefaultThemeDark">#B39DDB</color>
     <color name="colorDefaultThemeLight">#EDE7F6</color>
@@ -39,6 +40,7 @@
     <color name="colorGrey700">#455A64</color>
     <color name="colorDarkGreyTransparent">#809E9E9E</color>
     <color name="colorJet">#343434</color>
+    <color name="colorDavyGrey">#555555</color>
     <color name="colorSilver">#C0C0C0</color>
     <color name="colorWhite">#FEFEFE</color>
 
@@ -97,4 +99,11 @@
     <color name="colorWater">#C5E2F7</color>
     <color name="colorLuminousVividGold">#FFFF00</color>
     <color name="colorTropicalIndigo">#9683EC</color>
+
+    <!-- Like Button -->
+    <color name="colorLikeButtonEnd">#1de9b6</color>  <!-- Teal A 300 -->
+    <color name="colorLikeButtonStart">#18ffff</color> <!-- Cyan A 200 -->
+
+    <!-- Chip -->
+    <color name="colorChip">@color/colorDavyGrey</color>
 </resources>

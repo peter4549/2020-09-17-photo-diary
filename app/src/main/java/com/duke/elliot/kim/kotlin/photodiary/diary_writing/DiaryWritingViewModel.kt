@@ -1,6 +1,7 @@
 package com.duke.elliot.kim.kotlin.photodiary.diary_writing
 
 import android.app.Application
+import android.content.Context
 import android.graphics.Typeface
 import android.view.Gravity
 import androidx.core.content.ContextCompat
@@ -12,14 +13,13 @@ import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.MediaModel
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.media_helper.PhotoHelper
 import com.duke.elliot.kim.kotlin.photodiary.utility.getCurrentTime
 import com.duke.elliot.kim.kotlin.photodiary.utility.getFont
-import java.util.*
-import kotlin.collections.ArrayList
 
 class DiaryWritingViewModel(application: Application, val originDiary: DiaryModel?, val mode: Int): ViewModel() {
 
-    // 얘가 기존의 데이터를 받아서 불러오는 방식. 즉 아래의 데이터들은, diary data class로 부터 파싱될 예정.
-    // private
     var initialized = false
+
+    private val preferences =
+        application.getSharedPreferences(PREFERENCES_HASH_TAG, Context.MODE_PRIVATE)
 
     var textAlignment = Gravity.START
     var textColor = ContextCompat.getColor(application, R.color.colorTextEnabledDark)
@@ -30,6 +30,9 @@ class DiaryWritingViewModel(application: Application, val originDiary: DiaryMode
     var textStyleItalic = false
 
     var weatherIconId = R.drawable.ic_sun_24
+
+    private val inputHashTag = application.getString(R.string.input_hash_tag)
+    val hashTags: ArrayList<String> = restoreHashTagsFromPreferences()
 
     private val _time: Long = getCurrentTime()
     val time: Long
@@ -85,6 +88,24 @@ class DiaryWritingViewModel(application: Application, val originDiary: DiaryMode
         const val REMOVED = 4
     }
 
+    fun storeHashTagsToPreferences(hashTag: String) {
+        hashTags.add(hashTag)
+        preferences.edit()
+            .putStringSet(KEY_HASH_TAG_SET, hashTags.toSet())
+            .apply()
+    }
+
+    private fun restoreHashTagsFromPreferences(): ArrayList<String> {
+        val arrayList = ArrayList<String>()
+        for (hashTag in preferences.getStringSet(KEY_HASH_TAG_SET, setOf(inputHashTag)) ?: setOf(inputHashTag))
+            arrayList.add(hashTag)
+
+        arrayList.remove(inputHashTag)
+        arrayList.add(0, inputHashTag)
+
+        return arrayList
+    }
+
     companion object {
         val weatherIconIds = arrayOf(
             R.drawable.ic_cloud_24,
@@ -99,5 +120,8 @@ class DiaryWritingViewModel(application: Application, val originDiary: DiaryMode
             R.drawable.ic_snow_cloud_24,
             R.drawable.ic_sun_24
         )
+
+        const val PREFERENCES_HASH_TAG = "preferences_hash_tag"
+        const val KEY_HASH_TAG_SET = "key_hash_tag_set"
     }
 }

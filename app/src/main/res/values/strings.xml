@@ -61,6 +61,7 @@
     <string name="save_diary_title">다이어리 저장</string>
     <string name="save_diary_message">다이어리를 저장하시겠습니까?</string>
     <string name="save_edited_diary_message">변경된 내용을 저장하시겠습니까?</string>
+    <string name="input_hash_tag">해시태그 입력</string>
 
     <!-- TabFragment -->
     <string name="diary">다이어리</string>

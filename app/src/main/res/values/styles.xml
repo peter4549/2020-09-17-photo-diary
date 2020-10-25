@@ -1,6 +1,6 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
@@ -12,20 +12,16 @@
 
         <item name="android:fontFamily">@font/font_family_cookie_run</item>
         <item name="fontFamily">@font/font_family_cookie_run</item>
+        <item name="chipStyle">@style/Widget.App.Chip</item>
     </style>
 
-    <style name="MaterialComponentsTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:colorControlHighlight">@color/colorControlHighlight</item>
-
-        <item name="android:buttonStyle">@style/ButtonStyle</item>
-        <item name="android:editTextStyle">@style/EditTextStyle</item>
-        <item name="android:textViewStyle">@style/TextViewStyle</item>
-
-        <item name="android:fontFamily">@font/font_family_cookie_run</item>
-        <item name="fontFamily">@font/font_family_cookie_run</item>
+    <style name="Widget.App.Chip" parent="Widget.MaterialComponents.Chip.Entry">
+        <item name="chipBackgroundColor">@color/colorFragmentBackgroundLight</item>
+        <item name="closeIcon" tools:ignore="PrivateResource">
+            @drawable/ic_mtrl_chip_close_circle</item>
+        <item name="closeIconEnabled">true</item>
+        <item name="closeIconTint">@color/colorChip</item>
+        <item name="closeIconVisible">true</item>
     </style>
 
     <style name="ButtonStyle" parent="@android:style/Widget.DeviceDefault.Button.Borderless">
@@ -58,5 +54,10 @@
         <item name="android:minHeight">48dp</item>
         <item name="android:textSize">16sp</item>
         <item name="android:gravity">center_horizontal|center_vertical</item>
+    </style>
+
+    <style name="ChipFontStyle" parent="TextAppearance.MaterialComponents.Chip">
+        <item name="android:textColor">@color/colorChip</item>
+        <item name="android:fontFamily">@font/font_family_cookie_run</item>
     </style>
 </resources>

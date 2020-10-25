@@ -13,8 +13,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/colorDefaultThemeLight"
-        android:theme="@style/MaterialComponentsTheme">
+        android:background="@color/colorDefaultThemeLight">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
@@ -126,6 +125,16 @@
                     app:layout_constraintHorizontal_bias="0.0"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/text_date_time" />
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/chip_group"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginStart="8dp"
+                    app:singleSelection="true">
+
+                </com.google.android.material.chip.ChipGroup>
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/recycler_view_media"
@@ -245,15 +254,31 @@
                     android:contentDescription="@string/drawing"
                     app:srcCompat="@drawable/ic_sharp_brush_32" />
 
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical|end">
+
                 <ImageView
                     android:id="@+id/image_text"
                     android:layout_width="32dp"
                     android:layout_height="32dp"
                     android:layout_gravity="center_vertical"
-                    android:layout_marginStart="48dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:contentDescription="@string/text"
                     app:srcCompat="@drawable/ic_sharp_title_32" />
+
+                <com.duke.elliot.kim.kotlin.photodiary.view.CustomSpinner
+                    android:id="@+id/spinner_hash_tag"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginEnd="24dp"
+                    android:layout_marginStart="8dp"
+                    android:background="@drawable/ic_hashtag_50px"
+                    android:backgroundTint="@color/colorIconTint" />
+
+                </LinearLayout>
 
             </LinearLayout>
         </LinearLayout>

@@ -300,3 +300,9 @@ fun replaceLast(string: String, oldString: String, newString: String): String {
     stringBuilder.replace(string.lastIndexOf(oldString), string.lastIndexOf(oldString) + oldString.length, newString)
     return stringBuilder.toString()
 }
+
+fun convertPxToDp(context: Context, px: Float): Float {
+    val resources = context.resources
+    val displayMetrics = resources.displayMetrics
+    return px / (displayMetrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT)
+}

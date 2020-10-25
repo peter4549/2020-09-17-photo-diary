@@ -16,7 +16,8 @@ data class DiaryModel(@PrimaryKey(autoGenerate = true)
                       var mediaArray: Array<MediaModel> = arrayOf(),
                       var textOptions: TextOptionsModel,
                       var liked: Boolean,
-                      var weatherIconId: Int) : Parcelable {
+                      var weatherIconId: Int,
+                      var hashTags: Array<String>) : Parcelable {
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
