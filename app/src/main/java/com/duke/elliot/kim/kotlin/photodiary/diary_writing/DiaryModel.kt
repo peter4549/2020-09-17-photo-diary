@@ -33,6 +33,7 @@ data class DiaryModel(@PrimaryKey(autoGenerate = true)
         if (textOptions != other.textOptions) return false
         if (liked != other.liked) return false
         if (weatherIconId != other.weatherIconId) return false
+        if (!hashTags.contentEquals(other.hashTags)) return false
 
         return true
     }
@@ -46,6 +47,7 @@ data class DiaryModel(@PrimaryKey(autoGenerate = true)
         result = 31 * result + textOptions.hashCode()
         result = 31 * result + liked.hashCode()
         result = 31 * result + weatherIconId
+        result = 31 * result + hashTags.contentHashCode()
         return result
     }
 }

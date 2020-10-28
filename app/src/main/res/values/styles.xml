@@ -13,9 +13,13 @@
         <item name="android:fontFamily">@font/font_family_cookie_run</item>
         <item name="fontFamily">@font/font_family_cookie_run</item>
         <item name="chipStyle">@style/Widget.App.Chip</item>
+
+        <item name="actionBarTheme">@style/ToolbarTheme</item>
     </style>
 
     <style name="Widget.App.Chip" parent="Widget.MaterialComponents.Chip.Entry">
+        <item name="checkedIconEnabled">false</item>
+        <item name="checkedIconVisible">false</item>
         <item name="chipBackgroundColor">@color/colorFragmentBackgroundLight</item>
         <item name="closeIcon" tools:ignore="PrivateResource">
             @drawable/ic_mtrl_chip_close_circle</item>

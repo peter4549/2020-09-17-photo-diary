@@ -20,8 +20,7 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:theme="@style/Theme.MaterialComponents.Light.NoActionBar">
+            android:layout_height="wrap_content">
 
             <LinearLayout
                 android:id="@+id/date_time_container"
@@ -108,6 +107,19 @@
                 app:layout_constraintTop_toBottomOf="@+id/date_time_container"
                 tools:text="시원한 이이스커피" />
 
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/chip_group"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                android:animateLayoutChanges="true"
+                app:singleSelection="false"
+                app:layout_constraintBottom_toTopOf="@+id/media_container"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/text_title" />
+
             <RelativeLayout
                 android:id="@+id/media_container"
                 android:layout_width="240dp"
@@ -116,7 +128,7 @@
                 app:layout_constraintBottom_toTopOf="@+id/text_content"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/text_title">
+                app:layout_constraintTop_toBottomOf="@+id/chip_group">
 
                 <com.duke.elliot.kim.kotlin.photodiary.view.ClickableViewPager
                     android:id="@+id/view_pager"
@@ -196,11 +208,11 @@
 
                 <ImageView
                     android:id="@+id/image_export"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
                     android:layout_marginStart="8dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
-                    app:srcCompat="@drawable/ic_right_arrow_50px"
+                    app:srcCompat="@drawable/ic_export_32"
                     app:tint="@color/colorIconTint"
                     tools:ignore="ContentDescription" />
 

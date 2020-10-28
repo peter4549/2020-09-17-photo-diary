@@ -16,6 +16,7 @@ import com.duke.elliot.kim.kotlin.photodiary.diary_writing.TextOptionsModel
 import com.duke.elliot.kim.kotlin.photodiary.tab.diary.MediaPagerAdapter
 import com.duke.elliot.kim.kotlin.photodiary.utility.getFont
 import com.duke.elliot.kim.kotlin.photodiary.utility.toDateFormat
+import com.google.android.material.chip.Chip
 
 class DiaryViewFragment: Fragment() {
 
@@ -61,6 +62,14 @@ class DiaryViewFragment: Fragment() {
                 setContext(requireContext())
                 setMediaList(diary.mediaArray.toList())
             }
+        }
+
+        for (hashTag in diary.hashTags) {
+            val chip = Chip(binding.chipGroup.context)
+            chip.text = hashTag
+            chip.setTextAppearanceResource(R.style.ChipFontStyle)
+            chip.isCloseIconVisible = false
+            binding.chipGroup.addView(chip)
         }
 
         applyTextOptions(diary.textOptions)

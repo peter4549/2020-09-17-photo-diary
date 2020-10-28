@@ -13,8 +13,13 @@ import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.MediaModel
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.media_helper.PhotoHelper
 import com.duke.elliot.kim.kotlin.photodiary.utility.getCurrentTime
 import com.duke.elliot.kim.kotlin.photodiary.utility.getFont
+import kotlinx.coroutines.*
+import kotlin.collections.ArrayList
 
 class DiaryWritingViewModel(application: Application, val originDiary: DiaryModel?, val mode: Int): ViewModel() {
+
+    private val job = Job()
+    private val coroutineScope = CoroutineScope(Dispatchers.Main + job)
 
     var initialized = false
 
@@ -32,7 +37,8 @@ class DiaryWritingViewModel(application: Application, val originDiary: DiaryMode
     var weatherIconId = R.drawable.ic_sun_24
 
     private val inputHashTag = application.getString(R.string.input_hash_tag)
-    val hashTags: ArrayList<String> = restoreHashTagsFromPreferences()
+    val hashTagList: ArrayList<String> = restoreHashTagsFromPreferences()
+    lateinit var selectedHashTags: ArrayList<String>
 
     private val _time: Long = getCurrentTime()
     val time: Long
@@ -54,6 +60,7 @@ class DiaryWritingViewModel(application: Application, val originDiary: DiaryMode
 
     var selectedItemPosition: Int? = null
 
+    // Fetch data from the original diary.
     init {
         originDiary?.let {
             val textOptions = it.textOptions
@@ -68,6 +75,8 @@ class DiaryWritingViewModel(application: Application, val originDiary: DiaryMode
         textFont = getFont(application, textFontId)
 
         _mediaArrayListSize = mediaArrayList.value?.size ?: 0
+
+        selectedHashTags = originDiary?.hashTags?.toCollection(ArrayList()) ?: arrayListOf()
     }
 
     fun addMedia(media: MediaModel) {
@@ -88,11 +97,29 @@ class DiaryWritingViewModel(application: Application, val originDiary: DiaryMode
         const val REMOVED = 4
     }
 
-    fun storeHashTagsToPreferences(hashTag: String) {
-        hashTags.add(hashTag)
+    fun storeHashTagToPreferences(hashTag: String) {
+        hashTagList.add(hashTag)
         preferences.edit()
-            .putStringSet(KEY_HASH_TAG_SET, hashTags.toSet())
+            .putStringSet(KEY_HASH_TAG_SET, hashTagList.toSet())
             .apply()
+    }
+
+    fun deleteHashTagInPreferences(hashTag: String) {
+        coroutineScope.launch {
+            withContext(Dispatchers.IO) {
+                hashTagList.remove(hashTag)
+            }
+        }
+    }
+
+    fun updateHashTagsToPreferences() {
+        coroutineScope.launch {
+            withContext(Dispatchers.IO) {
+                preferences.edit()
+                    .putStringSet(KEY_HASH_TAG_SET, hashTagList.toSet())
+                    .apply()
+            }
+        }
     }
 
     private fun restoreHashTagsFromPreferences(): ArrayList<String> {

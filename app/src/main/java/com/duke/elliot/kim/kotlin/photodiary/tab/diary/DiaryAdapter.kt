@@ -12,6 +12,7 @@ import com.duke.elliot.kim.kotlin.photodiary.databinding.ItemDiaryBinding
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryModel
 import com.duke.elliot.kim.kotlin.photodiary.utility.getFont
 import com.duke.elliot.kim.kotlin.photodiary.utility.toDateFormat
+import com.google.android.material.chip.Chip
 import com.like.LikeButton
 import com.like.OnLikeListener
 import kotlinx.coroutines.CoroutineScope
@@ -77,6 +78,14 @@ class DiaryAdapter : ListAdapter<DiaryModel, DiaryAdapter.ViewHolder>(DiaryDiffC
                 binding.textContent.setTypeface(font, Typeface.BOLD)
             else if (diary.textOptions.textStyleItalic)
                 binding.textContent.setTypeface(font, Typeface.ITALIC)
+
+            for (hashTag in diary.hashTags) {
+                val chip = Chip(binding.chipGroup.context)
+                chip.text = hashTag
+                chip.setTextAppearanceResource(R.style.ChipFontStyle)
+                chip.isCloseIconVisible = false
+                binding.chipGroup.addView(chip)
+            }
 
             if (diary.mediaArray.isEmpty())
                 binding.mediaContainer.visibility = View.GONE

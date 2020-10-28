@@ -6,6 +6,8 @@
 
     <color name="colorControlHighlight">@color/colorAluminum</color>
 
+    <color name="colorTextAccent">@color/colorRoyalBlue</color>
+
     <color name="colorTextCalendar">@color/colorJet</color>
     <color name="colorTextSpinnerItem">@color/colorDavyGrey</color>
 
@@ -75,6 +77,7 @@
     <color name="colorBabyBlue">#89CFF0</color>
     <color name="colorCrushedIce">#C4FFF7</color>
     <color name="colorGold">#FFD700</color>
+    <color name="colorRoyalBlue">#4169e1</color>
 
     <color name="colorAluminum">#D6D6D6</color>
 

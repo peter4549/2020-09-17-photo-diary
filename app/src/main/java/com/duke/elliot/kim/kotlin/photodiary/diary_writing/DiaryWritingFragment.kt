@@ -3,7 +3,6 @@ package com.duke.elliot.kim.kotlin.photodiary.diary_writing
 import android.app.Activity.RESULT_OK
 import android.app.AlertDialog
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.graphics.PorterDuff
@@ -13,9 +12,7 @@ import android.os.Bundle
 import android.util.TypedValue
 import android.view.*
 import android.view.inputmethod.InputMethodManager
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.EditText
+import android.widget.*
 import androidx.activity.OnBackPressedCallback
 import androidx.annotation.ColorInt
 import androidx.appcompat.widget.Toolbar
@@ -47,7 +44,6 @@ import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent.set
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
 
 const val CREATE_MODE = 0
 const val EDIT_MODE = 1
@@ -411,14 +407,15 @@ class DiaryWritingFragment: Fragment() {
         binding.imageDrawing.setOnClickListener(optionsOnClickListener)
         binding.imageText.setOnClickListener(optionsOnClickListener)
 
-        initializeSpinners()
-        initializeOptionItems()
-        initializeTextItems()
-
         if (!viewModel.initialized) {
             viewModel.originDiary?.let { fetchOriginDiary(it) }
             viewModel.initialized = true
         }
+
+        initializeSpinners()
+        initializeOptionItems()
+        initializeTextItems()
+        initializeHashTagChipGroup()
 
         setCursorColor(viewModel.textColor)
         applyTextOptions()  // TODO 여기서 bold, alignment, 색상 다시 할당할 것.
@@ -555,6 +552,22 @@ class DiaryWritingFragment: Fragment() {
         binding.imageAudioLibraryItem.setOnClickListener(optionItemsOnClickListener)
     }
 
+    private fun initializeHashTagChipGroup() {
+        binding.chipGroup.removeAllViews()
+
+        for (hashTag in viewModel.selectedHashTags) {
+            val chip = Chip(requireContext())
+            chip.text = hashTag
+            chip.setTextAppearanceResource(R.style.ChipFontStyle)
+            chip.setOnCloseIconClickListener {
+                binding.chipGroup.removeView(it)
+                viewModel.selectedHashTags.remove((it as Chip).text)
+            }
+
+            binding.chipGroup.addView(chip)
+        }
+    }
+
     private fun initializeSpinners() {
         binding.spinnerFont.adapter = FontSpinnerAdapter(
             requireContext(), resources.getStringArray(R.array.fonts)
@@ -626,9 +639,23 @@ class DiaryWritingFragment: Fragment() {
         }
 
         binding.spinnerHashTag.apply {
-            adapter = HashTagSpinnerAdapter(requireContext(), viewModel.hashTags)
+            adapter = HashTagSpinnerAdapter(requireContext(), viewModel.hashTagList).apply {
+                setDeleteButtonClickListener { position ->
+                    try {
+                        val method =
+                            Spinner::class.java.getDeclaredMethod("onDetachedFromWindow")
+                        method.isAccessible = true
+                        method.invoke(binding.spinnerHashTag)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+
+                    val hashTag = viewModel.hashTagList[position]
+                    viewModel.deleteHashTagInPreferences(hashTag)
+                }
+            }
             isSelected = false
-            setSelection(0,true)
+            setSelection(0, true)
             onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(
                     parentView: AdapterView<*>?,
@@ -636,11 +663,10 @@ class DiaryWritingFragment: Fragment() {
                     position: Int,
                     id: Long
                 ) {
-                    println("ABCD: $position")
-                    if (position == 0)
+                    if (position == 0) {
                         showHashTagInputDialog()
-                    else
-                        addHashTagChip(viewModel.hashTags[position])
+                    } else
+                        addHashTagChip(viewModel.hashTagList[position])
                 }
 
                 override fun onNothingSelected(parentView: AdapterView<*>?) {  }
@@ -1063,6 +1089,7 @@ class DiaryWritingFragment: Fragment() {
             diary.mediaArray = mediaAdapter.getMediaArray()
             diary.weatherIconId = viewModel.weatherIconId
             (requireActivity() as MainActivity).updateDiary(diary)
+            diary.hashTags = viewModel.selectedHashTags.toTypedArray()
         } ?: run {
             showToast(requireContext(), "원본 다이어리가 손상되었습니다.") // TODO change to resource
             saveDiary(createDiary())
@@ -1093,6 +1120,9 @@ class DiaryWritingFragment: Fragment() {
             if (originDiary.textOptions != createTextOptions())
                 return true
 
+            if (!originDiary.hashTags.contentEquals(viewModel.selectedHashTags.toTypedArray()))
+                return true
+
             return false
         }
     }
@@ -1107,9 +1137,7 @@ class DiaryWritingFragment: Fragment() {
             textOptions = createTextOptions(),
             liked = false,
             weatherIconId = viewModel.weatherIconId,
-            hashTags = viewModel.hashTags.apply {
-                removeAt(0)
-            }.toTypedArray()
+            hashTags = viewModel.selectedHashTags.toTypedArray()
         )
     }
 
@@ -1124,6 +1152,7 @@ class DiaryWritingFragment: Fragment() {
 
     override fun onDestroy() {
         super.onDestroy()
+        viewModel.updateHashTagsToPreferences()
         PhotoHelper.deleteTempJpegFiles(requireContext())
     }
 
@@ -1267,33 +1296,66 @@ class DiaryWritingFragment: Fragment() {
     }
 
     private fun showHashTagInputDialog() {
-        val alert: AlertDialog.Builder = AlertDialog.Builder(requireContext())
+        val alertDialog: AlertDialog.Builder = AlertDialog.Builder(requireContext())
 
-        alert.setTitle("해시태그 입력")
-        alert.setMessage("해시태그를 입력하세요.")
+        alertDialog.setMessage("해시태그를 입력하세요.")
 
         val editText = EditText(requireContext())
-        alert.setView(editText)
+        val id = getCurrentTime().toInt()
+        editText.id = id
+        alertDialog.setView(editText)
 
-        alert.setPositiveButton(getString(R.string.ok)) { dialog, _ ->
-            val hashTag = "#${editText.text}"
-            viewModel.storeHashTagsToPreferences(hashTag)
-            hideKeyboard(binding.root, inputMethodManager)
+        alertDialog.setPositiveButton(getString(R.string.ok)) { dialog, _ ->
+            if (editText.text.isNotBlank()) {
+                val hashTag = "#${editText.text}"
+                viewModel.storeHashTagToPreferences(hashTag)
+                viewModel.selectedHashTags.add(hashTag)
+                addHashTagChip(hashTag)
+            }
+            inputMethodManager.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0)
             dialog.dismiss()
         }
 
-        alert.setNegativeButton(getString(R.string.cancel)) { dialog, _ ->
+        alertDialog.setNegativeButton(getString(R.string.cancel)) { dialog, _ ->
            dialog.dismiss()
         }
 
-        alert.show()
+        val dialog = alertDialog.show()
+
+        val alertTitleId = resources.getIdentifier("alertTitle", "id", requireContext().packageName)
+        val okButton = dialog.findViewById<Button>(android.R.id.button1)!!
+        val cancelButton = dialog.findViewById<Button>(android.R.id.button2)!!
+        val inflatedEditText = dialog.findViewById<EditText>(id)!!
+
+        if (alertTitleId > 0) {
+            val color = ContextCompat.getColor(requireContext(), R.color.colorRoyalBlue)
+            okButton.setTextColor(color)
+            cancelButton.setTextColor(color)
+
+            val layoutParams = inflatedEditText.layoutParams as FrameLayout.LayoutParams
+            val dp16 = convertDpToPx(
+                requireContext(),
+                resources.getDimension(R.dimen.spacing_large) / resources.displayMetrics.density
+            )
+            layoutParams.marginEnd = dp16.toInt()
+            layoutParams.marginStart = dp16.toInt()
+        }
     }
 
     private fun addHashTagChip(hashTag: String) {
-        val chip = Chip(requireContext())
-        chip.text = hashTag
-        chip.setTextAppearanceResource(R.style.ChipFontStyle)
-        binding.chipGroup.addView(chip)
+        if (!viewModel.selectedHashTags.contains(hashTag)) {
+            val chip = Chip(requireContext())
+            chip.text = hashTag
+            chip.setTextAppearanceResource(R.style.ChipFontStyle)
+            chip.setOnCloseIconClickListener {
+                binding.chipGroup.removeView(it)
+                viewModel.selectedHashTags.remove((it as Chip).text)
+            }
+
+            viewModel.selectedHashTags.add(hashTag)
+
+            binding.chipGroup.addView(chip)
+        }
     }
 
     companion object {

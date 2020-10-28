@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import androidx.viewpager2.widget.ViewPager2
 import com.duke.elliot.kim.kotlin.photodiary.MainActivity
 import com.duke.elliot.kim.kotlin.photodiary.R
 import com.duke.elliot.kim.kotlin.photodiary.database.DiaryDatabase
@@ -51,7 +52,8 @@ class DiaryViewPagerFragment: Fragment() {
         viewModel.initialized = false
         viewModel.diaries.observe(viewLifecycleOwner) { diaries ->
             if (!viewModel.initialized) {
-                viewPagerAdapter = ViewPagerAdapter(requireActivity(), diaries as ArrayList<DiaryModel>)
+                viewPagerAdapter =
+                    ViewPagerAdapter(requireActivity(), diaries as ArrayList<DiaryModel>)
                 binding.viewPager.apply {
                     adapter = viewPagerAdapter
                 }
@@ -59,12 +61,33 @@ class DiaryViewPagerFragment: Fragment() {
                 binding.viewPager.setCurrentItem(viewModel.getInitialDiaryPosition(), false)
                 viewModel.initialized = true
             } else {
-                when(viewModel.status) {
+                when (viewModel.status) {
                     DiaryViewPagerViewModel.DELETED -> viewPagerAdapter.removeFragment(binding.viewPager.currentItem)
                     DiaryViewPagerViewModel.UPDATED -> viewPagerAdapter.updateFragment(binding.viewPager.currentItem)
                 }
 
             }
+        }
+
+        binding.viewPager.registerOnPageChangeCallback(object: ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                val page = "${binding.viewPager.currentItem + 1}/${viewModel.diaries.value?.count() ?: 0}"
+                binding.textPage.text = page
+            }
+        })
+
+        binding.imageBackArrow.setOnClickListener {
+            val previousPosition = binding.viewPager.currentItem - 1
+            if (previousPosition >= 0) {
+                binding.viewPager.setCurrentItem(previousPosition, true)
+            }
+        }
+
+        binding.imageForwardArrow.setOnClickListener {
+            val nextPosition = binding.viewPager.currentItem + 1
+            if (nextPosition < viewModel.diaries.value?.count() ?: 0)
+                binding.viewPager.setCurrentItem(nextPosition, true)
         }
 
         return binding.root

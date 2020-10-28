@@ -132,7 +132,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
                     android:layout_marginStart="8dp"
-                    app:singleSelection="true">
+                    android:animateLayoutChanges="true"
+                    app:singleSelection="false">
 
                 </com.google.android.material.chip.ChipGroup>
 
@@ -259,24 +260,24 @@
                     android:layout_height="match_parent"
                     android:gravity="center_vertical|end">
 
-                <ImageView
-                    android:id="@+id/image_text"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:layout_gravity="center_vertical"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="@string/text"
-                    app:srcCompat="@drawable/ic_sharp_title_32" />
+                    <ImageView
+                        android:id="@+id/image_text"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:layout_gravity="center_vertical"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="@string/text"
+                        app:srcCompat="@drawable/ic_sharp_title_32" />
 
-                <com.duke.elliot.kim.kotlin.photodiary.view.CustomSpinner
-                    android:id="@+id/spinner_hash_tag"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginEnd="24dp"
-                    android:layout_marginStart="8dp"
-                    android:background="@drawable/ic_hashtag_50px"
-                    android:backgroundTint="@color/colorIconTint" />
+                    <com.duke.elliot.kim.kotlin.photodiary.view.CustomSpinner
+                        android:id="@+id/spinner_hash_tag"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginEnd="24dp"
+                        android:layout_marginStart="8dp"
+                        android:background="@drawable/ic_hashtag_50px"
+                        android:backgroundTint="@color/colorIconTint" />
 
                 </LinearLayout>
 
