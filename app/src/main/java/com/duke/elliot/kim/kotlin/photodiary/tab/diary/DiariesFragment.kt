@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.SimpleItemAnimator
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.duke.elliot.kim.kotlin.photodiary.*
 import com.duke.elliot.kim.kotlin.photodiary.database.DiaryDatabase
 import com.duke.elliot.kim.kotlin.photodiary.databinding.FragmentDairiesBinding
@@ -74,18 +75,17 @@ class DiariesFragment: Fragment() {
             }
         }
 
-        binding.recyclerViewDiary.layoutManager = GridLayoutManagerWrapper(requireContext(), 1)
-
+        binding.recyclerViewDiary.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
         binding.recyclerViewDiary.adapter = diaryAdapter
 
         viewModel.diaries.observe(requireActivity()) { diaries ->
-            diaryAdapter.submitList(diaries)
+            diaryAdapter.addHeaderAndSubmitList(diaries)
+
             CoroutineScope(Dispatchers.Main).launch {
                 delay(200L)
                 (binding.recyclerViewDiary.itemAnimator as SimpleItemAnimator)
                     .supportsChangeAnimations = true
             }
-
 
             if (viewModel.status == DiariesViewModel.UNINITIALIZED) {
                 binding.recyclerViewDiary.scrollToPosition(0)
@@ -96,11 +96,16 @@ class DiariesFragment: Fragment() {
                 CoroutineScope(Dispatchers.Default).launch {
                     delay(200L)
                     withContext(Dispatchers.Main) {
-                        binding.recyclerViewDiary.smoothScrollToPosition(0)
+                        binding.recyclerViewDiary.scrollToPosition(0)
                     }
                 }
 
                 MainViewModel.inserted = false
+            }
+
+            if (MainViewModel.updated) {
+                diaryAdapter.notifyItemChanged(MainViewModel.selectedDiaryPosition)
+                MainViewModel.updated = false
             }
         }
 

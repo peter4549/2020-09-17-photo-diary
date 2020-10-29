@@ -34,11 +34,11 @@ class DiaryWritingViewModel(application: Application, val originDiary: DiaryMode
     var textStyleBold = false
     var textStyleItalic = false
 
-    var weatherIconId = R.drawable.ic_sun_24
+    var weatherIconIndex = 10
 
     private val inputHashTag = application.getString(R.string.input_hash_tag)
     val hashTagList: ArrayList<String> = restoreHashTagsFromPreferences()
-    lateinit var selectedHashTags: ArrayList<String>
+    var selectedHashTags: ArrayList<String>
 
     private val _time: Long = getCurrentTime()
     val time: Long
@@ -70,6 +70,8 @@ class DiaryWritingViewModel(application: Application, val originDiary: DiaryMode
             textSize = textOptions.textSize
             textStyleBold = textOptions.textStyleBold
             textStyleItalic = textOptions.textStyleItalic
+
+            weatherIconIndex = it.weatherIconIndex
         }
 
         textFont = getFont(application, textFontId)

@@ -28,7 +28,8 @@ class ClickableViewPager : ViewPager {
     }
 
     override fun onInterceptTouchEvent(ev: MotionEvent?): Boolean {
-        this.requestDisallowInterceptTouchEvent(true)
+        if (this.childCount > 1)
+            this.requestDisallowInterceptTouchEvent(true)
         return true
     }
 

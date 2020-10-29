@@ -631,7 +631,7 @@ class DiaryWritingFragment: Fragment() {
                     position: Int,
                     id: Long
                 ) {
-                    viewModel.weatherIconId = DiaryWritingViewModel.weatherIconIds[position]
+                    viewModel.weatherIconIndex = position
                 }
 
                 override fun onNothingSelected(parentView: AdapterView<*>?) {  }
@@ -673,7 +673,7 @@ class DiaryWritingFragment: Fragment() {
             }
         }
 
-        binding.spinnerWeather.setSelection(DiaryWritingViewModel.weatherIconIds.indexOf(viewModel.weatherIconId))
+        binding.spinnerWeather.setSelection(viewModel.weatherIconIndex)
         binding.spinnerTextSize.setSelection(fontSizes.indexOf(viewModel.textSize.toInt()))  // 18sp
         binding.spinnerFont.setSelection(MainActivity.fontIds.indexOf(viewModel.textFontId))
     }
@@ -1087,13 +1087,14 @@ class DiaryWritingFragment: Fragment() {
             diary.content = binding.editTextContent.text.toString()
             diary.textOptions = createTextOptions()
             diary.mediaArray = mediaAdapter.getMediaArray()
-            diary.weatherIconId = viewModel.weatherIconId
-            (requireActivity() as MainActivity).updateDiary(diary)
+            diary.weatherIconIndex = viewModel.weatherIconIndex
             diary.hashTags = viewModel.selectedHashTags.toTypedArray()
         } ?: run {
             showToast(requireContext(), "원본 다이어리가 손상되었습니다.") // TODO change to resource
             saveDiary(createDiary())
         }
+
+        (requireActivity() as MainActivity).updateDiary(viewModel.originDiary!!)
 
         findNavController().popBackStack()
     }
@@ -1111,7 +1112,7 @@ class DiaryWritingFragment: Fragment() {
             val originDiary = viewModel.originDiary!!
             if (originDiary.title != binding.editTextTitle.text.toString() ||
                     originDiary.content != binding.editTextContent.text.toString() ||
-                    originDiary.weatherIconId != viewModel.weatherIconId)
+                    originDiary.weatherIconIndex != viewModel.weatherIconIndex)
                 return true
 
             if (!originDiary.mediaArray.contentEquals(mediaAdapter.getMediaArray()))
@@ -1136,7 +1137,7 @@ class DiaryWritingFragment: Fragment() {
             mediaArray = mediaAdapter.getMediaArray(),
             textOptions = createTextOptions(),
             liked = false,
-            weatherIconId = viewModel.weatherIconId,
+            weatherIconIndex = viewModel.weatherIconIndex,
             hashTags = viewModel.selectedHashTags.toTypedArray()
         )
     }
@@ -1309,7 +1310,6 @@ class DiaryWritingFragment: Fragment() {
             if (editText.text.isNotBlank()) {
                 val hashTag = "#${editText.text}"
                 viewModel.storeHashTagToPreferences(hashTag)
-                viewModel.selectedHashTags.add(hashTag)
                 addHashTagChip(hashTag)
             }
             inputMethodManager.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0)

@@ -51,6 +51,7 @@ class MainViewModel(application: Application): AndroidViewModel(application) {
     fun update(diary: DiaryModel) {
         coroutineScope.launch {
             withContext(Dispatchers.IO) {
+                updated = true
                 database.update(diary)
             }
         }
@@ -81,5 +82,7 @@ class MainViewModel(application: Application): AndroidViewModel(application) {
 
     companion object {
         var inserted = false
+        var updated = false
+        var selectedDiaryPosition = -1
     }
 }
