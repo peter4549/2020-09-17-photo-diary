@@ -7,16 +7,20 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.TextView
+import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.duke.elliot.kim.kotlin.photodiary.MainViewModel
 import com.duke.elliot.kim.kotlin.photodiary.R
 import com.duke.elliot.kim.kotlin.photodiary.databinding.ItemDiaryBinding
+import com.duke.elliot.kim.kotlin.photodiary.databinding.ItemDiaryBriefViewBinding
 import com.duke.elliot.kim.kotlin.photodiary.databinding.ViewModeSortBarBinding
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryModel
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryWritingViewModel
 import com.duke.elliot.kim.kotlin.photodiary.utility.getFont
+import com.duke.elliot.kim.kotlin.photodiary.utility.setImage
 import com.duke.elliot.kim.kotlin.photodiary.utility.showToast
 import com.duke.elliot.kim.kotlin.photodiary.utility.toDateFormat
 import com.google.android.material.chip.Chip
@@ -25,7 +29,6 @@ import com.like.LikeButton
 import com.like.OnLikeListener
 import kotlinx.coroutines.*
 import java.util.*
-import java.util.Collections.unmodifiableList
 import kotlin.Comparator
 
 
@@ -34,6 +37,10 @@ private const val ITEM_VIEW_TYPE_ITEM = 1
 
 private const val SORT_BY_LATEST = 0
 private const val SORT_BY_OLDEST = 1
+
+private const val LIST_VIEW_MODE = 0
+private const val BRIEF_VIEW_MODE = 1
+private const val FRAME_VIEW_MODE = 2
 
 class DiaryAdapter : ListAdapter<AdapterItem, RecyclerView.ViewHolder>(DiaryDiffCallback()) {
 
@@ -44,7 +51,9 @@ class DiaryAdapter : ListAdapter<AdapterItem, RecyclerView.ViewHolder>(DiaryDiff
     private lateinit var viewOnClickListener: () -> Unit
     private val adapterScope = CoroutineScope(Dispatchers.Default)
     private var currentItem: DiaryModel? = null
+    // TODO, load from shared pref.
     private var sortingCriteria = SORT_BY_LATEST
+    private var viewMode = LIST_VIEW_MODE
 
     fun addHeaderAndSubmitList(list: List<DiaryModel>?) {
         adapterScope.launch {
@@ -59,9 +68,13 @@ class DiaryAdapter : ListAdapter<AdapterItem, RecyclerView.ViewHolder>(DiaryDiff
         }
     }
 
-    private fun from(parent: ViewGroup): ViewHolder {
-        val binding =
-            ItemDiaryBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+    private fun from(parent: ViewGroup, viewMode: Int = 0): ViewHolder {
+        val binding = when(viewMode) {
+            LIST_VIEW_MODE -> ItemDiaryBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            BRIEF_VIEW_MODE -> ItemDiaryBriefViewBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            else -> ItemDiaryBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        }
+
         return ViewHolder(binding)
     }
 
@@ -93,26 +106,30 @@ class DiaryAdapter : ListAdapter<AdapterItem, RecyclerView.ViewHolder>(DiaryDiff
     fun getCurrentDiary(): DiaryModel? = currentItem
 
     fun sort() {
-        val modifiableList = ArrayList(currentList)
+        val modifiableList = ArrayList(currentList).filterIsInstance<AdapterItem.DiaryItem>()
         Collections.sort(modifiableList,
             Comparator { o1: AdapterItem, o2: AdapterItem ->
                 when (sortingCriteria) {
                     SORT_BY_LATEST -> {
-                        sortingCriteria = SORT_BY_OLDEST
-                        return@Comparator (o1.id - o2.id).toInt()
+                        return@Comparator (o2.time - o1.time).toInt()
                     }
                     SORT_BY_OLDEST -> {
-                        sortingCriteria = SORT_BY_LATEST
-                        return@Comparator (o2.id - o1.id).toInt()
+                        return@Comparator (o1.time - o2.time).toInt()
                     }
                     else -> 0
                 }
             }
         )
 
-        // recyclerView.scheduleLayoutAnimation()
-        submitList(modifiableList)
-        notifyDataSetChanged()
+        sortingCriteria = when(sortingCriteria) {
+            SORT_BY_LATEST -> SORT_BY_OLDEST
+            else -> SORT_BY_LATEST
+        }
+
+        recyclerView.scheduleLayoutAnimation()
+        val diaries = modifiableList.toList()
+            .requireNoNulls().map { it.diary }
+        addHeaderAndSubmitList(diaries)
     }
 
     inner class HeaderViewHolder constructor(val binding: ViewModeSortBarBinding): RecyclerView.ViewHolder(
@@ -150,26 +167,67 @@ class DiaryAdapter : ListAdapter<AdapterItem, RecyclerView.ViewHolder>(DiaryDiff
 
         fun bind() {
             binding.viewModeContainer.setOnClickListener {
-                // (recyclerView.layoutManager as StaggeredGridLayoutManager).spanCount = 1
                 MaterialAlertDialogBuilder(binding.root.context)
                     .setTitle(binding.root.context.getString(R.string.view_mode))
-                    .setAdapter(viewModeAdapter) { dialog, item ->
-                        showToast(binding.root.context, "JIO")
+                    .setAdapter(viewModeAdapter) { _, viewMode ->
+                        recyclerView.scheduleLayoutAnimation()
+                        when(viewMode) {
+                            0 -> (recyclerView.layoutManager as StaggeredGridLayoutManager).spanCount = 1
+                            1 -> (recyclerView.layoutManager as StaggeredGridLayoutManager).spanCount = 1
+                            2 -> (recyclerView.layoutManager as StaggeredGridLayoutManager).spanCount = 2
+                        }
+
+                        this@DiaryAdapter.viewMode = viewMode
+                        recyclerView.adapter = this@DiaryAdapter
                     }
                     .show()
             }
 
             binding.sortingContainer.setOnClickListener {
                 sort()
+
+                if (sortingCriteria == SORT_BY_OLDEST)
+                    binding.textSort.text = binding.root.context.getString(R.string.latest)
+                else
+                    binding.textSort.text = binding.root.context.getString(R.string.oldest)
             }
         }
     }
 
-    inner class ViewHolder constructor(val binding: ItemDiaryBinding): RecyclerView.ViewHolder(
+    inner class ViewHolder constructor(val binding: ViewDataBinding): RecyclerView.ViewHolder(
         binding.root
     ) {
+        fun bind(binding: ItemDiaryBriefViewBinding, diary: DiaryModel) {
+            val font = getFont(itemView.context, diary.textOptions.textFontId)
 
-        fun bind(diary: DiaryModel) {
+            binding.textDate.text = diary.time.toDateFormat(binding.root.context.getString(R.string.date_format_short))
+            binding.textTime.text = diary.time.toDateFormat(binding.root.context.getString(R.string.time_format_short))
+            binding.imageWeatherIcon.setImageResource(DiaryWritingViewModel.weatherIconIds[diary.weatherIconIndex])
+
+            binding.textTitle.text = diary.title
+            binding.textTitle.setTextColor(diary.textOptions.textColor)
+            binding.textTitle.typeface = font
+
+            if (diary.hashTags.isEmpty())
+                binding.textHashTags.visibility = View.GONE
+            else
+                binding.textHashTags.text = diary.hashTags.joinToString(separator = " ")
+
+            if (diary.mediaArray.isEmpty())
+                binding.imageMedia.visibility = View.GONE
+            else
+                setImage(binding.imageMedia, diary.mediaArray[0].uriString)
+
+            binding.root.setOnClickListener {
+                currentItem = diary
+                MainViewModel.selectedDiaryPosition = absoluteAdapterPosition
+
+                if (::viewOnClickListener.isInitialized)
+                    viewOnClickListener.invoke()
+            }
+        }
+
+        fun bind(binding: ItemDiaryBinding, diary: DiaryModel) {
             val font = getFont(itemView.context, diary.textOptions.textFontId)
 
             binding.textDate.text = diary.time.toDateFormat(binding.root.context.getString(R.string.date_format_short))
@@ -292,9 +350,17 @@ class DiaryAdapter : ListAdapter<AdapterItem, RecyclerView.ViewHolder>(DiaryDiff
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        // TODO: Divide target view.
+        println("CREATED CALL!!! vm: $viewMode")
         return when(viewType) {
             ITEM_VIEW_TYPE_HEADER -> inflateHeaderFrom(parent)
-            ITEM_VIEW_TYPE_ITEM -> from(parent)
+            ITEM_VIEW_TYPE_ITEM -> {
+                when (viewMode) {
+                    LIST_VIEW_MODE ->  from(parent)
+                    BRIEF_VIEW_MODE -> from(parent, BRIEF_VIEW_MODE)
+                    else -> from(parent)
+                }
+            }
             else -> throw ClassCastException("Unknown viewType $viewType")
         }
     }
@@ -303,7 +369,10 @@ class DiaryAdapter : ListAdapter<AdapterItem, RecyclerView.ViewHolder>(DiaryDiff
         when(holder) {
             is ViewHolder -> {
                 val diaryItem = getItem(position) as AdapterItem.DiaryItem
-                holder.bind(diaryItem.diary)
+                when(viewMode) {
+                    LIST_VIEW_MODE -> holder.bind(holder.binding as ItemDiaryBinding, diaryItem.diary)
+                    BRIEF_VIEW_MODE -> holder.bind(holder.binding as ItemDiaryBriefViewBinding, diaryItem.diary)
+                }
             }
             is HeaderViewHolder -> {
                 holder.bind()
@@ -325,11 +394,14 @@ class DiaryDiffCallback: DiffUtil.ItemCallback<AdapterItem>() {
 sealed class AdapterItem() {
     data class DiaryItem(val diary: DiaryModel): AdapterItem() {
         override val id = diary.id
+        override val time = diary.time
     }
 
     object Header: AdapterItem() {
         override val id = Long.MIN_VALUE
+        override val time = Long.MIN_VALUE
     }
 
     abstract val id: Long
+    abstract val time: Long
 }

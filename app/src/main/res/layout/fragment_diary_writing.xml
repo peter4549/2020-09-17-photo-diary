@@ -83,7 +83,7 @@
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/toolbar"
-                        app:drawableStartCompat="@drawable/ic_round_access_time_24"
+                        app:drawableStartCompat="@drawable/ic_round_access_time_20"
                         app:drawableTint="@color/colorDefaultThemeDark"
                         tools:text="오후 3시 30분" />
 
