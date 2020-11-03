@@ -79,13 +79,27 @@
                     android:gravity="center_vertical|end">
 
                     <ImageView
+                        android:id="@+id/imageMore"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_marginBottom="4dp"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginTop="4dp"
+                        app:srcCompat="@drawable/ic_round_more_vert_36"
+                        app:tint="@color/colorIconTint"
+                        tools:ignore="ContentDescription" />
+
+                    <ImageView
                         android:id="@+id/image_weather_icon"
                         android:layout_width="36dp"
                         android:layout_height="36dp"
                         android:layout_marginBottom="4dp"
-                        android:layout_marginEnd="24dp"
+                        android:layout_marginEnd="16dp"
                         android:layout_marginTop="4dp"
-                        tools:ignore="ContentDescription" />
+                        android:layout_toStartOf="@id/imageMore"
+                        tools:ignore="ContentDescription"
+                        tools:srcCompat="@drawable/ic_sun_24"/>
+
                 </RelativeLayout>
             </LinearLayout>
 
@@ -210,8 +224,8 @@
 
                 <ImageView
                     android:id="@+id/image_export"
-                    android:layout_width="26dp"
-                    android:layout_height="26dp"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="0.5dp"
                     android:background="?attr/selectableItemBackgroundBorderless"

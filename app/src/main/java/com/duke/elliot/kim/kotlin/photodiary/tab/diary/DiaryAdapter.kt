@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import android.widget.PopupMenu
 import android.widget.TextView
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.DiffUtil
@@ -21,7 +22,6 @@ import com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryModel
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryWritingViewModel
 import com.duke.elliot.kim.kotlin.photodiary.utility.getFont
 import com.duke.elliot.kim.kotlin.photodiary.utility.setImage
-import com.duke.elliot.kim.kotlin.photodiary.utility.showToast
 import com.duke.elliot.kim.kotlin.photodiary.utility.toDateFormat
 import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -70,8 +70,16 @@ class DiaryAdapter : ListAdapter<AdapterItem, RecyclerView.ViewHolder>(DiaryDiff
 
     private fun from(parent: ViewGroup, viewMode: Int = 0): ViewHolder {
         val binding = when(viewMode) {
-            LIST_VIEW_MODE -> ItemDiaryBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-            BRIEF_VIEW_MODE -> ItemDiaryBriefViewBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            LIST_VIEW_MODE -> ItemDiaryBinding.inflate(
+                LayoutInflater.from(parent.context),
+                parent,
+                false
+            )
+            BRIEF_VIEW_MODE -> ItemDiaryBriefViewBinding.inflate(
+                LayoutInflater.from(parent.context),
+                parent,
+                false
+            )
             else -> ItemDiaryBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         }
 
@@ -172,9 +180,12 @@ class DiaryAdapter : ListAdapter<AdapterItem, RecyclerView.ViewHolder>(DiaryDiff
                     .setAdapter(viewModeAdapter) { _, viewMode ->
                         recyclerView.scheduleLayoutAnimation()
                         when(viewMode) {
-                            0 -> (recyclerView.layoutManager as StaggeredGridLayoutManager).spanCount = 1
-                            1 -> (recyclerView.layoutManager as StaggeredGridLayoutManager).spanCount = 1
-                            2 -> (recyclerView.layoutManager as StaggeredGridLayoutManager).spanCount = 2
+                            0 -> (recyclerView.layoutManager as StaggeredGridLayoutManager).spanCount =
+                                1
+                            1 -> (recyclerView.layoutManager as StaggeredGridLayoutManager).spanCount =
+                                1
+                            2 -> (recyclerView.layoutManager as StaggeredGridLayoutManager).spanCount =
+                                2
                         }
 
                         this@DiaryAdapter.viewMode = viewMode
@@ -334,6 +345,35 @@ class DiaryAdapter : ListAdapter<AdapterItem, RecyclerView.ViewHolder>(DiaryDiff
                     }
                 }
             })
+
+            binding.imageMore.setOnClickListener {
+                val popupMenu = PopupMenu(binding.root.context, binding.imageMore)
+                popupMenu.inflate(R.menu.diary_options)
+                popupMenu.setOnMenuItemClickListener { item ->
+                    currentItem = diary
+                    MainViewModel.selectedDiaryPosition = absoluteAdapterPosition
+
+                    when (item.itemId) {
+                        R.id.edit -> {
+                            if (::editOnClickListener.isInitialized)
+                                editOnClickListener.invoke()
+                            true
+                        }
+                        R.id.set_category ->  // TODO: Implement
+                            true
+                        R.id.export -> // TODO: Implement
+                            true
+                        R.id.delete -> {
+                            if (::deleteOnClickListener.isInitialized)
+                                deleteOnClickListener.invoke()
+                            true
+                        }
+                        else -> false
+                    }
+                }
+
+                popupMenu.show()
+            }
         }
     }
 
@@ -356,7 +396,7 @@ class DiaryAdapter : ListAdapter<AdapterItem, RecyclerView.ViewHolder>(DiaryDiff
             ITEM_VIEW_TYPE_HEADER -> inflateHeaderFrom(parent)
             ITEM_VIEW_TYPE_ITEM -> {
                 when (viewMode) {
-                    LIST_VIEW_MODE ->  from(parent)
+                    LIST_VIEW_MODE -> from(parent)
                     BRIEF_VIEW_MODE -> from(parent, BRIEF_VIEW_MODE)
                     else -> from(parent)
                 }
@@ -369,9 +409,15 @@ class DiaryAdapter : ListAdapter<AdapterItem, RecyclerView.ViewHolder>(DiaryDiff
         when(holder) {
             is ViewHolder -> {
                 val diaryItem = getItem(position) as AdapterItem.DiaryItem
-                when(viewMode) {
-                    LIST_VIEW_MODE -> holder.bind(holder.binding as ItemDiaryBinding, diaryItem.diary)
-                    BRIEF_VIEW_MODE -> holder.bind(holder.binding as ItemDiaryBriefViewBinding, diaryItem.diary)
+                when (viewMode) {
+                    LIST_VIEW_MODE -> holder.bind(
+                        holder.binding as ItemDiaryBinding,
+                        diaryItem.diary
+                    )
+                    BRIEF_VIEW_MODE -> holder.bind(
+                        holder.binding as ItemDiaryBriefViewBinding,
+                        diaryItem.diary
+                    )
                 }
             }
             is HeaderViewHolder -> {

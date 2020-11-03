@@ -17,6 +17,7 @@ import com.duke.elliot.kim.kotlin.photodiary.databinding.FragmentDiaryViewPagerB
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryModel
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.EDIT_MODE
 import com.duke.elliot.kim.kotlin.photodiary.utility.FileUtilities
+import com.duke.elliot.kim.kotlin.photodiary.utility.PdfUtilities
 import com.duke.elliot.kim.kotlin.photodiary.utility.showToast
 
 class DiaryViewPagerFragment: Fragment() {
@@ -97,7 +98,7 @@ class DiaryViewPagerFragment: Fragment() {
         super.onCreateOptionsMenu(menu, inflater)
         menu.clear()
         (requireActivity() as MainActivity).menuInflater.inflate(
-            R.menu.diary_view_pager, menu
+            R.menu.diary_options, menu
         )
     }
 
@@ -108,6 +109,7 @@ class DiaryViewPagerFragment: Fragment() {
             R.id.set_category -> {
             }
             R.id.export -> {
+                PdfUtilities.viewToPdf(binding.viewPager, binding.root.context) // TODO test,, 미리보기 페이지 이동 같은걸로 변경. scroll text view
             }
             R.id.delete -> viewModel.getItem(binding.viewPager.currentItem)?.let {
                 viewModel.delete(it)
