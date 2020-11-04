@@ -17,7 +17,7 @@ import com.duke.elliot.kim.kotlin.photodiary.databinding.FragmentDiaryViewPagerB
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryModel
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.EDIT_MODE
 import com.duke.elliot.kim.kotlin.photodiary.utility.FileUtilities
-import com.duke.elliot.kim.kotlin.photodiary.utility.PdfUtilities
+import com.duke.elliot.kim.kotlin.photodiary.export.PdfUtilities
 import com.duke.elliot.kim.kotlin.photodiary.utility.showToast
 
 class DiaryViewPagerFragment: Fragment() {

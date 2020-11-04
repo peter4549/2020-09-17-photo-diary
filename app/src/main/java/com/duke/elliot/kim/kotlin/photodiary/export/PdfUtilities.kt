@@ -1,4 +1,4 @@
-package com.duke.elliot.kim.kotlin.photodiary.utility
+package com.duke.elliot.kim.kotlin.photodiary.export
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -7,6 +7,7 @@ import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.view.View
 import android.widget.Toast
+import com.duke.elliot.kim.kotlin.photodiary.utility.showToast
 import com.itextpdf.text.Document
 import com.itextpdf.text.Image
 import com.itextpdf.text.pdf.PdfWriter

@@ -80,11 +80,12 @@
 
                     <ImageView
                         android:id="@+id/imageMore"
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
                         android:layout_marginBottom="4dp"
                         android:layout_marginEnd="8dp"
                         android:layout_marginTop="4dp"
+                        android:layout_centerVertical="true"
                         app:srcCompat="@drawable/ic_round_more_vert_36"
                         app:tint="@color/colorIconTint"
                         tools:ignore="ContentDescription" />

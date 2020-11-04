@@ -1,36 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <data>
-        <variable
-            name="diaryViewViewModel"
-            type="com.duke.elliot.kim.kotlin.photodiary.tab.diary.diary_view.DiaryViewViewModel" />
-    </data>
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/colorDefaultThemeLight">
+        android:layout_height="match_parent">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/dimen_toolbar_height"
+            android:background="@color/colorToolbarBackground"
+            android:elevation="2dp"
+            android:theme="@style/ToolbarTheme"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginBottom="8dp"
-            android:fillViewport="true"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_height="wrap_content"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toBottomOf="@+id/toolbar">
 
             <LinearLayout
+                android:id="@+id/container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:gravity="center_horizontal">
 
                 <LinearLayout
+                    android:id="@+id/date_time_container"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
@@ -44,31 +47,30 @@
                         android:id="@+id/text_date"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:drawablePadding="6dp"
-                        android:gravity="bottom"
+                        android:layout_marginStart="8dp"
+                        android:drawablePadding="8dp"
+                        android:gravity="center_vertical"
                         android:includeFontPadding="false"
                         android:padding="8dp"
                         android:textColor="@color/colorTextCalendar"
-                        android:textSize="12sp"
-                        android:textStyle="bold"
+                        android:textSize="14sp"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/toolbar"
                         app:drawableStartCompat="@drawable/ic_round_date_range_24"
                         app:drawableTint="@color/colorDefaultThemeDark"
-                        tools:text="2020년 9월 17일 금요일" />
+                        tools:text="9월 17일 금요일" />
 
                     <TextView
                         android:id="@+id/text_time"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:drawablePadding="6dp"
-                        android:gravity="bottom"
+                        android:drawablePadding="8dp"
+                        android:gravity="center_vertical"
                         android:includeFontPadding="false"
                         android:padding="8dp"
                         android:textColor="@color/colorTextCalendar"
-                        android:textSize="12sp"
-                        android:textStyle="bold"
+                        android:textSize="14sp"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/toolbar"
@@ -76,10 +78,27 @@
                         app:drawableTint="@color/colorDefaultThemeDark"
                         tools:text="오후 3시 30분" />
 
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical|end">
+
+                        <ImageView
+                            android:id="@+id/imageWeather"
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:layout_marginBottom="4dp"
+                            android:layout_marginEnd="16dp"
+                            android:layout_marginTop="4dp"
+                            android:background="?attr/selectableItemBackground"
+                            tools:ignore="ContentDescription" />
+
+                    </RelativeLayout>
+
                 </LinearLayout>
 
-                <TextView
-                    android:id="@+id/text_title"
+                <EditText
+                    android:id="@+id/edit_text_title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
@@ -88,6 +107,10 @@
                     android:background="@drawable/background_white_rounded_corners"
                     android:ellipsize="end"
                     android:ems="10"
+                    android:gravity="start"
+                    android:hint="@string/title"
+                    android:inputType="text"
+                    android:importantForAutofill="no"
                     android:maxLines="1"
                     android:padding="8dp"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -102,48 +125,27 @@
                     android:layout_marginEnd="8dp"
                     android:layout_marginStart="8dp"
                     android:animateLayoutChanges="true"
-                    app:singleSelection="false"
-                    app:layout_constraintBottom_toTopOf="@+id/media_container"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/text_title" />
+                    app:singleSelection="false">
 
-                <RelativeLayout
-                    android:id="@+id/media_container"
+                </com.google.android.material.chip.ChipGroup>
+
+                <ImageView
+                    android:id="@+id/imageView0"
                     android:layout_width="320dp"
                     android:layout_height="400dp"
-                    android:layout_gravity="center_horizontal"
-                    android:elevation="2dp"
-                    app:layout_constraintBottom_toTopOf="@+id/text_content"
+                    android:background="@drawable/media_recycler_view_background_rounded_corners"
+                    android:visibility="visible"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/text_title">
+                    app:layout_constraintTop_toBottomOf="@+id/edit_text_title"
+                    tools:srcCompat="@drawable/ic_snow_24"
+                    tools:ignore="ContentDescription" />
 
-                    <com.duke.elliot.kim.kotlin.photodiary.view.ClickableViewPager
-                        android:id="@+id/view_pager"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_marginEnd="8dp"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginTop="8dp"/>
-
-                    <com.rd.PageIndicatorView
-                        android:id="@+id/page_indicator_view"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentBottom="true"
-                        android:layout_centerHorizontal="true"
-                        android:layout_marginBottom="16dp"
-                        app:piv_viewPager="@id/view_pager"
-                        tools:piv_padding="12dp"
-                        tools:piv_radius="8dp" />
-
-                </RelativeLayout>
-
-                <TextView
-                    android:id="@+id/text_content"
+                <EditText
+                    android:id="@+id/edit_text_content"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="8dp"
                     android:layout_marginEnd="8dp"
@@ -151,18 +153,19 @@
                     android:ellipsize="end"
                     android:ems="10"
                     android:gravity="top"
+                    android:importantForAutofill="no"
+                    android:inputType="textMultiLine"
                     android:lineSpacingMultiplier="1.1"
-                    android:minHeight="@dimen/dimen_edit_text_content_min_height"
                     android:overScrollMode="always"
                     android:padding="8dp"
                     android:scrollbars="vertical"
                     app:layout_constraintBottom_toTopOf="@+id/layout_options_container"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/view_pager" />
+                    app:layout_constraintTop_toBottomOf="@+id/recycler_view_media"
+                    tools:ignore="LabelFor" />
 
             </LinearLayout>
         </ScrollView>
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

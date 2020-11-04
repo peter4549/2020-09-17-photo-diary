@@ -20,6 +20,9 @@
         <action
             android:id="@+id/action_tabFragment_to_diaryViewPagerFragment"
             app:destination="@id/diaryViewPagerFragment" />
+        <action
+            android:id="@+id/action_tabFragment_to_pdfPreviewFragment"
+            app:destination="@id/pdfPreviewFragment" />
     </fragment>
     <fragment
         android:id="@+id/diaryWritingFragment"
@@ -77,5 +80,19 @@
         <argument
             android:name="selectedDiary"
             app:argType="com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryModel" />
+        <action
+            android:id="@+id/action_diaryViewPagerFragment_to_pdfPreviewFragment"
+            app:destination="@id/pdfPreviewFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/pdfPreviewFragment"
+        android:name="com.duke.elliot.kim.kotlin.photodiary.export.PdfPreviewFragment"
+        android:label="PdfPreviewFragment">
+
+        <argument
+            android:name="diary"
+            app:argType="com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryModel"
+            app:nullable="true" />
+
     </fragment>
 </navigation>

@@ -53,6 +53,13 @@ class DiariesFragment: Fragment() {
                 }
             }
 
+            setConvertPdfClickListener {
+                getCurrentDiary()?.let {
+                    findNavController().navigate(TabFragmentDirections
+                        .actionTabFragmentToPdfPreviewFragment(it))
+                }
+            }
+
             setEditOnClickListener {
                 getCurrentDiary()?.let {
                     findNavController().navigate(TabFragmentDirections

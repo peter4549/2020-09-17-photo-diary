@@ -47,6 +47,7 @@ class DiaryAdapter : ListAdapter<AdapterItem, RecyclerView.ViewHolder>(DiaryDiff
     private lateinit var recyclerView: RecyclerView
     private lateinit var deleteOnClickListener: () -> Unit
     private lateinit var editOnClickListener: () -> Unit
+    private lateinit var convertPdfClickListener: () -> Unit
     private lateinit var updateListener: () -> Unit
     private lateinit var viewOnClickListener: () -> Unit
     private val adapterScope = CoroutineScope(Dispatchers.Default)
@@ -101,6 +102,10 @@ class DiaryAdapter : ListAdapter<AdapterItem, RecyclerView.ViewHolder>(DiaryDiff
 
     fun setEditOnClickListener(editOnClickListener: () -> Unit) {
         this.editOnClickListener = editOnClickListener
+    }
+
+    fun setConvertPdfClickListener(convertPdfClickListener: () -> Unit) {
+        this.convertPdfClickListener = convertPdfClickListener
     }
 
     fun setDeleteOnClickListener(deleteOnClickListener: () -> Unit) {
@@ -213,8 +218,7 @@ class DiaryAdapter : ListAdapter<AdapterItem, RecyclerView.ViewHolder>(DiaryDiff
 
             binding.textDate.text = diary.time.toDateFormat(binding.root.context.getString(R.string.date_format_short))
             binding.textTime.text = diary.time.toDateFormat(binding.root.context.getString(R.string.time_format_short))
-            binding.imageWeatherIcon.setImageResource(DiaryWritingViewModel.weatherIconIds[diary.weatherIconIndex])
-
+            setImage(binding.imageWeatherIcon, DiaryWritingViewModel.weatherIconIds[diary.weatherIconIndex])
             binding.textTitle.text = diary.title
             binding.textTitle.setTextColor(diary.textOptions.textColor)
             binding.textTitle.typeface = font
@@ -361,8 +365,12 @@ class DiaryAdapter : ListAdapter<AdapterItem, RecyclerView.ViewHolder>(DiaryDiff
                         }
                         R.id.set_category ->  // TODO: Implement
                             true
-                        R.id.export -> // TODO: Implement
+                        R.id.export -> {
+                            // TODO make select bar.
+                            if (::convertPdfClickListener.isInitialized)
+                                convertPdfClickListener.invoke()
                             true
+                        }
                         R.id.delete -> {
                             if (::deleteOnClickListener.isInitialized)
                                 deleteOnClickListener.invoke()
