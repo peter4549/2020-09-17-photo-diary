@@ -5,22 +5,59 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@color/colorAluminum">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="0dp"
-            android:layout_height="@dimen/dimen_toolbar_height"
+            android:layout_height="wrap_content"
+            android:minHeight="@dimen/dimen_toolbar_height"
             android:background="@color/colorToolbarBackground"
             android:elevation="2dp"
             android:theme="@style/ToolbarTheme"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:title="@string/pdf_preview">
+
+            <LinearLayout
+                android:id="@+id/exportPdf"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:clickable="true"
+                android:focusable="true"
+                tools:ignore="UseCompoundDrawables">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginStart="56dp"
+                android:text="@string/export_pdf"
+                android:gravity="center_vertical"
+                android:textColor="@color/colorToolbarTitle" />
+
+                <ImageView
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:layout_marginStart="8dp"
+                    app:srcCompat="@drawable/ic_export_pdf_50px"
+                    tools:ignore="ContentDescription" />
+
+            </LinearLayout>
+        </androidx.appcompat.widget.Toolbar>
 
         <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:id="@+id/scrollView"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_margin="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/toolbar">
@@ -29,8 +66,10 @@
                 android:id="@+id/container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:gravity="center_horizontal">
+                android:background="@drawable/background_white_rounded_corners"
+                android:backgroundTint="@color/colorDefaultThemeLight"
+                android:gravity="center_horizontal"
+                android:orientation="vertical">
 
                 <LinearLayout
                     android:id="@+id/date_time_container"
@@ -39,9 +78,9 @@
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="8dp"
                     android:layout_marginEnd="8dp"
-                    android:orientation="horizontal"
                     android:background="@drawable/background_white_rounded_corners"
-                    android:gravity="center_vertical">
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
 
                     <TextView
                         android:id="@+id/text_date"
@@ -54,11 +93,11 @@
                         android:padding="8dp"
                         android:textColor="@color/colorTextCalendar"
                         android:textSize="14sp"
+                        app:drawableStartCompat="@drawable/ic_round_date_range_24"
+                        app:drawableTint="@color/colorDefaultThemeDark"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/toolbar"
-                        app:drawableStartCompat="@drawable/ic_round_date_range_24"
-                        app:drawableTint="@color/colorDefaultThemeDark"
                         tools:text="9월 17일 금요일" />
 
                     <TextView
@@ -71,11 +110,11 @@
                         android:padding="8dp"
                         android:textColor="@color/colorTextCalendar"
                         android:textSize="14sp"
+                        app:drawableStartCompat="@drawable/ic_round_access_time_20"
+                        app:drawableTint="@color/colorDefaultThemeDark"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/toolbar"
-                        app:drawableStartCompat="@drawable/ic_round_access_time_20"
-                        app:drawableTint="@color/colorDefaultThemeDark"
                         tools:text="오후 3시 30분" />
 
                     <RelativeLayout
@@ -87,9 +126,9 @@
                             android:id="@+id/imageWeather"
                             android:layout_width="36dp"
                             android:layout_height="36dp"
-                            android:layout_marginBottom="4dp"
-                            android:layout_marginEnd="16dp"
                             android:layout_marginTop="4dp"
+                            android:layout_marginEnd="16dp"
+                            android:layout_marginBottom="4dp"
                             android:background="?attr/selectableItemBackground"
                             tools:ignore="ContentDescription" />
 
@@ -109,8 +148,8 @@
                     android:ems="10"
                     android:gravity="start"
                     android:hint="@string/title"
-                    android:inputType="text"
                     android:importantForAutofill="no"
+                    android:inputType="text"
                     android:maxLines="1"
                     android:padding="8dp"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -122,8 +161,8 @@
                     android:id="@+id/chip_group"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
                     android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
                     android:animateLayoutChanges="true"
                     app:singleSelection="false">
 
@@ -133,22 +172,23 @@
                     android:id="@+id/imageView0"
                     android:layout_width="320dp"
                     android:layout_height="400dp"
+                    android:layout_marginTop="8dp"
                     android:background="@drawable/media_recycler_view_background_rounded_corners"
                     android:visibility="visible"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/edit_text_title"
-                    tools:srcCompat="@drawable/ic_snow_24"
-                    tools:ignore="ContentDescription" />
+                    tools:ignore="ContentDescription"
+                    tools:srcCompat="@drawable/ic_snow_24" />
 
                 <EditText
                     android:id="@+id/edit_text_content"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="8dp"
                     android:layout_marginEnd="8dp"
+                    android:layout_marginBottom="8dp"
                     android:background="@drawable/background_white_rounded_corners"
                     android:ellipsize="end"
                     android:ems="10"

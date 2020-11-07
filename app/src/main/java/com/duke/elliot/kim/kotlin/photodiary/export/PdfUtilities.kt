@@ -7,6 +7,7 @@ import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.view.View
 import android.widget.Toast
+import com.duke.elliot.kim.kotlin.photodiary.utility.getOutputDirectory
 import com.duke.elliot.kim.kotlin.photodiary.utility.showToast
 import com.itextpdf.text.Document
 import com.itextpdf.text.Image
@@ -49,7 +50,7 @@ object PdfUtilities {
             fileOutputStream.write(byteArrayOutputStream.toByteArray())
 
             val document = Document()
-            PdfWriter.getInstance(document, FileOutputStream(context.getExternalFilesDir("null").toString() + "/newPDF.pdf"))
+            PdfWriter.getInstance(document, FileOutputStream(getOutputDirectory(context).toString() + "/newPDF.pdf"))
             document.open()
 
             val image = Image.getInstance(file.toString())
@@ -66,3 +67,53 @@ object PdfUtilities {
         }
     }
 }
+/*
+private void createPDFWithMultipleImage(){
+    File file = getOutputFile();
+    if (file != null){
+        try {
+            FileOutputStream fileOutputStream = new FileOutputStream(file);
+            PdfDocument pdfDocument = new PdfDocument();
+
+            for (int i = 0; i < images.size(); i++){
+                Bitmap bitmap = BitmapFactory.decodeFile(images.get(i).getPath());
+                PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(bitmap.getWidth(), bitmap.getHeight(), (i + 1)).create();
+                PdfDocument.Page page = pdfDocument.startPage(pageInfo);
+                Canvas canvas = page.getCanvas();
+                Paint paint = new Paint();
+                paint.setColor(Color.BLUE);
+                canvas.drawPaint(paint);
+                canvas.drawBitmap(bitmap, 0f, 0f, null);
+                pdfDocument.finishPage(page);
+                bitmap.recycle();
+            }
+            pdfDocument.writeTo(fileOutputStream);
+            pdfDocument.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+private File getOutputFile(){
+    File root = new File(this.getExternalFilesDir(null),"My PDF Folder");
+
+    boolean isFolderCreated = true;
+
+    if (!root.exists()){
+        isFolderCreated = root.mkdir();
+    }
+
+    if (isFolderCreated) {
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
+        String imageFileName = "PDF_" + timeStamp;
+
+        return new File(root, imageFileName + ".pdf");
+    }
+    else {
+        Toast.makeText(this, "Folder is not created", Toast.LENGTH_SHORT).show();
+        return null;
+    }
+}
+ */

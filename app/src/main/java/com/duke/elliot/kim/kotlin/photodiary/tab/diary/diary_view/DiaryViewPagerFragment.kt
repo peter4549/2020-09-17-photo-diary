@@ -109,7 +109,7 @@ class DiaryViewPagerFragment: Fragment() {
             R.id.set_category -> {
             }
             R.id.export -> {
-                PdfUtilities.viewToPdf(binding.viewPager, binding.root.context) // TODO test,, 미리보기 페이지 이동 같은걸로 변경. scroll text view
+                // PdfUtilities.viewToPdf(binding.viewPager, binding.root.context) // TODO test,, 미리보기 페이지 이동 같은걸로 변경. scroll text view
             }
             R.id.delete -> viewModel.getItem(binding.viewPager.currentItem)?.let {
                 viewModel.delete(it)

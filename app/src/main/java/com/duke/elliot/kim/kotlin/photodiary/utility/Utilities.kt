@@ -35,6 +35,7 @@ import com.duke.elliot.kim.kotlin.photodiary.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.io.File
 import java.lang.StringBuilder
 import java.text.SimpleDateFormat
 import java.util.*
@@ -339,4 +340,12 @@ fun convertPxToDp(context: Context, px: Float): Float {
     val resources = context.resources
     val displayMetrics = resources.displayMetrics
     return px / (displayMetrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT)
+}
+
+fun getOutputDirectory(context: Context): File {
+    val appContext = context.applicationContext
+    val mediaDir = context.getExternalFilesDirs(null).firstOrNull()?.let {
+        File(it, appContext.resources.getString(R.string.app_name)).apply { mkdirs() } }
+    return if (mediaDir != null && mediaDir.exists())
+        mediaDir else appContext.filesDir
 }

@@ -117,4 +117,8 @@
     <string name="frame">액자</string>
     <string name="latest">최신순</string>
     <string name="oldest">오래된 순</string>
+
+    <!-- Export PDF -->
+    <string name="pdf_preview">PDF 미리보기</string>
+    <string name="export_pdf">PDF 내보내기</string>
 </resources>
