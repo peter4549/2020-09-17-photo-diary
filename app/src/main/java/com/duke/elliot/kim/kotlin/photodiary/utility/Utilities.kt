@@ -2,6 +2,8 @@ package com.duke.elliot.kim.kotlin.photodiary.utility
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.AlertDialog
+import android.content.ContentValues
 import android.content.Context
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
@@ -9,14 +11,14 @@ import android.graphics.*
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
+import android.os.Environment
+import android.provider.MediaStore
 import android.util.AttributeSet
 import android.util.DisplayMetrics
 import android.view.Surface
-import android.widget.ImageView
-import android.widget.Toast
-import androidx.annotation.ColorInt
+import android.view.inputmethod.InputMethodManager
+import android.widget.*
 import androidx.annotation.RequiresApi
-import androidx.annotation.Size
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.GridLayoutManager
@@ -30,17 +32,13 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
-import com.duke.elliot.kim.kotlin.photodiary.MainActivity
 import com.duke.elliot.kim.kotlin.photodiary.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
-import java.lang.StringBuilder
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.math.max
-import kotlin.math.min
 
 @Suppress("unused")
 class GridLayoutManagerWrapper: GridLayoutManager {
@@ -332,7 +330,11 @@ fun hasPermissions(context: Context, permissionRequired: Array<String>) = permis
 
 fun replaceLast(string: String, oldString: String, newString: String): String {
     val stringBuilder = StringBuilder(string)
-    stringBuilder.replace(string.lastIndexOf(oldString), string.lastIndexOf(oldString) + oldString.length, newString)
+    stringBuilder.replace(
+        string.lastIndexOf(oldString),
+        string.lastIndexOf(oldString) + oldString.length,
+        newString
+    )
     return stringBuilder.toString()
 }
 
@@ -344,8 +346,142 @@ fun convertPxToDp(context: Context, px: Float): Float {
 
 fun getOutputDirectory(context: Context): File {
     val appContext = context.applicationContext
-    val mediaDir = context.getExternalFilesDirs(null).firstOrNull()?.let {
+    val mediaDir = context.getExternalFilesDirs(Environment.DIRECTORY_DOCUMENTS).firstOrNull()?.let {
         File(it, appContext.resources.getString(R.string.app_name)).apply { mkdirs() } }
+
+    getDocumentDirectory(context, "HHHHH")
     return if (mediaDir != null && mediaDir.exists())
         mediaDir else appContext.filesDir
 }
+
+
+
+fun showInputDialog(context: Context, title: String, okEvent: (text: String) -> Unit) {
+    val inputMethodManager = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+    val alertDialog: AlertDialog.Builder = AlertDialog.Builder(context)
+
+    alertDialog.setMessage(title)
+
+    val editText = EditText(context)
+    val id = getCurrentTime().toInt()
+    editText.id = id
+    alertDialog.setView(editText)
+
+    alertDialog.setPositiveButton(context.getString(R.string.ok)) { dialog, _ ->
+        if (editText.text.isNotBlank()) {
+            okEvent.invoke(editText.text.toString())
+        }
+
+        inputMethodManager.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0)
+        dialog.dismiss()
+    }
+
+    alertDialog.setNegativeButton(context.getString(R.string.cancel)) { dialog, _ ->
+        dialog.dismiss()
+    }
+
+    val dialog = alertDialog.show()
+
+    val alertTitleId = context.resources.getIdentifier("alertTitle", "id", context.packageName)
+    val okButton = dialog.findViewById<Button>(android.R.id.button1)!!
+    val cancelButton = dialog.findViewById<Button>(android.R.id.button2)!!
+    val inflatedEditText = dialog.findViewById<EditText>(id)!!
+
+    if (alertTitleId > 0) {
+        val color = ContextCompat.getColor(context, R.color.colorRoyalBlue)
+        okButton.setTextColor(color)
+        cancelButton.setTextColor(color)
+
+        val layoutParams = inflatedEditText.layoutParams as FrameLayout.LayoutParams
+        val dp16 = convertDpToPx(
+            context,
+            context.resources.getDimension(R.dimen.spacing_large) / context.resources.displayMetrics.density
+        )
+        layoutParams.marginEnd = dp16.toInt()
+        layoutParams.marginStart = dp16.toInt()
+    }
+}
+
+fun getDocumentDirectory(context: Context, fileName: String): String {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        val values = ContentValues()
+        with(values) {
+            put(MediaStore.Files.FileColumns.TITLE, fileName)
+            put(MediaStore.Files.FileColumns.DATE_TAKEN, System.currentTimeMillis())
+            put(MediaStore.Files.FileColumns.RELATIVE_PATH, "Document/my_folder")
+            put(MediaStore.Files.FileColumns.MIME_TYPE, "application/pdf")
+        }
+
+        val uri = context.contentResolver.in
+        println("OOOOOOO: ${uri?.path}")
+        return uri?.path ?: ""
+    } else {
+        return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)
+            .toString() +
+                File.separator + context.getString(R.string.app_name)
+    }
+}
+
+@RequiresApi(api = Build.VERSION_CODES.Q)
+@NonNull
+@Throws(IOException::class)
+private fun savePDFFile(
+    @NonNull context: Context,
+    @NonNull `in`: InputStream,
+    @NonNull mimeType: String,
+    @NonNull displayName: String,
+    @Nullable subFolder: String
+): Uri? {
+    var relativeLocation = Environment.DIRECTORY_DOCUMENTS
+    if (!TextUtils.isEmpty(subFolder)) {
+        relativeLocation += File.separator + subFolder
+    }
+    val contentValues = ContentValues()
+    contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, displayName)
+    contentValues.put(MediaStore.MediaColumns.MIME_TYPE, mimeType)
+    contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, relativeLocation)
+    contentValues.put(MediaStore.Video.Media.TITLE, "SomeName")
+    contentValues.put(MediaStore.Video.Media.DATE_ADDED, System.currentTimeMillis() / 1000)
+    contentValues.put(MediaStore.Video.Media.DATE_TAKEN, System.currentTimeMillis())
+    val resolver: ContentResolver = context.contentResolver
+    var stream: OutputStream? = null
+    var uri: Uri? = null
+    return try {
+        val contentUri = MediaStore.Files.getContentUri("external")
+        uri = resolver.insert(contentUri, contentValues)
+        val pfd: ParcelFileDescriptor
+        try {
+            assert(uri != null)
+            pfd = getContentResolver().openFileDescriptor(uri, "w")
+            assert(pfd != null)
+            val out = FileOutputStream(pfd.getFileDescriptor())
+            val buf = ByteArray(4 * 1024)
+            var len: Int
+            while (`in`.read(buf).also { len = it } > 0) {
+                out.write(buf, 0, len)
+            }
+            out.close()
+            `in`.close()
+            pfd.close()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        contentValues.clear()
+        contentValues.put(MediaStore.Video.Media.IS_PENDING, 0)
+        getContentResolver().update(uri, contentValues, null, null)
+        stream = resolver.openOutputStream(uri)
+        if (stream == null) {
+            throw IOException("Failed to get output stream.")
+        }
+        uri
+    } catch (e: IOException) {
+        // Don't leave an orphan entry in the MediaStore
+        resolver.delete(uri, null, null)
+        throw e
+    } finally {
+        if (stream != null) {
+            stream.close()
+        }
+    }
+}
+

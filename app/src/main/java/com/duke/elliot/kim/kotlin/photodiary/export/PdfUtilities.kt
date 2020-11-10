@@ -11,6 +11,7 @@ import com.duke.elliot.kim.kotlin.photodiary.utility.getOutputDirectory
 import com.duke.elliot.kim.kotlin.photodiary.utility.showToast
 import com.itextpdf.text.Document
 import com.itextpdf.text.Image
+import com.itextpdf.text.pdf.PdfDocument
 import com.itextpdf.text.pdf.PdfWriter
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -59,13 +60,43 @@ object PdfUtilities {
             image.scalePercent(scaler)
             image.alignment = Image.ALIGN_CENTER or Image.ALIGN_TOP
             document.add(image)
-            document.close()
             Toast.makeText(context, context.getExternalFilesDir("null").toString() + "/newPDF.pdf", Toast.LENGTH_SHORT).show()
             file.delete()
         } catch (e: Exception) {
             e.printStackTrace()
         }
     }
+
+    /*
+    fun createPDFWithMultipleImage(){
+        File file = getOutputFile()
+        if (file != null){
+            try {
+                FileOutputStream fileOutputStream = new FileOutputStream(file);
+                PdfDocument pdfDocument = new PdfDocument();
+
+                for (int i = 0; i < images.size(); i++){
+                    Bitmap bitmap = BitmapFactory.decodeFile(images.get(i).getPath());
+                    PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(bitmap.getWidth(), bitmap.getHeight(), (i + 1)).create();
+                    PdfDocument.Page page = pdfDocument.startPage(pageInfo);
+                    Canvas canvas = page.getCanvas();
+                    Paint paint = new Paint();
+                    paint.setColor(Color.BLUE);
+                    canvas.drawPaint(paint);
+                    canvas.drawBitmap(bitmap, 0f, 0f, null);
+                    pdfDocument.finishPage(page);
+                    bitmap.recycle();
+                }
+                pdfDocument.writeTo(fileOutputStream);
+                pdfDocument.close();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+     */
 }
 /*
 private void createPDFWithMultipleImage(){

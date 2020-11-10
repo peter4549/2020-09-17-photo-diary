@@ -30,13 +30,13 @@
                 android:focusable="true"
                 tools:ignore="UseCompoundDrawables">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_marginStart="56dp"
-                android:text="@string/export_pdf"
-                android:gravity="center_vertical"
-                android:textColor="@color/colorToolbarTitle" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="56dp"
+                    android:text="@string/export_pdf"
+                    android:gravity="center_vertical"
+                    android:textColor="@color/colorToolbarTitle" />
 
                 <ImageView
                     android:layout_width="28dp"
@@ -63,147 +63,160 @@
             app:layout_constraintTop_toBottomOf="@+id/toolbar">
 
             <LinearLayout
-                android:id="@+id/container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/background_white_rounded_corners"
-                android:backgroundTint="@color/colorDefaultThemeLight"
+                android:background="@color/colorDefaultThemeLight"
                 android:gravity="center_horizontal"
                 android:orientation="vertical">
 
                 <LinearLayout
-                    android:id="@+id/date_time_container"
+                    android:id="@+id/container"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginEnd="8dp"
-                    android:background="@drawable/background_white_rounded_corners"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical">
 
-                    <TextView
-                        android:id="@+id/text_date"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:drawablePadding="8dp"
-                        android:gravity="center_vertical"
-                        android:includeFontPadding="false"
-                        android:padding="8dp"
-                        android:textColor="@color/colorTextCalendar"
-                        android:textSize="14sp"
-                        app:drawableStartCompat="@drawable/ic_round_date_range_24"
-                        app:drawableTint="@color/colorDefaultThemeDark"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/toolbar"
-                        tools:text="9월 17일 금요일" />
-
-                    <TextView
-                        android:id="@+id/text_time"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:drawablePadding="8dp"
-                        android:gravity="center_vertical"
-                        android:includeFontPadding="false"
-                        android:padding="8dp"
-                        android:textColor="@color/colorTextCalendar"
-                        android:textSize="14sp"
-                        app:drawableStartCompat="@drawable/ic_round_access_time_20"
-                        app:drawableTint="@color/colorDefaultThemeDark"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/toolbar"
-                        tools:text="오후 3시 30분" />
-
-                    <RelativeLayout
+                    <LinearLayout
+                        android:id="@+id/date_time_container"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:gravity="center_vertical|end">
+                        android:layout_marginStart="8dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:background="@drawable/background_white_rounded_corners"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
 
-                        <ImageView
-                            android:id="@+id/imageWeather"
-                            android:layout_width="36dp"
-                            android:layout_height="36dp"
-                            android:layout_marginTop="4dp"
-                            android:layout_marginEnd="16dp"
-                            android:layout_marginBottom="4dp"
-                            android:background="?attr/selectableItemBackground"
-                            tools:ignore="ContentDescription" />
+                        <TextView
+                            android:id="@+id/text_date"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:drawablePadding="8dp"
+                            android:gravity="center_vertical"
+                            android:includeFontPadding="false"
+                            android:padding="8dp"
+                            android:textColor="@color/colorTextCalendar"
+                            android:textSize="14sp"
+                            app:drawableStartCompat="@drawable/ic_round_date_range_24"
+                            app:drawableTint="@color/colorDefaultThemeDark"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/toolbar"
+                            tools:text="9월 17일 금요일" />
 
-                    </RelativeLayout>
+                        <TextView
+                            android:id="@+id/text_time"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:drawablePadding="8dp"
+                            android:gravity="center_vertical"
+                            android:includeFontPadding="false"
+                            android:padding="8dp"
+                            android:textColor="@color/colorTextCalendar"
+                            android:textSize="14sp"
+                            app:drawableStartCompat="@drawable/ic_round_access_time_20"
+                            app:drawableTint="@color/colorDefaultThemeDark"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/toolbar"
+                            tools:text="오후 3시 30분" />
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical|end">
+
+                            <ImageView
+                                android:id="@+id/imageWeather"
+                                android:layout_width="36dp"
+                                android:layout_height="36dp"
+                                android:layout_marginTop="4dp"
+                                android:layout_marginEnd="16dp"
+                                android:layout_marginBottom="4dp"
+                                android:background="?attr/selectableItemBackground"
+                                tools:ignore="ContentDescription" />
+
+                        </RelativeLayout>
+
+                    </LinearLayout>
+
+                    <EditText
+                        android:id="@+id/edit_text_title"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:background="@drawable/background_white_rounded_corners"
+                        android:ellipsize="end"
+                        android:ems="10"
+                        android:gravity="start"
+                        android:hint="@string/title"
+                        android:importantForAutofill="no"
+                        android:inputType="text"
+                        android:maxLines="1"
+                        android:padding="8dp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintHorizontal_bias="0.0"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/text_date_time" />
+
+                    <com.google.android.material.chip.ChipGroup
+                        android:id="@+id/chip_group"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:animateLayoutChanges="true"
+                        app:singleSelection="false">
+
+                    </com.google.android.material.chip.ChipGroup>
+
+                    <ImageView
+                        android:id="@+id/imageView0"
+                        android:layout_width="320dp"
+                        android:layout_height="400dp"
+                        android:layout_marginTop="8dp"
+                        android:background="@drawable/media_recycler_view_background_rounded_corners"
+                        android:visibility="visible"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/edit_text_title"
+                        tools:ignore="ContentDescription"
+                        tools:srcCompat="@drawable/ic_snow_24" />
+
+                    <EditText
+                        android:id="@+id/edit_text_content"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginBottom="8dp"
+                        android:background="@drawable/background_white_rounded_corners"
+                        android:ellipsize="end"
+                        android:ems="10"
+                        android:gravity="top"
+                        android:importantForAutofill="no"
+                        android:inputType="textMultiLine"
+                        android:lineSpacingMultiplier="1.1"
+                        android:overScrollMode="always"
+                        android:padding="8dp"
+                        android:scrollbars="vertical"
+                        app:layout_constraintBottom_toTopOf="@+id/layout_options_container"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/recycler_view_media"
+                        tools:ignore="LabelFor" />
 
                 </LinearLayout>
 
-                <EditText
-                    android:id="@+id/edit_text_title"
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerViewPdfPage"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginEnd="8dp"
-                    android:background="@drawable/background_white_rounded_corners"
-                    android:ellipsize="end"
-                    android:ems="10"
-                    android:gravity="start"
-                    android:hint="@string/title"
-                    android:importantForAutofill="no"
-                    android:inputType="text"
-                    android:maxLines="1"
-                    android:padding="8dp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.0"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/text_date_time" />
-
-                <com.google.android.material.chip.ChipGroup
-                    android:id="@+id/chip_group"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginEnd="8dp"
-                    android:animateLayoutChanges="true"
-                    app:singleSelection="false">
-
-                </com.google.android.material.chip.ChipGroup>
-
-                <ImageView
-                    android:id="@+id/imageView0"
-                    android:layout_width="320dp"
-                    android:layout_height="400dp"
-                    android:layout_marginTop="8dp"
-                    android:background="@drawable/media_recycler_view_background_rounded_corners"
-                    android:visibility="visible"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/edit_text_title"
-                    tools:ignore="ContentDescription"
-                    tools:srcCompat="@drawable/ic_snow_24" />
-
-                <EditText
-                    android:id="@+id/edit_text_content"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginBottom="8dp"
-                    android:background="@drawable/background_white_rounded_corners"
-                    android:ellipsize="end"
-                    android:ems="10"
-                    android:gravity="top"
-                    android:importantForAutofill="no"
-                    android:inputType="textMultiLine"
-                    android:lineSpacingMultiplier="1.1"
-                    android:overScrollMode="always"
-                    android:padding="8dp"
-                    android:scrollbars="vertical"
-                    app:layout_constraintBottom_toTopOf="@+id/layout_options_container"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/recycler_view_media"
-                    tools:ignore="LabelFor" />
+                    android:visibility="gone"/>
 
             </LinearLayout>
         </ScrollView>

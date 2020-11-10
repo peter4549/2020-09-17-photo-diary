@@ -1299,7 +1299,7 @@ class DiaryWritingFragment: Fragment() {
     private fun showHashTagInputDialog() {
         val alertDialog: AlertDialog.Builder = AlertDialog.Builder(requireContext())
 
-        alertDialog.setMessage("해시태그를 입력하세요.")
+        alertDialog.setMessage("해시태그를 입력하세요.") // TODO change string resource.
 
         val editText = EditText(requireContext())
         val id = getCurrentTime().toInt()
