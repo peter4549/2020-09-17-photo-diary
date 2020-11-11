@@ -5,6 +5,7 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.content.ContentValues
 import android.content.Context
+import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.graphics.*
@@ -12,7 +13,10 @@ import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
+import android.os.ParcelFileDescriptor
+import android.provider.DocumentsContract
 import android.provider.MediaStore
+import android.text.TextUtils
 import android.util.AttributeSet
 import android.util.DisplayMetrics
 import android.view.Surface
@@ -36,7 +40,7 @@ import com.duke.elliot.kim.kotlin.photodiary.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.io.File
+import java.io.*
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -349,12 +353,9 @@ fun getOutputDirectory(context: Context): File {
     val mediaDir = context.getExternalFilesDirs(Environment.DIRECTORY_DOCUMENTS).firstOrNull()?.let {
         File(it, appContext.resources.getString(R.string.app_name)).apply { mkdirs() } }
 
-    getDocumentDirectory(context, "HHHHH")
     return if (mediaDir != null && mediaDir.exists())
         mediaDir else appContext.filesDir
 }
-
-
 
 fun showInputDialog(context: Context, title: String, okEvent: (text: String) -> Unit) {
     val inputMethodManager = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -402,86 +403,8 @@ fun showInputDialog(context: Context, title: String, okEvent: (text: String) -> 
     }
 }
 
-fun getDocumentDirectory(context: Context, fileName: String): String {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-        val values = ContentValues()
-        with(values) {
-            put(MediaStore.Files.FileColumns.TITLE, fileName)
-            put(MediaStore.Files.FileColumns.DATE_TAKEN, System.currentTimeMillis())
-            put(MediaStore.Files.FileColumns.RELATIVE_PATH, "Document/my_folder")
-            put(MediaStore.Files.FileColumns.MIME_TYPE, "application/pdf")
-        }
-
-        val uri = context.contentResolver.in
-        println("OOOOOOO: ${uri?.path}")
-        return uri?.path ?: ""
-    } else {
-        return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)
-            .toString() +
-                File.separator + context.getString(R.string.app_name)
-    }
-}
-
-@RequiresApi(api = Build.VERSION_CODES.Q)
-@NonNull
-@Throws(IOException::class)
-private fun savePDFFile(
-    @NonNull context: Context,
-    @NonNull `in`: InputStream,
-    @NonNull mimeType: String,
-    @NonNull displayName: String,
-    @Nullable subFolder: String
-): Uri? {
-    var relativeLocation = Environment.DIRECTORY_DOCUMENTS
-    if (!TextUtils.isEmpty(subFolder)) {
-        relativeLocation += File.separator + subFolder
-    }
-    val contentValues = ContentValues()
-    contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, displayName)
-    contentValues.put(MediaStore.MediaColumns.MIME_TYPE, mimeType)
-    contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, relativeLocation)
-    contentValues.put(MediaStore.Video.Media.TITLE, "SomeName")
-    contentValues.put(MediaStore.Video.Media.DATE_ADDED, System.currentTimeMillis() / 1000)
-    contentValues.put(MediaStore.Video.Media.DATE_TAKEN, System.currentTimeMillis())
-    val resolver: ContentResolver = context.contentResolver
-    var stream: OutputStream? = null
-    var uri: Uri? = null
-    return try {
-        val contentUri = MediaStore.Files.getContentUri("external")
-        uri = resolver.insert(contentUri, contentValues)
-        val pfd: ParcelFileDescriptor
-        try {
-            assert(uri != null)
-            pfd = getContentResolver().openFileDescriptor(uri, "w")
-            assert(pfd != null)
-            val out = FileOutputStream(pfd.getFileDescriptor())
-            val buf = ByteArray(4 * 1024)
-            var len: Int
-            while (`in`.read(buf).also { len = it } > 0) {
-                out.write(buf, 0, len)
-            }
-            out.close()
-            `in`.close()
-            pfd.close()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-        contentValues.clear()
-        contentValues.put(MediaStore.Video.Media.IS_PENDING, 0)
-        getContentResolver().update(uri, contentValues, null, null)
-        stream = resolver.openOutputStream(uri)
-        if (stream == null) {
-            throw IOException("Failed to get output stream.")
-        }
-        uri
-    } catch (e: IOException) {
-        // Don't leave an orphan entry in the MediaStore
-        resolver.delete(uri, null, null)
-        throw e
-    } finally {
-        if (stream != null) {
-            stream.close()
-        }
-    }
+@Suppress("DEPRECATION")
+fun getDocumentDirectory(context: Context): String {
+    return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).toString()
 }
 

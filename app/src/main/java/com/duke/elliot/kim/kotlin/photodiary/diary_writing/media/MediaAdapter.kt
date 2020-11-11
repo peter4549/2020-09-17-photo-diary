@@ -10,13 +10,9 @@ import com.bumptech.glide.Glide
 import com.duke.elliot.kim.kotlin.photodiary.R
 import com.duke.elliot.kim.kotlin.photodiary.base.BaseRecyclerViewAdapter
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.media_helper.MediaHelper
-import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.media_helper.PhotoHelper
 import com.duke.elliot.kim.kotlin.photodiary.utility.FileUtilities
 import com.duke.elliot.kim.kotlin.photodiary.utility.setImage
 import kotlinx.android.synthetic.main.item_media.view.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class MediaAdapter(layoutId: Int, mediaArrayList: ArrayList<MediaModel>)
@@ -76,7 +72,9 @@ class MediaAdapter(layoutId: Int, mediaArrayList: ArrayList<MediaModel>)
         }
 
         holder.view.image_delete.setOnClickListener {
-            remove(position)
+            remove(holder.absoluteAdapterPosition)
+            holder.view.image_audio.visibility = View.GONE
+            holder.view.image_play.visibility = View.GONE
         }
     }
 

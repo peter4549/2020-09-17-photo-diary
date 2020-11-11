@@ -31,7 +31,6 @@ import kotlinx.coroutines.*
 import java.util.*
 import kotlin.Comparator
 
-
 private const val ITEM_VIEW_TYPE_HEADER = 0
 private const val ITEM_VIEW_TYPE_ITEM = 1
 

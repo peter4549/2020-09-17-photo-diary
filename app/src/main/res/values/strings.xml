@@ -123,4 +123,5 @@
     <string name="export_pdf">PDF 내보내기</string>
     <string name="pdf_file_name_input_message">PDF 파일 이름을 입력하세요.</string>
     <string name="failed_to_create_pdf_file">PDF 파일을 생성하지 못했습니다.</string>
+    <string name="pdf_file_created">PDF 파일을 생성했습니다.</string>
 </resources>

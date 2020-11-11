@@ -1,12 +1,22 @@
 package com.duke.elliot.kim.kotlin.photodiary.export
 
+import android.annotation.SuppressLint
+import android.content.ContentValues
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.graphics.pdf.PdfDocument
+import android.os.Build
 import android.os.Bundle
+import android.os.Environment
+import android.provider.MediaStore
 import android.view.*
+import android.widget.BaseAdapter
+import android.widget.EditText
+import android.widget.ImageView
+import android.widget.LinearLayout
+import androidx.annotation.RequiresApi
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -16,27 +26,24 @@ import androidx.recyclerview.widget.RecyclerView
 import com.duke.elliot.kim.kotlin.photodiary.MainActivity
 import com.duke.elliot.kim.kotlin.photodiary.R
 import com.duke.elliot.kim.kotlin.photodiary.databinding.FragmentPdfPreviewBinding
+import com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryModel
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryWritingViewModel
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.MediaModel
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.media_helper.MediaHelper
 import com.duke.elliot.kim.kotlin.photodiary.utility.*
 import com.google.android.material.chip.Chip
 import kotlinx.android.synthetic.main.item_pdf_page.view.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import timber.log.Timber
 import java.io.File
 import java.io.FileOutputStream
-import java.lang.Exception
-import java.lang.NullPointerException
 
 class PdfPreviewFragment: Fragment() {
 
     private lateinit var binding: FragmentPdfPreviewBinding
+    private lateinit var mediaScanner: MediaScanner
     private lateinit var viewModel: PdfPreviewViewModel
-    private lateinit var photoSublist: List<MediaModel>
+    private lateinit var pdfPageAdapter: MyAdapter
     private val job = Job()
     private val coroutineScope = CoroutineScope(Dispatchers.Main + job)
 
@@ -57,10 +64,14 @@ class PdfPreviewFragment: Fragment() {
         viewModel = ViewModelProvider(viewModelStore, viewModelFactory)[PdfPreviewViewModel::class.java]
 
         initializeView()
+        mediaScanner = MediaScanner.newInstance(requireContext())
 
         binding.exportPdf.setOnClickListener {
             showInputDialog(requireContext(), getString(R.string.pdf_file_name_input_message)) { text ->
-                createPdfFile(text)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+                    createPdfFile2(text)
+                else
+                    createPdfFile(text)
             }
         }
 
@@ -69,36 +80,20 @@ class PdfPreviewFragment: Fragment() {
 
     private fun initializeView() {
         val diary = viewModel.diary
-        binding.textDate.text = diary.time.toDateFormat(getString(R.string.date_format))
-        binding.textTime.text = diary.time.toDateFormat(getString(R.string.time_format))
-        setImage(binding.imageWeather, DiaryWritingViewModel.weatherIconIds[diary.weatherIconIndex])
+        val photos = diary.mediaArray.filter { it.type == MediaModel.Type.PHOTO }
+        for (i in 0..photos.count() - 1) {
+            val view = LayoutInflater.from(requireContext())
+                .inflate(R.layout.item_pdf_page, binding.container, false) as LinearLayout
 
-        binding.editTextTitle.setText(diary.title)
 
-        for (hashTag in diary.hashTags) {
-            val chip = Chip(binding.chipGroup.context)
-            chip.text = hashTag
-            chip.setTextAppearanceResource(R.style.ChipFontStyle)
-            chip.isCloseIconVisible = false
-            binding.chipGroup.addView(chip)
+            setImage(view.imagePhoto, photos[i].uriString)
+
+            binding.container.addView(view)
         }
-
-        if (diary.mediaArray.isEmpty())
-            binding.imageView0.visibility = View.GONE
-
-        binding.editTextContent.setText(diary.content)
-
-        val photos = diary.mediaArray.filter { it.type == MediaHelper.MediaType.PHOTO }
-        binding.imageView0.visibility = View.VISIBLE
-        setImage(binding.imageView0, photos[0].uriString)
-
-        if (photos.count() > 1) {
-            binding.recyclerViewPdfPage.visibility = View.VISIBLE
-            photoSublist = photos.subList(1, photos.count())
-            binding.recyclerViewPdfPage.layoutManager =
-                GridLayoutManagerWrapper(requireContext(), 1)
-            binding.recyclerViewPdfPage.adapter = PdfPageRecyclerViewAdapter(photoSublist)
-        }
+        //pdfPageAdapter = MyAdapter(viewModel.diary)
+        //binding.recyclerViewPdfPage.layoutManager =
+        //    GridLayoutManagerWrapper(requireContext(), 1)
+        //binding.recyclerViewPdfPage.adapter = pdfPageAdapter
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -134,43 +129,43 @@ class PdfPreviewFragment: Fragment() {
         coroutineScope.launch(Dispatchers.IO) {
             val pdfDocument = PdfDocument()
             try {
-                val pageInfo = PdfDocument.PageInfo
-                    .Builder(binding.container.width, binding.container.height, 1).create()
-                val page = pdfDocument.startPage(pageInfo)
-                val bitmap = getBitmapFromView(binding.container)
-
-                val path = getOutputDirectory(requireContext()).absolutePath
+                val path = getDocumentDirectory(requireContext())
                 val directory = File(path, getString(R.string.app_name))
                 if (!directory.exists())
                     directory.mkdir()
 
                 val file = File(directory, "/${fileName}.pdf")
                 file.createNewFile()
-
                 val fileOutputStream = FileOutputStream(file)
-                val canvas = page.canvas
+                println("BBBB ${pdfPageAdapter.count}")
+                withContext(Dispatchers.Main) {
+                    pdfPageAdapter.notifyDataSetChanged()
+                    //binding.recyclerViewPdfPage.layoutManager?.scrollToPosition(pdfPageAdapter.itemCount - 1)
+                    //binding.recyclerViewPdfPage.layoutManager?.scrollToPosition(0)
+                }
 
-                bitmap?.let { canvas.drawBitmap(it, 0F, 0F, null) } ?: throw NullPointerException()
-                pdfDocument.finishPage(page)
+                for (i in 0 until pdfPageAdapter.count) {
+                    val pageView = pdfPageAdapter.getViewByPosition(i) ?: break
+                    println("AAAA $i")
+                    val pageInfo = PdfDocument.PageInfo
+                        .Builder(pageView.width, pageView.height, 1 + i).create()
+                    val page = pdfDocument.startPage(pageInfo)
+                    val bitmap = getBitmapFromView(pageView)
+                    val canvas = page.canvas
 
-                for ((index, _) in photoSublist.withIndex()) {
-                    val itemView =
-                        binding.recyclerViewPdfPage.layoutManager?.findViewByPosition(index)
-                            ?: break
-                    val pageInfo2 = PdfDocument.PageInfo
-                        .Builder(itemView.width, itemView.height, index + 2).create()
-                    val page2 = pdfDocument.startPage(pageInfo2)
-                    val bitmap2 = getBitmapFromView(itemView)
-
-                    val canvas2 = page2.canvas
-
-                    bitmap2?.let { canvas2.drawBitmap(it, 0F, 0F, null) }
-                        ?: throw NullPointerException()
-                    pdfDocument.finishPage(page2)
+                    bitmap?.let { canvas.drawBitmap(it, 0F, 0F, null) } ?: throw NullPointerException()
+                    pdfDocument.finishPage(page)
                 }
 
                 pdfDocument.writeTo(fileOutputStream)
                 pdfDocument.close()
+                // fileOutputStream.close()
+                mediaScanner.scanMedia(file.absolutePath)
+
+                showToast(
+                    requireContext(),
+                    getString(R.string.pdf_file_created) + file.absolutePath
+                )
             } catch (e: Exception) {
                 showToast(requireContext(), getString(R.string.failed_to_create_pdf_file))
                 Timber.e(e)
@@ -178,51 +173,215 @@ class PdfPreviewFragment: Fragment() {
         }
     }
 
-    inner class PdfPageRecyclerViewAdapter(private val photos: List<MediaModel>): RecyclerView.Adapter<PdfPageRecyclerViewAdapter.ViewHolder>() {
+    @RequiresApi(api = Build.VERSION_CODES.Q)
+    private fun createPdfFile2(fileName: String) {
+        coroutineScope.launch(Dispatchers.IO) {
+            val pdfDocument = PdfDocument()
+            try {
+                val values = ContentValues()
+                values.put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
+                values.put(MediaStore.MediaColumns.MIME_TYPE, "application/pdf")
+                values.put(
+                    MediaStore.MediaColumns.RELATIVE_PATH,
+                    Environment.DIRECTORY_DOCUMENTS.toString() + "/${
+                        getString(
+                            R.string.app_name
+                        )
+                    }/"
+                )
+                val uri = requireContext().contentResolver.insert(
+                    MediaStore.Files.getContentUri("external"),
+                    values
+                )
+                val outputStream = uri?.let { requireContext().contentResolver.openOutputStream(it) }
+
+                println("AAAA ${pdfPageAdapter.count}")
+                for (i in 0 .. pdfPageAdapter.count) {
+                    val pageView = binding.recyclerViewPdfPage.getChildAt(i) ?: break
+                    val pageInfo = PdfDocument.PageInfo
+                        .Builder(pageView.width, pageView.height, 1 + i).create()
+                    val page = pdfDocument.startPage(pageInfo)
+                    val bitmap = getBitmapFromView(pageView)
+
+                    val canvas = page.canvas
+
+                    bitmap?.let { canvas.drawBitmap(it, 0F, 0F, null) } ?: throw NullPointerException()
+                    pdfDocument.finishPage(page)
+                }
+
+                pdfDocument.writeTo(outputStream)
+                pdfDocument.close()
+                outputStream?.close()
+                showToast(requireContext(), getString(R.string.pdf_file_created))
+                println("zzzzz: ${uri?.path}")
+                mediaScanner.scanMedia(uri?.path ?: "")
+            } catch (e: Exception) {
+                showToast(requireContext(), getString(R.string.failed_to_create_pdf_file))
+                Timber.e(e)
+            }
+        }
+    }
+
+    inner class MyAdapter(private val diary: DiaryModel) :
+        BaseAdapter() {
+
+        private lateinit var firstPhoto: MediaModel
+        private lateinit var photoSublist: List<MediaModel>
+        private val photos = diary.mediaArray.filter { it.type == MediaHelper.MediaType.PHOTO }
+
+        init {
+            if (photos.isNotEmpty())
+                firstPhoto = photos[0]
+
+            if (photos.count() > 1)
+                photoSublist = photos.subList(1, photos.count())
+        }
+
+        override fun getCount(): Int {
+            return if (::photoSublist.isInitialized)
+                photoSublist.count() + 1
+            else
+                1
+        }
+
+        override fun getItem(p0: Int): Any? {
+            return null
+        }
+
+        override fun getItemId(p0: Int): Long {
+            return p0.toLong()
+        }
+
+        @SuppressLint("ViewHolder")
+        override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
+            println("ZIONXIAL")
+            val view: View = LayoutInflater.from(requireContext())
+                .inflate(R.layout.item_pdf_page, parent, false)
+            if (photos.isNotEmpty()) {
+
+                val photo = photos[position]
+                if (position == 0) {
+                    bindFirstView(view)
+                } else {
+                    setImage(view.imagePhoto, photo.uriString)
+                }
+            } else
+                bindFirstView(view)
+
+            println("HHHHHH $position")
+            return view
+        }
+
+        private fun bindFirstView(view: View) {
+            view.date_time_container.visibility = View.VISIBLE
+            view.edit_text_title.visibility = View.VISIBLE
+
+            view.text_date.text = diary.time.toDateFormat(getString(R.string.date_format))
+            view.text_time.text = diary.time.toDateFormat(getString(R.string.time_format))
+            setImage(
+                view.imageWeather,
+                DiaryWritingViewModel.weatherIconIds[diary.weatherIconIndex]
+            )
+
+            view.edit_text_title.setText(diary.title)
+
+            for (hashTag in diary.hashTags) {
+                val chip = Chip(view.chip_group.context)
+                chip.text = hashTag
+                chip.setTextAppearanceResource(R.style.ChipFontStyle)
+                chip.isCloseIconVisible = false
+                view.chip_group.addView(chip)
+            }
+
+            if (::firstPhoto.isInitialized)
+                setImage(view.imagePhoto, firstPhoto.uriString)
+            else
+                view.imagePhoto.visibility = View.GONE
+        }
+
+        fun getViewByPosition(pos: Int): View? {
+            val firstListItemPosition: Int = binding.recyclerViewPdfPage.getFirstVisiblePosition()
+            val lastListItemPosition: Int = firstListItemPosition + binding.recyclerViewPdfPage.getChildCount() - 1
+            return if (pos < firstListItemPosition || pos > lastListItemPosition) {
+                binding.recyclerViewPdfPage.getAdapter().getView(pos, null, binding.recyclerViewPdfPage)
+            } else {
+                val childIndex = pos - firstListItemPosition
+                binding.recyclerViewPdfPage.getChildAt(childIndex)
+            }
+        }
+    }
+
+    inner class PdfPageRecyclerViewAdapter(private val diary: DiaryModel): RecyclerView.Adapter<PdfPageRecyclerViewAdapter.ViewHolder>() {
+        private lateinit var firstPhoto: MediaModel
+        private lateinit var photoSublist: List<MediaModel>
+        private val photos = diary.mediaArray.filter { it.type == MediaHelper.MediaType.PHOTO }
+
+        init {
+            if (photos.isNotEmpty())
+                firstPhoto = photos[0]
+
+            if (photos.count() > 1)
+               photoSublist = photos.subList(1, photos.count())
+        }
 
         inner class ViewHolder(val view: View): RecyclerView.ViewHolder(view)
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-            val view = LayoutInflater.from(requireContext()).inflate(R.layout.item_pdf_page, parent, false)
+            val view = LayoutInflater.from(requireContext()).inflate(
+                R.layout.item_pdf_page,
+                parent,
+                false
+            )
+
             return ViewHolder(view)
         }
 
-        override fun getItemCount(): Int = photos.count()
+        override fun getItemCount(): Int {
+            return if (::photoSublist.isInitialized)
+                photoSublist.count() + 1
+            else
+                1
+        }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            val photo = photos[position]
-            setImage(holder.view.imagePhoto, photo.uriString)
+            if (photos.isNotEmpty()) {
+                val photo = photos[position]
+                if (position == 0) {
+                    bindFirstView(holder.view)
+                } else {
+                    setImage(holder.view.imagePhoto, photo.uriString)
+                }
+            } else
+                bindFirstView(holder.view)
+
+            println("HHHHHH $position")
         }
-    }
-}
 
-/*
-private void createPDFWithMultipleImage(){
-    File file = getOutputFile();
-    if (file != null){
-        try {
-            FileOutputStream fileOutputStream = new FileOutputStream(file);
-            PdfDocument pdfDocument = new PdfDocument();
+        private fun bindFirstView(view: View) {
+            view.date_time_container.visibility = View.VISIBLE
+            view.edit_text_title.visibility = View.VISIBLE
 
-            for (int i = 0; i < images.size(); i++){
-                Bitmap bitmap = BitmapFactory.decodeFile(images.get(i).getPath());
-                PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(bitmap.getWidth(), bitmap.getHeight(), (i + 1)).create();
-                PdfDocument.Page page = pdfDocument.startPage(pageInfo);
-                Canvas canvas = page.getCanvas();
-                Paint paint = new Paint();
-                paint.setColor(Color.BLUE);
-                canvas.drawPaint(paint);
-                canvas.drawBitmap(bitmap, 0f, 0f, null);
-                pdfDocument.finishPage(page);
-                bitmap.recycle();
+            view.text_date.text = diary.time.toDateFormat(getString(R.string.date_format))
+            view.text_time.text = diary.time.toDateFormat(getString(R.string.time_format))
+            setImage(
+                view.imageWeather,
+                DiaryWritingViewModel.weatherIconIds[diary.weatherIconIndex]
+            )
+
+            view.edit_text_title.setText(diary.title)
+
+            for (hashTag in diary.hashTags) {
+                val chip = Chip(view.chip_group.context)
+                chip.text = hashTag
+                chip.setTextAppearanceResource(R.style.ChipFontStyle)
+                chip.isCloseIconVisible = false
+                view.chip_group.addView(chip)
             }
-            pdfDocument.writeTo(fileOutputStream);
-            pdfDocument.close();
 
-        } catch (IOException e) {
-            e.printStackTrace();
+            if (::firstPhoto.isInitialized)
+                setImage(view.imagePhoto, firstPhoto.uriString)
+            else
+                view.imagePhoto.visibility = View.GONE
         }
     }
 }
-
- */
