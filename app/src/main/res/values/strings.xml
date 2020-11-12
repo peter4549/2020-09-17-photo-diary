@@ -118,10 +118,36 @@
     <string name="latest">최신순</string>
     <string name="oldest">오래된 순</string>
 
-    <!-- Export PDF -->
+    <!-- Export -->
+    <!-- Export Text File -->
+    <string name="export_text">텍스트 파일로 내보내기</string>
+    <string name="text_file_created">텍스트 파일을 생성했습니다.</string>
+    <string name="failed_to_create_text_file">텍스트 파일을 생성하지 못했습니다.</string>
+    <string name="text_file_name_input_message">텍스트 파일 이름을 입력하세요.</string>
+
+    <!-- Export PDF File -->
     <string name="pdf_preview">PDF 미리보기</string>
     <string name="export_pdf">PDF 내보내기</string>
+    <string name="export_pdf_file">PDF 파일로 내보내기</string>
     <string name="pdf_file_name_input_message">PDF 파일 이름을 입력하세요.</string>
     <string name="failed_to_create_pdf_file">PDF 파일을 생성하지 못했습니다.</string>
     <string name="pdf_file_created">PDF 파일을 생성했습니다.</string>
+
+    <!-- Share Diary -->
+    <string name="share_diary">다이어리 공유하기</string>
+
+    <!-- Weather -->
+    <string-array name="weatherWords">
+        <item>흐림</item> <!-- 0 -->
+        <item>구름조금</item>  <!-- 1 -->
+        <item>천둥번개</item>  <!-- 2 -->
+        <item>천둥번개, 구름</item>  <!-- 3 -->
+        <item>맑음, 밤</item>  <!-- 4 -->
+        <item>비</item>  <!-- 5 -->
+        <item>비, 구름</item>  <!-- 6 -->
+        <item>무지개</item>  <!-- 7 -->
+        <item>눈</item>  <!-- 8 -->
+        <item>눈, 구름</item>  <!-- 9 -->
+        <item>맑음, 낮</item>  <!-- 10 -->
+    </string-array>
 </resources>

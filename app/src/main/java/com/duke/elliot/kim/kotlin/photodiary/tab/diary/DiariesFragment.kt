@@ -14,8 +14,8 @@ import com.duke.elliot.kim.kotlin.photodiary.*
 import com.duke.elliot.kim.kotlin.photodiary.database.DiaryDatabase
 import com.duke.elliot.kim.kotlin.photodiary.databinding.FragmentDairiesBinding
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.EDIT_MODE
+import com.duke.elliot.kim.kotlin.photodiary.export.ExportUtilities
 import com.duke.elliot.kim.kotlin.photodiary.tab.TabFragmentDirections
-import com.duke.elliot.kim.kotlin.photodiary.utility.GridLayoutManagerWrapper
 import com.duke.elliot.kim.kotlin.photodiary.utility.showToast
 import kotlinx.coroutines.*
 import timber.log.Timber
@@ -40,7 +40,7 @@ class DiariesFragment: Fragment() {
 
         binding.diariesViewModel = viewModel
 
-        diaryAdapter = DiaryAdapter().apply {
+        diaryAdapter = DiaryAdapter(requireContext()).apply {
             setViewOnClickListener {
                 getCurrentDiary()?.let { diary ->
                     viewModel.diaries.value?.let { diaries ->
@@ -73,6 +73,12 @@ class DiariesFragment: Fragment() {
                 }
             }
 
+            setShareClickListener {
+                getCurrentDiary()?.let {
+                    ExportUtilities.sendDiary(requireActivity(), it)
+                }
+            }
+
             setUpdateListener {
                 getCurrentDiary()?.let {
                     (binding.recyclerViewDiary.itemAnimator as SimpleItemAnimator)
@@ -82,7 +88,7 @@ class DiariesFragment: Fragment() {
             }
         }
 
-        binding.recyclerViewDiary.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+        binding.recyclerViewDiary.layoutManager = StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL)
         binding.recyclerViewDiary.adapter = diaryAdapter
 
         viewModel.diaries.observe(requireActivity()) { diaries ->
@@ -117,5 +123,10 @@ class DiariesFragment: Fragment() {
         }
 
         return binding.root
+    }
+
+    override fun onStop() {
+        super.onStop()
+        diaryAdapter.saveSortingCriteriaViewMode()
     }
 }

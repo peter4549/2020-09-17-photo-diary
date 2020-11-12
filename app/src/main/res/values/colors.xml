@@ -104,8 +104,8 @@
     <color name="colorTropicalIndigo">#9683EC</color>
 
     <!-- Like Button -->
-    <color name="colorLikeButtonEnd">#1de9b6</color>  <!-- Teal A 300 -->
-    <color name="colorLikeButtonStart">#18ffff</color> <!-- Cyan A 200 -->
+    <color name="colorLikeButtonEnd">#b2ff59</color>  <!-- Light Green A 200 -->
+    <color name="colorLikeButtonStart">#69f0ae</color> <!-- Green A 200 -->
 
     <!-- Chip -->
     <color name="colorChip">@color/colorDavyGrey</color>

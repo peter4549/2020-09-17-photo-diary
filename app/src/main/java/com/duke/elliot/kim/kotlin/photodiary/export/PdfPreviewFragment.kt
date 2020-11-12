@@ -62,7 +62,7 @@ class PdfPreviewFragment: Fragment() {
         binding.exportPdf.setOnClickListener {
             showInputDialog(requireContext(), getString(R.string.pdf_file_name_input_message)) { text ->
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
-                    createPdfFile2(text)
+                    createPdfFileQ(text)
                 else
                     createPdfFile(text)
             }
@@ -95,7 +95,8 @@ class PdfPreviewFragment: Fragment() {
         if (photos.isNotEmpty()) {
             val firstPhoto = photos[0]
             setImage(binding.imagePhoto, firstPhoto.uriString)
-        }
+        } else
+            binding.imagePhoto.visibility = View.GONE
 
         if (photos.count() > 1) {
             val photoSublist = photos.subList(1, photos.count())
@@ -182,7 +183,7 @@ class PdfPreviewFragment: Fragment() {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
-    private fun createPdfFile2(fileName: String) {
+    private fun createPdfFileQ(fileName: String) {
         coroutineScope.launch(Dispatchers.IO) {
             val pdfDocument = PdfDocument()
             try {

@@ -39,7 +39,7 @@
                     android:textColor="@color/colorTextCalendar"
                     android:textSize="12sp"
                     android:textStyle="bold"
-                    app:drawableStartCompat="@drawable/ic_round_date_range_20"
+                    app:drawableStartCompat="@drawable/ic_round_date_range_22"
                     app:drawableTint="@color/colorDefaultThemeDark"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
