@@ -830,6 +830,7 @@ class DiaryWritingFragment: Fragment() {
                     viewModel.getCurrentImageUri()?.let { uri ->
                         CoroutineScope(Dispatchers.Main).launch {
                             fileUtilities.copyFileToInternalStorage(uri)?.let { copiedUri ->
+                                println("FILE COPIED!!!!, $copiedUri")
                                 progressDialogFragment.dismiss()
                                 addMedia(MediaModel(MediaModel.Type.PHOTO, copiedUri.toString()))
                             } ?: run {
@@ -862,6 +863,7 @@ class DiaryWritingFragment: Fragment() {
                                         uri,
                                         suffix = "_${timestamp}"
                                     )?.let { copiedUri ->
+                                        println("FILE COPIED222!!!!, $copiedUri")
                                         itemCount += 1
                                         if (itemCount >= totalItemCount)
                                             progressDialogFragment.dismiss()
@@ -888,6 +890,7 @@ class DiaryWritingFragment: Fragment() {
                         data.data?.let { uri ->
                             CoroutineScope(Dispatchers.Main).launch {
                                 fileUtilities.copyFileToInternalStorage(uri)?.let { copiedUri ->
+                                    println("FILE COPIED!!!!, $copiedUri")
                                     progressDialogFragment.dismiss()
                                     addMedia(
                                         MediaModel(

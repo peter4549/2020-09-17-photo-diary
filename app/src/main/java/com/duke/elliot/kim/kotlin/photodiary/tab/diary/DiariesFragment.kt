@@ -79,6 +79,18 @@ class DiariesFragment: Fragment() {
                 }
             }
 
+            setSendDiaryToFacebookClickListener {
+                getCurrentDiary()?.let {
+                    ExportUtilities.sendDiaryToFacebook(requireActivity(), it)
+                }
+            }
+
+            setSendDiaryToKakaoTalkClickListener {
+                getCurrentDiary()?.let {
+                    ExportUtilities.sendDiaryToKakaoTalk(requireActivity(), it)
+                }
+            }
+
             setUpdateListener {
                 getCurrentDiary()?.let {
                     (binding.recyclerViewDiary.itemAnimator as SimpleItemAnimator)

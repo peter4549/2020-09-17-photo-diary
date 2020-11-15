@@ -49,6 +49,8 @@ private const val FRAME_VIEW_MODE = 2
 private const val EXPORT_AS_TEXT_FILE = 0
 private const val EXPORT_AS_PDF_FILE = 1
 private const val SHARE_DIARY = 2
+private const val SEND_DIARY_TO_KAKAO_TALK = 3
+private const val SEND_DIARY_TO_FACEBOOK = 4
 
 private const val PREFERENCES_DIARY_ADAPTER = "preferences_diary_adapter"
 private const val KEY_VIEW_MODE = "key_view_mode"
@@ -62,6 +64,8 @@ class DiaryAdapter(private val context: Context) : ListAdapter<AdapterItem, Recy
     private lateinit var convertPdfClickListener: () -> Unit
     private lateinit var updateListener: () -> Unit
     private lateinit var shareOnClickListener: () -> Unit
+    private lateinit var sendDiaryToKakaoTalkClickListener: () -> Unit
+    private lateinit var sendDiaryToFacebookClickListener: () -> Unit
     private lateinit var viewOnClickListener: () -> Unit
     private val adapterScope = CoroutineScope(Dispatchers.Default)
     private var currentItem: DiaryModel? = null
@@ -72,7 +76,9 @@ class DiaryAdapter(private val context: Context) : ListAdapter<AdapterItem, Recy
     private val exportTypes = arrayOf(
         Pair(context.getString(R.string.export_text), R.drawable.ic_text_file_24),
         Pair(context.getString(R.string.export_pdf_file), R.drawable.ic_pdf_file_24),
-        Pair(context.getString(R.string.share_diary), R.drawable.ic_round_share_24)
+        Pair(context.getString(R.string.share_diary), R.drawable.ic_round_share_24),
+        Pair(context.getString(R.string.send_diary_to_kakao_talk), R.drawable.ic_round_share_24),
+        Pair(context.getString(R.string.send_diary_to_facebook), R.drawable.ic_round_share_24)
     )
 
     private val exportTypeAdapter = object : ArrayAdapter<Pair<String, Int>>(
@@ -122,6 +128,14 @@ class DiaryAdapter(private val context: Context) : ListAdapter<AdapterItem, Recy
                     SHARE_DIARY -> {
                         if (::shareOnClickListener.isInitialized)
                             shareOnClickListener.invoke()
+                    }
+                    SEND_DIARY_TO_KAKAO_TALK -> {
+                        if (::sendDiaryToKakaoTalkClickListener.isInitialized)
+                            sendDiaryToKakaoTalkClickListener.invoke()
+                    }
+                    SEND_DIARY_TO_FACEBOOK -> {
+                        if (::sendDiaryToFacebookClickListener.isInitialized)
+                            sendDiaryToFacebookClickListener.invoke()
                     }
                 }
             }
@@ -220,6 +234,14 @@ class DiaryAdapter(private val context: Context) : ListAdapter<AdapterItem, Recy
 
     fun setShareClickListener(shareOnClickListener: () -> Unit) {
         this.shareOnClickListener = shareOnClickListener
+    }
+
+    fun setSendDiaryToKakaoTalkClickListener(sendDiaryToKakaoTalkClickListener: () -> Unit) {
+        this.sendDiaryToKakaoTalkClickListener = sendDiaryToKakaoTalkClickListener
+    }
+
+    fun setSendDiaryToFacebookClickListener(sendDiaryToFacebookClickListener: () -> Unit) {
+        this.sendDiaryToFacebookClickListener = sendDiaryToFacebookClickListener
     }
 
     fun getCurrentDiary(): DiaryModel? = currentItem

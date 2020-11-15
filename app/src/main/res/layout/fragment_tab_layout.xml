@@ -15,7 +15,14 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:title="@string/app_name" />
+        app:title="@string/app_name" >
+
+        <Button
+            android:id="@+id/alarm_test_btn"
+            android:layout_width="32dp"
+            android:layout_height="32dp" />
+
+    </androidx.appcompat.widget.Toolbar>
 
     <!-- 색상 수정할것. -->
     <com.google.android.material.tabs.TabLayout

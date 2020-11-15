@@ -134,7 +134,9 @@
     <string name="pdf_file_created">PDF 파일을 생성했습니다.</string>
 
     <!-- Share Diary -->
-    <string name="share_diary">다이어리 공유하기</string>
+    <string name="share_diary">다이어리 공유하기</string>  <!-- Share a diary -->
+    <string name="send_diary_to_kakao_talk">카카오톡으로 보내기</string>
+    <string name="send_diary_to_facebook">페이스북으로 보내기</string>
 
     <!-- Weather -->
     <string-array name="weatherWords">
@@ -142,12 +144,15 @@
         <item>구름조금</item>  <!-- 1 -->
         <item>천둥번개</item>  <!-- 2 -->
         <item>천둥번개, 구름</item>  <!-- 3 -->
-        <item>맑음, 밤</item>  <!-- 4 -->
+        <item>맑음</item>  <!-- 4 -->
         <item>비</item>  <!-- 5 -->
         <item>비, 구름</item>  <!-- 6 -->
         <item>무지개</item>  <!-- 7 -->
         <item>눈</item>  <!-- 8 -->
         <item>눈, 구름</item>  <!-- 9 -->
-        <item>맑음, 낮</item>  <!-- 10 -->
+        <item>맑음</item>  <!-- 10 -->
     </string-array>
+
+    <!-- Notification -->
+    <string name="default_notification_content">오늘의 이야기를 기록하세요.</string>
 </resources>

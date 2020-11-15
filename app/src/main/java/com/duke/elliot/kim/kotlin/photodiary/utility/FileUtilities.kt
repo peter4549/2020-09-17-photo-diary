@@ -335,7 +335,7 @@ class FileUtilities private constructor (private val context: Context) {
 
         replaceLast(displayName, fileName, "${prefix}$fileName${suffix}")
 
-        val outputFile = File(context.filesDir.toString() + "/${newDisplayName}")
+        val outputFile = File(context.getExternalFilesDir(null).toString() + "/${newDisplayName}")
 
             try {
                 val inputStream = context.contentResolver.openInputStream(sourceUri)

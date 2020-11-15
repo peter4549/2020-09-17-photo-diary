@@ -3,20 +3,15 @@ package com.duke.elliot.kim.kotlin.photodiary.utility
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
-import android.content.ContentValues
 import android.content.Context
-import android.content.Intent
 import android.content.pm.ActivityInfo
+import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.graphics.*
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
-import android.os.ParcelFileDescriptor
-import android.provider.DocumentsContract
-import android.provider.MediaStore
-import android.text.TextUtils
 import android.util.AttributeSet
 import android.util.DisplayMetrics
 import android.view.Surface
@@ -41,6 +36,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.*
+import java.security.MessageDigest
+import java.security.NoSuchAlgorithmException
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -406,5 +403,23 @@ fun showInputDialog(context: Context, title: String, okEvent: (text: String) -> 
 @Suppress("DEPRECATION")
 fun getDocumentDirectory(context: Context): String {
     return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).toString()
+}
+
+@SuppressLint("PackageManagerGetSignatures")
+fun printHashKey(context: Context) {
+    try {
+        val info: PackageInfo =
+            context.packageManager.getPackageInfo(context.packageName, PackageManager.GET_SIGNATURES)
+        for (signature in info.signatures) {
+            val md: MessageDigest = MessageDigest.getInstance("SHA")
+            md.update(signature.toByteArray())
+            val hashKey = String(android.util.Base64.encode(md.digest(), 0))
+            println("printHashKey() Hash Key: $hashKey")
+        }
+    } catch (e: NoSuchAlgorithmException) {
+        println("printHashKey() $e")
+    } catch (e: Exception) {
+        println("printHashKey() $e")
+    }
 }
 

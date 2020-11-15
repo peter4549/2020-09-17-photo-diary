@@ -9,13 +9,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
+import com.duke.elliot.kim.kotlin.photodiary.alarm.AlarmUtilities
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryModel
 import com.duke.elliot.kim.kotlin.photodiary.fluid_keyboard_resize.FluidContentResize
+import com.duke.elliot.kim.kotlin.photodiary.utility.printHashKey
 import kotlinx.android.synthetic.main.item_diary.view.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import timber.log.Timber
 
 class MainActivity : AppCompatActivity() {
 
@@ -25,6 +23,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        printHashKey(this)
 
         setFontNameIdMap()
 
@@ -38,6 +38,8 @@ class MainActivity : AppCompatActivity() {
 
         themeColorDark = ContextCompat.getColor(this, R.color.colorDefaultThemeDark)
         themeColorLight = ContextCompat.getColor(this, R.color.colorDefaultThemeLight)
+
+        AlarmUtilities.setReminder(this, 0L, "")
     }
 
     inner class DiaryRecyclerViewAdapter(private val diaries: ArrayList<String>): RecyclerView.Adapter<DiaryRecyclerViewAdapter.ViewHolder>() {
