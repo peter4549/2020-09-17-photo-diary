@@ -1,7 +1,9 @@
 package com.duke.elliot.kim.kotlin.photodiary.tab.diary
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.Typeface
+import android.graphics.drawable.BitmapDrawable
 import android.os.Build
 import android.util.TypedValue
 import android.view.LayoutInflater
@@ -10,6 +12,8 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.PopupMenu
 import android.widget.TextView
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.toBitmap
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -56,7 +60,9 @@ private const val PREFERENCES_DIARY_ADAPTER = "preferences_diary_adapter"
 private const val KEY_VIEW_MODE = "key_view_mode"
 private const val KEY_SORTING_CRITERIA = "key_sorting_criteria"
 
-class DiaryAdapter(private val context: Context) : ListAdapter<AdapterItem, RecyclerView.ViewHolder>(DiaryDiffCallback()) {
+class DiaryAdapter(private val context: Context) : ListAdapter<AdapterItem, RecyclerView.ViewHolder>(
+    DiaryDiffCallback()
+) {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var deleteOnClickListener: () -> Unit
@@ -77,8 +83,8 @@ class DiaryAdapter(private val context: Context) : ListAdapter<AdapterItem, Recy
         Pair(context.getString(R.string.export_text), R.drawable.ic_text_file_24),
         Pair(context.getString(R.string.export_pdf_file), R.drawable.ic_pdf_file_24),
         Pair(context.getString(R.string.share_diary), R.drawable.ic_round_share_24),
-        Pair(context.getString(R.string.send_diary_to_kakao_talk), R.drawable.ic_round_share_24),
-        Pair(context.getString(R.string.send_diary_to_facebook), R.drawable.ic_round_share_24)
+        Pair(context.getString(R.string.send_diary_to_kakao_talk), R.drawable.ic_kakao_talk_24),
+        Pair(context.getString(R.string.send_diary_to_facebook), R.drawable.ic_facebook_24)
     )
 
     private val exportTypeAdapter = object : ArrayAdapter<Pair<String, Int>>(
@@ -94,10 +100,7 @@ class DiaryAdapter(private val context: Context) : ListAdapter<AdapterItem, Recy
             textView.text = exportTypes[position].first
             textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16F)
             textView.setCompoundDrawablesWithIntrinsicBounds(
-                exportTypes[position].second,
-                0,
-                0,
-                0
+                exportTypes[position].second, 0, 0, 0
             )
 
             textView.compoundDrawablePadding = (16 * context.resources.displayMetrics.density + 0.5F).toInt()
@@ -112,12 +115,23 @@ class DiaryAdapter(private val context: Context) : ListAdapter<AdapterItem, Recy
                 recyclerView.scheduleLayoutAnimation()
                 when(exportType) {
                     EXPORT_AS_TEXT_FILE -> {
-                        showInputDialog(context, context.getString(R.string.text_file_name_input_message)) { fileName ->
+                        showInputDialog(
+                            context,
+                            context.getString(R.string.text_file_name_input_message)
+                        ) { fileName ->
                             adapterScope.launch {
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
-                                    ExportUtilities.exportAsTextFileQ(context, getCurrentDiary(), fileName)
+                                    ExportUtilities.exportAsTextFileQ(
+                                        context,
+                                        getCurrentDiary(),
+                                        fileName
+                                    )
                                 else
-                                    ExportUtilities.exportAsTextFile(context, getCurrentDiary(), fileName)
+                                    ExportUtilities.exportAsTextFile(
+                                        context,
+                                        getCurrentDiary(),
+                                        fileName
+                                    )
                             }
                         }
                     }
@@ -328,13 +342,16 @@ class DiaryAdapter(private val context: Context) : ListAdapter<AdapterItem, Recy
                         recyclerView.scheduleLayoutAnimation()
                         when(viewMode) {
                             LIST_VIEW_MODE -> {
-                                (recyclerView.layoutManager as StaggeredGridLayoutManager).spanCount = 1
+                                (recyclerView.layoutManager as StaggeredGridLayoutManager).spanCount =
+                                    1
                             }
                             BRIEF_VIEW_MODE -> {
-                                (recyclerView.layoutManager as StaggeredGridLayoutManager).spanCount  = 1
+                                (recyclerView.layoutManager as StaggeredGridLayoutManager).spanCount =
+                                    1
                             }
                             FRAME_VIEW_MODE -> {
-                                (recyclerView.layoutManager as StaggeredGridLayoutManager).spanCount = 2
+                                (recyclerView.layoutManager as StaggeredGridLayoutManager).spanCount =
+                                    2
                             }
                         }
 
@@ -364,7 +381,10 @@ class DiaryAdapter(private val context: Context) : ListAdapter<AdapterItem, Recy
 
             binding.textDate.text = diary.time.toDateFormat(binding.root.context.getString(R.string.date_format_short))
             binding.textTime.text = diary.time.toDateFormat(binding.root.context.getString(R.string.time_format_short))
-            setImage(binding.imageWeatherIcon, DiaryWritingViewModel.weatherIconIds[diary.weatherIconIndex])
+            setImage(
+                binding.imageWeatherIcon,
+                DiaryWritingViewModel.weatherIconIds[diary.weatherIconIndex]
+            )
             binding.textTitle.text = diary.title
             binding.textTitle.setTextColor(diary.textOptions.textColor)
             binding.textTitle.typeface = font
@@ -502,10 +522,12 @@ class DiaryAdapter(private val context: Context) : ListAdapter<AdapterItem, Recy
             })
 
             binding.imageExport.setOnClickListener {
+                currentItem = diary
                 showExportTypeDialog(binding.root.context)
             }
 
             binding.imageMore.setOnClickListener {
+                currentItem = diary
                 showPopupMenu(context, it!!, diary, absoluteAdapterPosition)
             }
         }
@@ -708,7 +730,10 @@ class DiaryAdapter(private val context: Context) : ListAdapter<AdapterItem, Recy
     }
 
     fun saveSortingCriteriaViewMode() {
-        val sharedPreferences = context.getSharedPreferences(PREFERENCES_DIARY_ADAPTER, Context.MODE_PRIVATE)
+        val sharedPreferences = context.getSharedPreferences(
+            PREFERENCES_DIARY_ADAPTER,
+            Context.MODE_PRIVATE
+        )
         val editor = sharedPreferences.edit()
 
         editor.putInt(KEY_SORTING_CRITERIA, sortingCriteria)
@@ -717,7 +742,10 @@ class DiaryAdapter(private val context: Context) : ListAdapter<AdapterItem, Recy
     }
 
     private fun loadSortingCriteriaViewMode() {
-        val sharedPreferences = context.getSharedPreferences(PREFERENCES_DIARY_ADAPTER, Context.MODE_PRIVATE)
+        val sharedPreferences = context.getSharedPreferences(
+            PREFERENCES_DIARY_ADAPTER,
+            Context.MODE_PRIVATE
+        )
         sortingCriteria = sharedPreferences.getInt(KEY_SORTING_CRITERIA, SORT_BY_LATEST)
         viewMode = sharedPreferences.getInt(KEY_VIEW_MODE, LIST_VIEW_MODE)
     }

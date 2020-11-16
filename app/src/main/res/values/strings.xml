@@ -135,8 +135,21 @@
 
     <!-- Share Diary -->
     <string name="share_diary">다이어리 공유하기</string>  <!-- Share a diary -->
+
+    <!-- Kakao Talk -->
     <string name="send_diary_to_kakao_talk">카카오톡으로 보내기</string>
+    <string name="kakao_talk_send_images">이미지 보내기</string>
+    <string name="kakao_talk_send_video">동영상 보내기</string>
+    <string name="kakao_talk_send_audio">오디오 보내기</string>
+    <string name="kakao_talk_send_text">텍스트 보내기</string>
+    <string name="kakao_talk_not_found">카카오톡을 찾을 수 없습니다.</string>
+
+    <!-- Facebook -->
     <string name="send_diary_to_facebook">페이스북으로 보내기</string>
+    <string name="facebook_send_images">이미지 보내기</string>
+    <string name="facebook_send_video">동영상 보내기</string>
+    <string name="facebook_send_audio">오디오 보내기</string>
+    <string name="facebook_send_text">텍스트 보내기</string>
 
     <!-- Weather -->
     <string-array name="weatherWords">

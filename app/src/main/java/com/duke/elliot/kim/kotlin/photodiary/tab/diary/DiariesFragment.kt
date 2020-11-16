@@ -15,12 +15,13 @@ import com.duke.elliot.kim.kotlin.photodiary.database.DiaryDatabase
 import com.duke.elliot.kim.kotlin.photodiary.databinding.FragmentDairiesBinding
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.EDIT_MODE
 import com.duke.elliot.kim.kotlin.photodiary.export.ExportUtilities
+import com.duke.elliot.kim.kotlin.photodiary.export.KakaoTalkOptionBottomSheetDialogFragment
 import com.duke.elliot.kim.kotlin.photodiary.tab.TabFragmentDirections
 import com.duke.elliot.kim.kotlin.photodiary.utility.showToast
 import kotlinx.coroutines.*
 import timber.log.Timber
 
-class DiariesFragment: Fragment() {
+class DiariesFragment: Fragment(), KakaoTalkOptionBottomSheetDialogFragment.KakaoTalkOptionClickListener {
 
     private lateinit var diaryAdapter: DiaryAdapter
     private lateinit var binding: FragmentDairiesBinding
@@ -86,9 +87,13 @@ class DiariesFragment: Fragment() {
             }
 
             setSendDiaryToKakaoTalkClickListener {
-                getCurrentDiary()?.let {
-                    ExportUtilities.sendDiaryToKakaoTalk(requireActivity(), it)
-                }
+                val bottomSheetDialogFragment =
+                    KakaoTalkOptionBottomSheetDialogFragment().apply {
+                        setKakaoTalkOptoinClickListener(this@DiariesFragment)
+                    }
+
+                bottomSheetDialogFragment.show(requireActivity().supportFragmentManager,
+                    bottomSheetDialogFragment.tag)
             }
 
             setUpdateListener {
@@ -140,5 +145,25 @@ class DiariesFragment: Fragment() {
     override fun onStop() {
         super.onStop()
         diaryAdapter.saveSortingCriteriaViewMode()
+    }
+
+    override fun onSendImagesClick() {
+        // TODO: Implement
+    }
+
+    override fun onSendVideoClick() {
+        // TODO: Implement
+    }
+
+    override fun onSendAudioClick() {
+        // TODO: Implement
+    }
+
+    override fun onSendTextClick() {
+        println("KKKKKKK ${diaryAdapter.getCurrentDiary()?.title ?: "널이랑깨."}")
+        diaryAdapter.getCurrentDiary()?.let {
+            ExportUtilities.sendDiaryToKakaoTalk(requireActivity(),
+                it, ExportUtilities.KAKAO_TALK_OPTION_SEND_TEXT)
+        }
     }
 }

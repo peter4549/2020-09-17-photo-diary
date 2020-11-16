@@ -30,6 +30,11 @@ import kotlin.collections.ArrayList
 
 
 object ExportUtilities {
+    const val KAKAO_TALK_OPTION_SEND_IMAGES = 0
+    const val KAKAO_TALK_OPTION_SEND_VIDEO = 1
+    const val KAKAO_TALK_OPTION_SEND_AUDIO = 2
+    const val KAKAO_TALK_OPTION_SEND_TEXT = 3
+
     private lateinit var mediaScanner : MediaScanner
 
     /** weatherTexts must be initialized to match weather icon ids. */
@@ -265,10 +270,20 @@ object ExportUtilities {
     }
 
     // TODO; 바로 보내지는 지 test 카톡.
-    fun sendDiaryToKakaoTalk(activity: Activity, diary: DiaryModel) {
+    fun sendDiaryToKakaoTalk(activity: Activity, diary: DiaryModel, option: Int) {
         if (!::weatherWords.isInitialized)
             weatherWords = activity.resources.getStringArray(R.array.weatherWords)
 
+        if (!isKakaoTalkInstalled(activity)) {
+            showToast(activity, activity.getString(R.string.kakao_talk_not_found))
+            return
+        }
+
+        when(option) {
+            KAKAO_TALK_OPTION_SEND_TEXT -> sendTextToKakaoTalk(activity, diary)
+        }
+
+        /*
         val shareIntent = Intent(Intent.ACTION_SEND)
 
         val imageUris = diary.mediaArray.map { toContentUri(activity, it.uriString) } as ArrayList
@@ -288,10 +303,33 @@ object ExportUtilities {
         shareIntent.type = "text/plain"
         shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        shareIntent.setPackage("com.kakao.talk") // 존나 잘됨.
+        shareIntent.setPackage("com.kakao.talk") // 존나 잘됨. 걍 뜨는거만 잘된건가???
 
         activity.startActivity(shareIntent)
+
+         */
     }
+
+    private fun sendTextToKakaoTalk(activity: Activity, diary: DiaryModel) {
+        val stringBuilder = StringBuilder()
+        val date = diary.time.toDateFormat(activity.getString(R.string.date_format))
+        val time = diary.time.toDateFormat(activity.getString(R.string.time_format))
+        val weather = weatherWords[diary.weatherIconIndex]
+        val dateTimeWeather = "$date  $time  $weather\n\n"
+
+        stringBuilder.append(dateTimeWeather)
+        stringBuilder.append(diary.title + "\n\n")
+        stringBuilder.append(diary.content)
+
+        val shareIntent = Intent(Intent.ACTION_SEND)
+        shareIntent.type = "text/plain"
+        shareIntent.putExtra(Intent.EXTRA_TEXT, stringBuilder.toString())
+        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        shareIntent.setPackage("com.kakao.talk")
+
+        activity.startActivity(Intent.createChooser(shareIntent, activity.getString(R.string.send_diary_to_kakao_talk)))
+    }
+
 
     fun showKakaoTalkSendOptions(context: Context) {
         if (isKakaoTalkInstalled(context)) {

@@ -163,8 +163,8 @@
 
                 <com.like.LikeButton
                     android:id="@+id/button_star"
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
+                    android:layout_width="26dp"
+                    android:layout_height="26dp"
                     android:layout_marginStart="2dp"
                     android:layout_marginBottom="0.25dp"
                     app:anim_scale_factor="2"
