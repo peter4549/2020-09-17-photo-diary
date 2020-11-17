@@ -9,6 +9,7 @@ import androidx.core.net.toUri
 import com.bumptech.glide.Glide
 import com.duke.elliot.kim.kotlin.photodiary.R
 import com.duke.elliot.kim.kotlin.photodiary.base.BaseRecyclerViewAdapter
+import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.media_helper.AudioHelper
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.media_helper.MediaHelper
 import com.duke.elliot.kim.kotlin.photodiary.utility.FileUtilities
 import com.duke.elliot.kim.kotlin.photodiary.utility.setImage
@@ -42,22 +43,9 @@ class MediaAdapter(layoutId: Int, mediaArrayList: ArrayList<MediaModel>)
             MediaHelper.MediaType.AUDIO -> {
                 Glide.with(holder.view.image.context).clear(holder.view.image)
 
-                val mediaMetadataRetriever = MediaMetadataRetriever()
-                val byteArray: ByteArray?
-                val albumArt: Bitmap
-                val bitmapFactoryOptions = BitmapFactory.Options()
-
-                mediaMetadataRetriever.setDataSource(holder.view.context, media.uriString.toUri())
-                byteArray = mediaMetadataRetriever.embeddedPicture
-
-                byteArray?.size?.let {
-                    albumArt = BitmapFactory.decodeByteArray(
-                        byteArray,
-                        0,
-                        it,
-                        bitmapFactoryOptions
-                    )
-                    setImage(holder.view.image, albumArt)
+                val albumArt = AudioHelper.getAudioAlbumArt(holder.view.context, media.uriString)
+                albumArt?.let {
+                    setImage(holder.view.image, it)
                 } ?: run {
                     setImage(holder.view.image, R.drawable.blue_gradation_background)
                 }

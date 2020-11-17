@@ -30,7 +30,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility sourceCompatibility
+        coreLibraryDesugaringEnabled true
+        sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
@@ -106,5 +107,6 @@ dependencies {
     // LikeButton
     implementation 'com.github.jd-alexander:LikeButton:0.2.3'
 
-    implementation 'com.itextpdf:itextpdf:5.0.6'
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.1'
+    implementation 'com.github.kizitonwose:CalendarView:1.0.0'
 }

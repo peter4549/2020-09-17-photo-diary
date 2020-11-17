@@ -136,10 +136,20 @@
     <!-- Share Diary -->
     <string name="share_diary">다이어리 공유하기</string>  <!-- Share a diary -->
 
+    <string name="photo_not_found">사진을 찾을 수 없습니다.</string>
+    <string name="video_not_found">비디오을 찾을 수 없습니다.</string>
+    <string name="audio_not_found">오디오를 찾을 수 없습니다.</string>
+    <string name="media_not_found">미디어를 찾을 수 없습니다.</string>
+    <string name="select_photos">사진 선택</string>
+    <string name="select_video">비디오 선택</string>
+    <string name="select_audio">오디오 선택</string>
+    <string name="select_all">모두 선택</string>
+    <string name="no_picture_is_selected">선택된 사진이 없습니다.</string>
+
     <!-- Kakao Talk -->
     <string name="send_diary_to_kakao_talk">카카오톡으로 보내기</string>
     <string name="kakao_talk_send_images">이미지 보내기</string>
-    <string name="kakao_talk_send_video">동영상 보내기</string>
+    <string name="kakao_talk_send_video">비디오 보내기</string>
     <string name="kakao_talk_send_audio">오디오 보내기</string>
     <string name="kakao_talk_send_text">텍스트 보내기</string>
     <string name="kakao_talk_not_found">카카오톡을 찾을 수 없습니다.</string>
@@ -147,9 +157,10 @@
     <!-- Facebook -->
     <string name="send_diary_to_facebook">페이스북으로 보내기</string>
     <string name="facebook_send_images">이미지 보내기</string>
-    <string name="facebook_send_video">동영상 보내기</string>
+    <string name="facebook_send_video">비디오 보내기</string>
     <string name="facebook_send_audio">오디오 보내기</string>
     <string name="facebook_send_text">텍스트 보내기</string>
+    <string name="facebook_not_found">페이스북을 찾을 수 없습니다.</string>
 
     <!-- Weather -->
     <string-array name="weatherWords">

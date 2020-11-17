@@ -21,7 +21,7 @@ class KakaoTalkOptionBottomSheetDialogFragment: BottomSheetDialogFragment() {
         fun onSendTextClick()
     }
 
-    fun setKakaoTalkOptoinClickListener(kakaoTalkOptionClickListener: KakaoTalkOptionClickListener) {
+    fun setKakaoTalkOptionClickListener(kakaoTalkOptionClickListener: KakaoTalkOptionClickListener) {
         this.kakaoTalkOptionClickListener = kakaoTalkOptionClickListener
     }
 

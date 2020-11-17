@@ -14,18 +14,22 @@ import com.duke.elliot.kim.kotlin.photodiary.*
 import com.duke.elliot.kim.kotlin.photodiary.database.DiaryDatabase
 import com.duke.elliot.kim.kotlin.photodiary.databinding.FragmentDairiesBinding
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.EDIT_MODE
+import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.media_helper.MediaHelper
 import com.duke.elliot.kim.kotlin.photodiary.export.ExportUtilities
 import com.duke.elliot.kim.kotlin.photodiary.export.KakaoTalkOptionBottomSheetDialogFragment
+import com.duke.elliot.kim.kotlin.photodiary.picker.MediaPickerBottomSheetDialogFragment
 import com.duke.elliot.kim.kotlin.photodiary.tab.TabFragmentDirections
 import com.duke.elliot.kim.kotlin.photodiary.utility.showToast
 import kotlinx.coroutines.*
 import timber.log.Timber
 
-class DiariesFragment: Fragment(), KakaoTalkOptionBottomSheetDialogFragment.KakaoTalkOptionClickListener {
+class DiariesFragment: Fragment(), KakaoTalkOptionBottomSheetDialogFragment.KakaoTalkOptionClickListener,
+    MediaPickerBottomSheetDialogFragment.OnMediaClickListener {
 
     private lateinit var diaryAdapter: DiaryAdapter
     private lateinit var binding: FragmentDairiesBinding
     private lateinit var viewModel: DiariesViewModel
+    private lateinit var mediaPicker: MediaPickerBottomSheetDialogFragment
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -40,6 +44,10 @@ class DiariesFragment: Fragment(), KakaoTalkOptionBottomSheetDialogFragment.Kaka
         viewModel = ViewModelProvider(viewModelStore, viewModelFactory)[DiariesViewModel::class.java]
 
         binding.diariesViewModel = viewModel
+
+        mediaPicker = MediaPickerBottomSheetDialogFragment().apply {
+            setMediaClickListener(this@DiariesFragment)
+        }
 
         diaryAdapter = DiaryAdapter(requireContext()).apply {
             setViewOnClickListener {
@@ -89,7 +97,7 @@ class DiariesFragment: Fragment(), KakaoTalkOptionBottomSheetDialogFragment.Kaka
             setSendDiaryToKakaoTalkClickListener {
                 val bottomSheetDialogFragment =
                     KakaoTalkOptionBottomSheetDialogFragment().apply {
-                        setKakaoTalkOptoinClickListener(this@DiariesFragment)
+                        setKakaoTalkOptionClickListener(this@DiariesFragment)
                     }
 
                 bottomSheetDialogFragment.show(requireActivity().supportFragmentManager,
@@ -148,15 +156,27 @@ class DiariesFragment: Fragment(), KakaoTalkOptionBottomSheetDialogFragment.Kaka
     }
 
     override fun onSendImagesClick() {
-        // TODO: Implement
+        diaryAdapter.getCurrentDiary()?.let {
+            mediaPicker.setDiary(it)
+            mediaPicker.setMediaType(MediaHelper.MediaType.PHOTO)
+            mediaPicker.show(requireActivity().supportFragmentManager, mediaPicker.tag)
+        }
     }
 
     override fun onSendVideoClick() {
-        // TODO: Implement
+        diaryAdapter.getCurrentDiary()?.let {
+            mediaPicker.setDiary(it)
+            mediaPicker.setMediaType(MediaHelper.MediaType.VIDEO)
+            mediaPicker.show(requireActivity().supportFragmentManager, mediaPicker.tag)
+        }
     }
 
     override fun onSendAudioClick() {
-        // TODO: Implement
+        diaryAdapter.getCurrentDiary()?.let {
+            mediaPicker.setDiary(it)
+            mediaPicker.setMediaType(MediaHelper.MediaType.AUDIO)
+            mediaPicker.show(requireActivity().supportFragmentManager, mediaPicker.tag)
+        }
     }
 
     override fun onSendTextClick() {
@@ -164,6 +184,29 @@ class DiariesFragment: Fragment(), KakaoTalkOptionBottomSheetDialogFragment.Kaka
         diaryAdapter.getCurrentDiary()?.let {
             ExportUtilities.sendDiaryToKakaoTalk(requireActivity(),
                 it, ExportUtilities.KAKAO_TALK_OPTION_SEND_TEXT)
+        }
+    }
+
+    // Media Picker Interfaces
+    /** 미디어 데이터를 선택받아 보내는 역할을 함. 인자들을 보낼 것이다. */
+    override fun photoOnClick(pickedPhotoUris: List<String>) {
+        diaryAdapter.getCurrentDiary()?.let {
+            ExportUtilities.sendDiaryToKakaoTalk(requireActivity(),
+                it, ExportUtilities.KAKAO_TALK_OPTION_SEND_IMAGES, pickedPhotoUris)
+        }
+    }
+
+    override fun videoOnClick(pickedVideoUri: String) {
+        diaryAdapter.getCurrentDiary()?.let {
+            ExportUtilities.sendDiaryToKakaoTalk(requireActivity(),
+                it, ExportUtilities.KAKAO_TALK_OPTION_SEND_VIDEO, mediaUri = pickedVideoUri)
+        }
+    }
+
+    override fun audioOnClick(pickedAudioUri: String) {
+        diaryAdapter.getCurrentDiary()?.let {
+            ExportUtilities.sendDiaryToKakaoTalk(requireActivity(),
+                it, ExportUtilities.KAKAO_TALK_OPTION_SEND_AUDIO,  mediaUri = pickedAudioUri)
         }
     }
 }

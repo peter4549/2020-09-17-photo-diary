@@ -16,6 +16,8 @@ import androidx.annotation.RequiresApi
 import androidx.core.content.FileProvider
 import com.duke.elliot.kim.kotlin.photodiary.R
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryModel
+import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.MediaModel
+import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.media_helper.MediaHelper
 import com.duke.elliot.kim.kotlin.photodiary.utility.MediaScanner
 import com.duke.elliot.kim.kotlin.photodiary.utility.getDocumentDirectory
 import com.duke.elliot.kim.kotlin.photodiary.utility.showToast
@@ -269,8 +271,8 @@ object ExportUtilities {
         return null
     }
 
-    // TODO; 바로 보내지는 지 test 카톡.
-    fun sendDiaryToKakaoTalk(activity: Activity, diary: DiaryModel, option: Int) {
+    fun sendDiaryToKakaoTalk(activity: Activity, diary: DiaryModel, option: Int,
+                             mediaUris: List<String>? = null, mediaUri: String? = null) {
         if (!::weatherWords.isInitialized)
             weatherWords = activity.resources.getStringArray(R.array.weatherWords)
 
@@ -280,34 +282,52 @@ object ExportUtilities {
         }
 
         when(option) {
+            KAKAO_TALK_OPTION_SEND_IMAGES -> sendPhotosToKakaoTalk(activity, mediaUris)
+            KAKAO_TALK_OPTION_SEND_VIDEO -> sendVideoToKakaoTalk(activity, mediaUri)
+            KAKAO_TALK_OPTION_SEND_AUDIO -> sendAudioToKakaoTalk(activity, mediaUri)
             KAKAO_TALK_OPTION_SEND_TEXT -> sendTextToKakaoTalk(activity, diary)
         }
+    }
 
-        /*
+    private fun sendPhotosToKakaoTalk(activity: Activity, photoUris: List<String>?) {
+        if (photoUris == null)
+            return
+
+        val shareIntent = Intent(Intent.ACTION_SEND_MULTIPLE)
+
+        shareIntent.type = "image/*"
+        shareIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, photoUris.map { toContentUri(activity, it) } as ArrayList)
+        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        shareIntent.setPackage("com.kakao.talk")
+
+        activity.startActivity(Intent.createChooser(shareIntent, activity.getString(R.string.send_diary_to_kakao_talk)))
+    }
+
+    private fun sendVideoToKakaoTalk(activity: Activity, videoUri: String?) {
+        if (videoUri == null)
+            return
+
+        val shareIntent = Intent(Intent.ACTION_SEND)
+        shareIntent.type = "video/*"
+        shareIntent.putExtra(Intent.EXTRA_STREAM, toContentUri(activity, videoUri))
+        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        shareIntent.setPackage("com.kakao.talk")
+
+        activity.startActivity(Intent.createChooser(shareIntent, activity.getString(R.string.send_diary_to_kakao_talk)))
+    }
+
+    private fun sendAudioToKakaoTalk(activity: Activity, audioUri: String?) {
+        if (audioUri == null)
+            return
+
         val shareIntent = Intent(Intent.ACTION_SEND)
 
-        val imageUris = diary.mediaArray.map { toContentUri(activity, it.uriString) } as ArrayList
-
-        val stringBuilder = StringBuilder()
-        val date = diary.time.toDateFormat(activity.getString(R.string.date_format))
-        val time = diary.time.toDateFormat(activity.getString(R.string.time_format))
-        val weather = weatherWords[diary.weatherIconIndex]
-        val dateTimeWeather = "$date  $time  $weather\n\n"
-
-        stringBuilder.append(dateTimeWeather)
-        stringBuilder.append(diary.title + "\n\n")
-        stringBuilder.append(diary.content)
-
-        shareIntent.putExtra(Intent.EXTRA_TEXT, stringBuilder.toString())
-        // shareIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, imageUris)
-        shareIntent.type = "text/plain"
-        shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        shareIntent.type = "audio/*"
+        shareIntent.putExtra(Intent.EXTRA_STREAM, toContentUri(activity, audioUri))
         shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        shareIntent.setPackage("com.kakao.talk") // 존나 잘됨. 걍 뜨는거만 잘된건가???
+        shareIntent.setPackage("com.kakao.talk")
 
-        activity.startActivity(shareIntent)
-
-         */
+        activity.startActivity(Intent.createChooser(shareIntent, activity.getString(R.string.send_diary_to_kakao_talk)))
     }
 
     private fun sendTextToKakaoTalk(activity: Activity, diary: DiaryModel) {
@@ -328,17 +348,6 @@ object ExportUtilities {
         shareIntent.setPackage("com.kakao.talk")
 
         activity.startActivity(Intent.createChooser(shareIntent, activity.getString(R.string.send_diary_to_kakao_talk)))
-    }
-
-
-    fun showKakaoTalkSendOptions(context: Context) {
-        if (isKakaoTalkInstalled(context)) {
-
-            // 이미지 연속 전송.
-            // 텍스트 온리.
-            // 동영상 1개,
-            // 오디오 1개.
-        }
     }
 
     // TODO: Test
@@ -369,7 +378,7 @@ object ExportUtilities {
         activity.startActivity(shareIntent)
     }
 
-    private fun isKakaoTalkInstalled(context: Context): Boolean {
+    fun isKakaoTalkInstalled(context: Context): Boolean {
         val applicationInfoList = context.packageManager.getInstalledApplications(PackageManager.GET_META_DATA)
 
         for (applicationInfo in applicationInfoList)
@@ -379,7 +388,7 @@ object ExportUtilities {
         return false
     }
 
-    private fun isFacebookInstalled(context: Context): Boolean {
+    fun isFacebookInstalled(context: Context): Boolean {
         val applicationInfoList = context.packageManager.getInstalledApplications(PackageManager.GET_META_DATA)
 
         for (applicationInfo in applicationInfoList)

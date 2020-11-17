@@ -1,9 +1,7 @@
 package com.duke.elliot.kim.kotlin.photodiary.tab.diary
 
 import android.content.Context
-import android.graphics.Bitmap
 import android.graphics.Typeface
-import android.graphics.drawable.BitmapDrawable
 import android.os.Build
 import android.util.TypedValue
 import android.view.LayoutInflater
@@ -12,8 +10,6 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.PopupMenu
 import android.widget.TextView
-import androidx.core.content.ContextCompat
-import androidx.core.graphics.drawable.toBitmap
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -28,14 +24,12 @@ import com.duke.elliot.kim.kotlin.photodiary.databinding.ViewModeSortBarBinding
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryModel
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryWritingViewModel
 import com.duke.elliot.kim.kotlin.photodiary.export.ExportUtilities
-import com.duke.elliot.kim.kotlin.photodiary.utility.getFont
-import com.duke.elliot.kim.kotlin.photodiary.utility.setImage
-import com.duke.elliot.kim.kotlin.photodiary.utility.showInputDialog
-import com.duke.elliot.kim.kotlin.photodiary.utility.toDateFormat
+import com.duke.elliot.kim.kotlin.photodiary.utility.*
 import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.like.LikeButton
 import com.like.OnLikeListener
+import kotlinx.android.synthetic.main.item_select_dialog_28.view.*
 import kotlinx.coroutines.*
 import java.util.*
 import kotlin.Comparator
@@ -83,27 +77,25 @@ class DiaryAdapter(private val context: Context) : ListAdapter<AdapterItem, Recy
         Pair(context.getString(R.string.export_text), R.drawable.ic_text_file_24),
         Pair(context.getString(R.string.export_pdf_file), R.drawable.ic_pdf_file_24),
         Pair(context.getString(R.string.share_diary), R.drawable.ic_round_share_24),
-        Pair(context.getString(R.string.send_diary_to_kakao_talk), R.drawable.ic_kakao_talk_24),
+        Pair(context.getString(R.string.send_diary_to_kakao_talk), R.drawable.ic_kakao_talk_150px),
         Pair(context.getString(R.string.send_diary_to_facebook), R.drawable.ic_facebook_24)
     )
 
     private val exportTypeAdapter = object : ArrayAdapter<Pair<String, Int>>(
         context,
-        android.R.layout.select_dialog_item,
-        android.R.id.text1,
+        R.layout.item_select_dialog_28,
+        R.id.text,
         exportTypes
     ) {
         override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
             val view = super.getView(position, convertView, parent)
-            val textView = view.findViewById<View>(android.R.id.text1) as TextView
+            val text = view.text
+            val image = view.image
 
-            textView.text = exportTypes[position].first
-            textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16F)
-            textView.setCompoundDrawablesWithIntrinsicBounds(
-                exportTypes[position].second, 0, 0, 0
-            )
+            text.text = exportTypes[position].first
+            text.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16F)
+            image.setImageResource(exportTypes[position].second)
 
-            textView.compoundDrawablePadding = (16 * context.resources.displayMetrics.density + 0.5F).toInt()
             return view
         }
     }
@@ -144,12 +136,18 @@ class DiaryAdapter(private val context: Context) : ListAdapter<AdapterItem, Recy
                             shareOnClickListener.invoke()
                     }
                     SEND_DIARY_TO_KAKAO_TALK -> {
-                        if (::sendDiaryToKakaoTalkClickListener.isInitialized)
-                            sendDiaryToKakaoTalkClickListener.invoke()
+                        if (ExportUtilities.isKakaoTalkInstalled(context)) {
+                            if (::sendDiaryToKakaoTalkClickListener.isInitialized)
+                                sendDiaryToKakaoTalkClickListener.invoke()
+                        } else
+                            showToast(context, context.getString(R.string.kakao_talk_not_found))
                     }
                     SEND_DIARY_TO_FACEBOOK -> {
-                        if (::sendDiaryToFacebookClickListener.isInitialized)
-                            sendDiaryToFacebookClickListener.invoke()
+                        if (ExportUtilities.isFacebookInstalled(context)) {
+                            if (::sendDiaryToFacebookClickListener.isInitialized)
+                                sendDiaryToFacebookClickListener.invoke()
+                        } else
+                            showToast(context, context.getString(R.string.facebook_not_found))
                     }
                 }
             }

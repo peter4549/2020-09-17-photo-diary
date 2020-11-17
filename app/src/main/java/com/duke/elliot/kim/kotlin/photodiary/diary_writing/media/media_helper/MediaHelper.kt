@@ -19,6 +19,7 @@ object MediaHelper {
     const val REQUEST_CODE_DRAW = 1004
 
     object MediaType {
+        const val NULL = -1
         const val PHOTO = 0
         const val VIDEO = 1
         const val AUDIO = 2

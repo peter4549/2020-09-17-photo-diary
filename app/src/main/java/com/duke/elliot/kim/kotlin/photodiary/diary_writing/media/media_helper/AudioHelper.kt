@@ -1,8 +1,15 @@
 package com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.media_helper
 
+import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.media.MediaMetadataRetriever
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import com.duke.elliot.kim.kotlin.photodiary.R
+import com.duke.elliot.kim.kotlin.photodiary.utility.setImage
+import kotlinx.android.synthetic.main.item_media.view.*
 
 
 object AudioHelper {
@@ -28,6 +35,29 @@ object AudioHelper {
                     )
                 ), MediaHelper.REQUEST_AUDIO_PICK
             )
+        }
+    }
+
+    fun getAudioAlbumArt(context: Context, uriString: String): Bitmap? {
+        val mediaMetadataRetriever = MediaMetadataRetriever()
+        val byteArray: ByteArray?
+        val albumArt: Bitmap
+        val bitmapFactoryOptions = BitmapFactory.Options()
+
+        mediaMetadataRetriever.setDataSource(context, uriString.toUri())
+        byteArray = mediaMetadataRetriever.embeddedPicture
+
+        byteArray?.size?.let {
+            albumArt = BitmapFactory.decodeByteArray(
+                byteArray,
+                0,
+                it,
+                bitmapFactoryOptions
+            )
+
+            return albumArt
+        } ?: run {
+            return null
         }
     }
 }

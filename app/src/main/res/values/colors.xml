@@ -109,4 +109,9 @@
 
     <!-- Chip -->
     <color name="colorChip">@color/colorDavyGrey</color>
+
+    <!-- Picker -->
+    <color name="colorPickerInnerCircle">#40000000</color> <!-- 40: 25% -->
+    <color name="colorPickerBackground">#E6000000</color> <!-- E6: 90% -->
+    <color name="colorPickerRecyclerViewBackground">#BF000000</color> <!-- BF: 75% -->
 </resources>
