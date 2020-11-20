@@ -55,6 +55,8 @@ class OkCancelDialogFragment: DialogFragment() {
         view.button_ok.setOnClickListener {
             if (::okButtonOnClick.isInitialized)
                 okButtonOnClick.invoke()
+
+            this.dismiss()
         }
 
         cancelButtonText?.let {

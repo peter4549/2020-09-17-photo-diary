@@ -47,6 +47,7 @@ import java.util.*
 
 const val CREATE_MODE = 0
 const val EDIT_MODE = 1
+const val DATE_OTHER_THAN_TODAY = 2
 
 class DiaryWritingFragment: Fragment() {
 
@@ -66,6 +67,7 @@ class DiaryWritingFragment: Fragment() {
     private var mediumAnimationDuration = 0
     private var recyclerViewMediaIsShown = false
     private var selectedItemView: View? = null
+    private var selectedTime = -1L
     private var shortAnimationDuration = 0
     private var showOptionItemsScheduled = false
 
@@ -299,6 +301,8 @@ class DiaryWritingFragment: Fragment() {
 
         val diaryWritingFragmentArgs by navArgs<DiaryWritingFragmentArgs>()
 
+        selectedTime = diaryWritingFragmentArgs.selectedTime
+
         viewModelFactory = DiaryWritingViewModelFactory(
             requireActivity().application,
             diaryWritingFragmentArgs.diary,
@@ -481,10 +485,17 @@ class DiaryWritingFragment: Fragment() {
         return binding.root
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        if (viewModel.mode == DATE_OTHER_THAN_TODAY) {
+            showConfirmDateDialog(selectedTime)
+        }
+    }
+
     private fun backPressed() {
         if (isChanged()) {
             val saveDiaryDialogFragment = OkCancelDialogFragment().apply {
-                val message = if (viewModel.mode == CREATE_MODE)
+                val message = if (viewModel.mode == CREATE_MODE || viewModel.mode == DATE_OTHER_THAN_TODAY)
                     binding.root.context.getString(R.string.save_diary_message)
                 else
                     binding.root.context.getString(R.string.save_edited_diary_message)
@@ -493,7 +504,7 @@ class DiaryWritingFragment: Fragment() {
                     binding.root.context.getString(R.string.save_diary_title),
                     message
                 ) {
-                    if (viewModel.mode == CREATE_MODE)
+                    if (viewModel.mode == CREATE_MODE || viewModel.mode == DATE_OTHER_THAN_TODAY)
                         saveDiary(createDiary())
                     else
                         updateDiary()
@@ -814,6 +825,7 @@ class DiaryWritingFragment: Fragment() {
 
                 when (viewModel.mode) {
                     CREATE_MODE -> saveDiary(createDiary())
+                    DATE_OTHER_THAN_TODAY -> saveDiary(createDiary())
                     EDIT_MODE -> updateDiary()
                 }
             }
@@ -1331,7 +1343,7 @@ class DiaryWritingFragment: Fragment() {
         val inflatedEditText = dialog.findViewById<EditText>(id)!!
 
         if (alertTitleId > 0) {
-            val color = ContextCompat.getColor(requireContext(), R.color.colorRoyalBlue)
+            val color = ContextCompat.getColor(requireContext(), R.color.colorTrueBlue)
             okButton.setTextColor(color)
             cancelButton.setTextColor(color)
 
@@ -1359,6 +1371,22 @@ class DiaryWritingFragment: Fragment() {
 
             binding.chipGroup.addView(chip)
         }
+    }
+
+    private fun showConfirmDateDialog(time: Long) {
+        val title = getString(R.string.confirm_date_title)
+        val message = getString(R.string.confirm_date_message)
+        val confirmDateDialogFragment = OkCancelDialogFragment().apply {
+            setDialogParameters(title, message) {
+                if (time != -1L) {
+                    viewModel.time = time
+                    binding.textDate.text = viewModel.time.toDateFormat(getString(R.string.date_format))
+                    binding.textTime.text = viewModel.time.toDateFormat(getString(R.string.time_format))
+                }
+            }
+        }
+
+        confirmDateDialogFragment.show(requireActivity().supportFragmentManager, confirmDateDialogFragment.tag)
     }
 
     companion object {

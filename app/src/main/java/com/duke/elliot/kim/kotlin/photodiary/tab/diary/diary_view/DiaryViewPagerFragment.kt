@@ -39,7 +39,7 @@ class DiaryViewPagerFragment: Fragment() {
 
         val diaryViewPagerFragmentArgs by navArgs<DiaryViewPagerFragmentArgs>()
 
-        val database = DiaryDatabase.getInstance(requireContext()).dao()
+        val database = DiaryDatabase.getInstance(requireContext()).diaryDao()
 
         val viewModelFactory = DiaryViewPagerViewModelFactory(database, FileUtilities.getInstance(requireActivity().application))
         viewModel = ViewModelProvider(viewModelStore, viewModelFactory)[DiaryViewPagerViewModel::class.java]

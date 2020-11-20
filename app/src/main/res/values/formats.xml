@@ -5,4 +5,6 @@
 
     <string name="date_format_short">yyyy. M. d. EE</string>
     <string name="time_format_short">aa h:m</string>
+
+    <string name="year_month_day_format">yyyy년 M월 d일</string>
 </resources>

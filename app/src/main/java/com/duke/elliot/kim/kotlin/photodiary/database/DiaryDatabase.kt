@@ -5,12 +5,14 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import com.duke.elliot.kim.kotlin.photodiary.calendar.AnniversaryModel
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryModel
 
-@Database(entities = [DiaryModel::class], version = 1, exportSchema = false)
+@Database(entities = [DiaryModel::class, AnniversaryModel::class], version = 1, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class DiaryDatabase : RoomDatabase() {
-    abstract fun dao(): DiaryDao
+    abstract fun diaryDao(): DiaryDao
+    abstract fun anniversaryDao(): AnniversaryDao
 
     companion object {
         @Volatile
@@ -24,7 +26,7 @@ abstract class DiaryDatabase : RoomDatabase() {
                     instance = Room.databaseBuilder(
                         context.applicationContext,
                         DiaryDatabase::class.java,
-                        "diary_database_debug_09"
+                        "diary_database_debug_12"
                     )
                         .fallbackToDestructiveMigration()
                         .build()

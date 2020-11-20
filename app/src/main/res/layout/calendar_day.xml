@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <TextView
+        android:id="@+id/textCalendarDay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="5dp"
+        android:gravity="center_horizontal|top"
+        android:paddingTop="2dp"
+        android:textColor="@color/calendarWhite"
+        android:textSize="16sp"
+        tools:background="@color/calendarBackground"
+        tools:text="22" />
+</layout>

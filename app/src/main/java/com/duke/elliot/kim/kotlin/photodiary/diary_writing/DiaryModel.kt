@@ -5,6 +5,9 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.MediaModel
 import kotlinx.android.parcel.Parcelize
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
 
 @Entity(tableName = "diary")
 @Parcelize
@@ -49,5 +52,10 @@ data class DiaryModel(@PrimaryKey(autoGenerate = true)
         result = 31 * result + weatherIconIndex
         result = 31 * result + hashTags.contentHashCode()
         return result
+    }
+
+    fun getLocalDate(): LocalDate {
+        return Instant.ofEpochMilli(this.time)
+            .atZone(ZoneId.systemDefault()).toLocalDate()
     }
 }

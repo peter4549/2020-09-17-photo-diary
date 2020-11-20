@@ -4,13 +4,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.navigation.findNavController
 import androidx.viewpager2.widget.ViewPager2
 import com.duke.elliot.kim.kotlin.photodiary.R
+import com.duke.elliot.kim.kotlin.photodiary.calendar.CalendarFragment
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.CREATE_MODE
+import com.duke.elliot.kim.kotlin.photodiary.diary_writing.DATE_OTHER_THAN_TODAY
 import com.duke.elliot.kim.kotlin.photodiary.tab.diary.DiariesFragment
 import com.duke.elliot.kim.kotlin.photodiary.tab.media.PhotosFragment
 import com.google.android.material.tabs.TabLayout
@@ -20,7 +21,7 @@ import java.lang.IllegalArgumentException
 
 class TabFragment: Fragment() {
 
-    private lateinit var tabIcons: Array<Int>
+    // private lateinit var tabIcons: Array<Int>
     private lateinit var tabTexts: Array<String>
 
     override fun onCreateView(
@@ -29,12 +30,22 @@ class TabFragment: Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_tab_layout, container, false)
-        tabIcons = arrayOf(R.drawable.ic_sharp_library_books_24, R.drawable.ic_sharp_photo_library_24)
-        tabTexts = arrayOf(getString(R.string.diary), getString(R.string.photo))
+        // tabIcons = arrayOf(R.drawable.ic_sharp_library_books_24, R.drawable.ic_sharp_photo_library_24)
+        tabTexts = arrayOf(getString(R.string.diary),  getString(R.string.calendar), getString(R.string.media))
         initializeTabLayoutViewPager(view.tab_layout, view.view_pager)
 
         view.fab_write_diary.setOnClickListener {
-            view.findNavController().navigate(TabFragmentDirections.actionTabFragmentToDiaryWritingFragment(null, CREATE_MODE))
+            when(diaryWritingMode) {
+                CREATE_MODE -> view.findNavController().navigate(
+                    TabFragmentDirections.actionTabFragmentToDiaryWritingFragment(
+                        null,
+                        diaryWritingMode
+                    )
+                )
+                DATE_OTHER_THAN_TODAY -> {
+                    calendarFragmentOnFabClick?.invoke()
+                }
+            }
         }
 
         return view
@@ -48,23 +59,29 @@ class TabFragment: Fragment() {
 
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             tab.tag = position
-            tab.icon = ContextCompat.getDrawable(requireContext(), tabIcons[position])
+            // tab.icon = ContextCompat.getDrawable(requireContext(), tabIcons[position])
             tab.text = tabTexts[position]
         }.attach()
     }
 
     class FragmentStateAdapter(fragmentActivity: FragmentActivity):
         androidx.viewpager2.adapter.FragmentStateAdapter(fragmentActivity) {
-        private val pageCount = 2
+        private val pageCount = 3
 
         override fun getItemCount(): Int = pageCount
 
         override fun createFragment(position: Int): Fragment {
             return when (position) {
                 0 -> DiariesFragment()
-                1 -> PhotosFragment()
+                1 -> CalendarFragment()
+                2 -> PhotosFragment()
                 else -> throw IllegalArgumentException("Invalid position")
             }
         }
+    }
+
+    companion object {
+        var diaryWritingMode = CREATE_MODE
+        var calendarFragmentOnFabClick: (() -> Unit)? = null
     }
 }

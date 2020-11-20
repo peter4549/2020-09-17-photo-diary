@@ -13,11 +13,13 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.duke.elliot.kim.kotlin.photodiary.*
 import com.duke.elliot.kim.kotlin.photodiary.database.DiaryDatabase
 import com.duke.elliot.kim.kotlin.photodiary.databinding.FragmentDairiesBinding
+import com.duke.elliot.kim.kotlin.photodiary.diary_writing.CREATE_MODE
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.EDIT_MODE
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.media_helper.MediaHelper
 import com.duke.elliot.kim.kotlin.photodiary.export.ExportUtilities
 import com.duke.elliot.kim.kotlin.photodiary.export.KakaoTalkOptionBottomSheetDialogFragment
 import com.duke.elliot.kim.kotlin.photodiary.picker.MediaPickerBottomSheetDialogFragment
+import com.duke.elliot.kim.kotlin.photodiary.tab.TabFragment
 import com.duke.elliot.kim.kotlin.photodiary.tab.TabFragmentDirections
 import com.duke.elliot.kim.kotlin.photodiary.utility.showToast
 import kotlinx.coroutines.*
@@ -39,7 +41,7 @@ class DiariesFragment: Fragment(), KakaoTalkOptionBottomSheetDialogFragment.Kaka
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_dairies, container, false)
 
         val application = requireActivity().application
-        val dataSource = DiaryDatabase.getInstance(requireContext()).dao()
+        val dataSource = DiaryDatabase.getInstance(requireContext()).diaryDao()
         val viewModelFactory = DiariesViewModelFactory(dataSource, application)
         viewModel = ViewModelProvider(viewModelStore, viewModelFactory)[DiariesViewModel::class.java]
 
@@ -148,6 +150,11 @@ class DiariesFragment: Fragment(), KakaoTalkOptionBottomSheetDialogFragment.Kaka
         }
 
         return binding.root
+    }
+
+    override fun onResume() {
+        super.onResume()
+        TabFragment.diaryWritingMode = CREATE_MODE
     }
 
     override fun onStop() {

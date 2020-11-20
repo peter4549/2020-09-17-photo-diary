@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.ColorInt
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
@@ -94,7 +95,11 @@ class MainActivity : AppCompatActivity() {
             R.font.nanum_square_regular,
             R.font.nanum_square_round_regular
         )
+
+        @ColorInt
         var themeColorDark = 0
+
+        @ColorInt
         var themeColorLight = 0
     }
 }

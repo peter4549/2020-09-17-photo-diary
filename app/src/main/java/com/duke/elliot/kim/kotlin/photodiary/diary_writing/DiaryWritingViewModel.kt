@@ -40,9 +40,7 @@ class DiaryWritingViewModel(application: Application, val originDiary: DiaryMode
     val hashTagList: ArrayList<String> = restoreHashTagsFromPreferences()
     var selectedHashTags: ArrayList<String>
 
-    private val _time: Long = getCurrentTime()
-    val time: Long
-        get() = _time
+    var time: Long = getCurrentTime()
 
     var title: String = ""
     var content = ""

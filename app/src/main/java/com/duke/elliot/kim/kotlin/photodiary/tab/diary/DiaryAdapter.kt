@@ -40,9 +40,9 @@ private const val ITEM_VIEW_TYPE_ITEM = 1
 private const val SORT_BY_LATEST = 0
 private const val SORT_BY_OLDEST = 1
 
-private const val LIST_VIEW_MODE = 0
-private const val BRIEF_VIEW_MODE = 1
-private const val FRAME_VIEW_MODE = 2
+const val LIST_VIEW_MODE = 0
+const val BRIEF_VIEW_MODE = 1
+const val FRAME_VIEW_MODE = 2
 
 private const val EXPORT_AS_TEXT_FILE = 0
 private const val EXPORT_AS_PDF_FILE = 1
@@ -54,10 +54,9 @@ private const val PREFERENCES_DIARY_ADAPTER = "preferences_diary_adapter"
 private const val KEY_VIEW_MODE = "key_view_mode"
 private const val KEY_SORTING_CRITERIA = "key_sorting_criteria"
 
-class DiaryAdapter(private val context: Context) : ListAdapter<AdapterItem, RecyclerView.ViewHolder>(
+class DiaryAdapter(private val context: Context, noInitialization: Boolean = false) : ListAdapter<AdapterItem, RecyclerView.ViewHolder>(
     DiaryDiffCallback()
 ) {
-
     private lateinit var recyclerView: RecyclerView
     private lateinit var deleteOnClickListener: () -> Unit
     private lateinit var editOnClickListener: () -> Unit
@@ -71,7 +70,7 @@ class DiaryAdapter(private val context: Context) : ListAdapter<AdapterItem, Recy
     private var currentItem: DiaryModel? = null
     // TODO, load from shared pref.
     private var sortingCriteria = SORT_BY_LATEST
-    private var viewMode = LIST_VIEW_MODE
+    var viewMode = LIST_VIEW_MODE
 
     private val exportTypes = arrayOf(
         Pair(context.getString(R.string.export_text), R.drawable.ic_text_file_24),
@@ -155,7 +154,8 @@ class DiaryAdapter(private val context: Context) : ListAdapter<AdapterItem, Recy
     }
 
     init {
-        loadSortingCriteriaViewMode()
+        if (!noInitialization)
+            loadSortingCriteriaViewMode()
     }
 
     fun addHeaderAndSubmitList(list: List<DiaryModel>?) {
@@ -169,6 +169,14 @@ class DiaryAdapter(private val context: Context) : ListAdapter<AdapterItem, Recy
 
             withContext(Dispatchers.Main) {
                 submitList(items)
+            }
+        }
+    }
+
+    fun submitListWithoutHeader(list: List<DiaryModel>) {
+        adapterScope.launch {
+            withContext(Dispatchers.Main) {
+                submitList(list.map { AdapterItem.DiaryItem(it) })
             }
         }
     }

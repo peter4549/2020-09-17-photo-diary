@@ -6,7 +6,7 @@
 
     <color name="colorControlHighlight">@color/colorAluminum</color>
 
-    <color name="colorTextAccent">@color/colorRoyalBlue</color>
+    <color name="colorTextAccent">@color/colorTrueBlue</color>
 
     <color name="colorTextCalendar">@color/colorJet</color>
     <color name="colorTextSpinnerItem">@color/colorDavyGrey</color>
@@ -74,10 +74,30 @@
     <color name="colorGrey500">#9E9E9E</color>
     <color name="colorBlueGrey500">#607D8B</color>
 
+    <!-- Default Colors 200 -->
+    <color name="colorRed200">#ef9a9a</color>
+    <color name="colorPink200">#f48fb1</color>
+    <color name="colorPurple200">#ce93d8</color>
+    <color name="colorDeepPurple200">#b39ddb</color>
+    <color name="colorIndigo200">#9fa8da</color>
+    <color name="colorBlue200">#90caf9</color>
+    <color name="colorLightBlue200">#81d4fa</color>
+    <color name="colorCyan200">#80deea</color>
+    <color name="colorTeal200">#80cbc4</color>
+    <color name="colorGreen200">#a5d6a7</color>
+    <color name="colorLightGreen200">#c5e1a5</color>
+    <color name="colorLime200">#e6ee9c</color>
+    <color name="colorYellow200">#ffeb3b</color>
+    <color name="colorAmber200">#ffe082</color>
+    <color name="colorOrange200">#ffcc80</color>
+    <color name="colorDeepOrange200">#ffab91</color>
+    <color name="colorBrown200">#bcaaa4</color>
+    <color name="colorBlueGrey">#b0bec5</color>
+
     <color name="colorBabyBlue">#89CFF0</color>
     <color name="colorCrushedIce">#C4FFF7</color>
     <color name="colorGold">#FFD700</color>
-    <color name="colorRoyalBlue">#4169e1</color>
+    <color name="colorTrueBlue">#0073cf</color>
 
     <color name="colorAluminum">#D6D6D6</color>
 
@@ -114,4 +134,20 @@
     <color name="colorPickerInnerCircle">#40000000</color> <!-- 40: 25% -->
     <color name="colorPickerBackground">#E6000000</color> <!-- E6: 90% -->
     <color name="colorPickerRecyclerViewBackground">#BF000000</color> <!-- BF: 75% -->
+
+    <!-- Calendar -->
+    <color name="calendarBackground">@color/colorDefaultThemeDark</color>
+    <color name="calendarBackgroundLight">@color/colorDefaultThemeLight</color>
+    <color name="calendarWhiteLight">#80FFFFFF</color>  <!-- 80: 50%, 99: 60%, B3: 70% -->
+    <color name="calendarWhite">#D9FFFFFF</color> <!-- D9: 85% -->
+    <color name="anniversaryColorPickerWhite">#F2F8F8FF</color> <!-- F2: 95% -->
+
+    <!-- Rainbow -->
+    <color name="rainbowRed">@color/colorRed500</color>
+    <color name="rainbowOrange">@color/colorOrange500</color>
+    <color name="rainbowYellow">@color/colorYellow500</color>
+    <color name="rainbowGreen">@color/colorGreen500</color>
+    <color name="rainbowBlue">@color/colorBlue500</color>
+    <color name="rainbowIndigo">@color/colorIndigo500</color>
+    <color name="rainbowViolet">#9F00FF</color>  <!-- Vivid Violet -->
 </resources>

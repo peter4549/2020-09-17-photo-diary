@@ -386,7 +386,7 @@ fun showInputDialog(context: Context, title: String, okEvent: (text: String) -> 
     val inflatedEditText = dialog.findViewById<EditText>(id)!!
 
     if (alertTitleId > 0) {
-        val color = ContextCompat.getColor(context, R.color.colorRoyalBlue)
+        val color = ContextCompat.getColor(context, R.color.colorTrueBlue)
         okButton.setTextColor(color)
         cancelButton.setTextColor(color)
 

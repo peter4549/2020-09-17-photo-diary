@@ -179,4 +179,19 @@
 
     <!-- Notification -->
     <string name="default_notification_content">오늘의 이야기를 기록하세요.</string>
+
+    <!-- Calendar -->
+    <string name="calendar">달력</string>
+    <string name="anniversary">기념일</string>
+    <string name="edit_anniversary">기념일 수정</string>
+    <string name="today">오늘</string>
+    <string name="please_enter_anniversary_name">기념일 이름을 입력하세요.</string>
+    <string name="annual_anniversary">매년 기념일</string>
+    <string name="anniversary_registration">기념일 등록</string>
+    <string name="no_selected_date">선택된 날짜가 없습니다.</string>
+    <string name="delete_anniversary_title">기념일 삭제</string>
+    <string name="delete_anniversary_message">기념일을 삭제하시겠습니까?</string>
+    <string name="confirm_date_title">날짜 변경</string>
+    <string name="confirm_date_message">선택한 날짜에 다이어리를 작성하시겠습니까?</string>
+    <string name="no_registered_diaries">등록된 다이어리가 없습니다.</string>
 </resources>

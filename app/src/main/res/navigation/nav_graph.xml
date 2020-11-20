@@ -43,6 +43,10 @@
         <argument
             android:name="mode"
             app:argType="integer" />
+        <argument
+            android:name="selectedTime"
+            app:argType="long"
+            android:defaultValue="-1L" />
     </fragment>
     <fragment
         android:id="@+id/photoEditorFragment"

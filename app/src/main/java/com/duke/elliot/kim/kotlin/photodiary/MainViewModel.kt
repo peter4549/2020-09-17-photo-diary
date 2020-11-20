@@ -4,7 +4,6 @@ import android.app.Application
 import androidx.core.net.toUri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.duke.elliot.kim.kotlin.photodiary.database.DiaryDao
 import com.duke.elliot.kim.kotlin.photodiary.database.DiaryDatabase
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryModel
@@ -12,6 +11,7 @@ import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.media_helper.Me
 import com.duke.elliot.kim.kotlin.photodiary.utility.FileUtilities
 import kotlinx.coroutines.*
 import timber.log.Timber
+import java.time.LocalDate
 
 class MainViewModel(application: Application): AndroidViewModel(application) {
     private val job = Job()
@@ -26,7 +26,7 @@ class MainViewModel(application: Application): AndroidViewModel(application) {
     init {
         coroutineScope.launch {
             withContext(Dispatchers.IO) {
-                database = DiaryDatabase.getInstance(application).dao()
+                database = DiaryDatabase.getInstance(application).diaryDao()
                 diaries = database.getAll()
             }
         }
@@ -70,6 +70,10 @@ class MainViewModel(application: Application): AndroidViewModel(application) {
                 }
             }
         }
+    }
+
+    fun getDiariesForSelectedDate(localDate: LocalDate) {
+
     }
 
     object Action {
