@@ -79,14 +79,14 @@
             android:id="@+id/action_diaryViewPagerFragment_to_diaryWritingFragment"
             app:destination="@id/diaryWritingFragment" />
         <argument
-            android:name="diaries"
-            app:argType="com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryModel[]" />
-        <argument
             android:name="selectedDiary"
             app:argType="com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryModel" />
         <action
             android:id="@+id/action_diaryViewPagerFragment_to_pdfPreviewFragment"
             app:destination="@id/pdfPreviewFragment" />
+        <argument
+            android:name="sortingCriteria"
+            app:argType="integer" />
     </fragment>
     <fragment
         android:id="@+id/pdfPreviewFragment"

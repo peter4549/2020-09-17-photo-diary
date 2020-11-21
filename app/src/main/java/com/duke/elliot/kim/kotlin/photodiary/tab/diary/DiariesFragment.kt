@@ -8,12 +8,15 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.RecyclerView.ItemAnimator
 import androidx.recyclerview.widget.SimpleItemAnimator
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.duke.elliot.kim.kotlin.photodiary.*
+import com.duke.elliot.kim.kotlin.photodiary.MainViewModel
+import com.duke.elliot.kim.kotlin.photodiary.R
 import com.duke.elliot.kim.kotlin.photodiary.database.DiaryDatabase
 import com.duke.elliot.kim.kotlin.photodiary.databinding.FragmentDairiesBinding
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.CREATE_MODE
+import com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryModel
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.EDIT_MODE
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.media_helper.MediaHelper
 import com.duke.elliot.kim.kotlin.photodiary.export.ExportUtilities
@@ -24,6 +27,9 @@ import com.duke.elliot.kim.kotlin.photodiary.tab.TabFragmentDirections
 import com.duke.elliot.kim.kotlin.photodiary.utility.showToast
 import kotlinx.coroutines.*
 import timber.log.Timber
+import java.util.*
+import kotlin.Comparator
+
 
 class DiariesFragment: Fragment(), KakaoTalkOptionBottomSheetDialogFragment.KakaoTalkOptionClickListener,
     MediaPickerBottomSheetDialogFragment.OnMediaClickListener {
@@ -52,12 +58,16 @@ class DiariesFragment: Fragment(), KakaoTalkOptionBottomSheetDialogFragment.Kaka
         }
 
         diaryAdapter = DiaryAdapter(requireContext()).apply {
+
             setViewOnClickListener {
                 getCurrentDiary()?.let { diary ->
-                    viewModel.diaries.value?.let { diaries ->
-                        findNavController().navigate(TabFragmentDirections
-                            .actionTabFragmentToDiaryViewPagerFragment(diaries.toTypedArray(), diary))
-                    }
+                    findNavController().navigate(
+                        TabFragmentDirections
+                            .actionTabFragmentToDiaryViewPagerFragment(
+                                diary,
+                                sortingCriteria
+                            )
+                    )
                 } ?: run {
                     Timber.e("Diary not found.")
                     showToast(requireContext(), getString(R.string.diary_not_found))
@@ -66,15 +76,19 @@ class DiariesFragment: Fragment(), KakaoTalkOptionBottomSheetDialogFragment.Kaka
 
             setConvertPdfClickListener {
                 getCurrentDiary()?.let {
-                    findNavController().navigate(TabFragmentDirections
-                        .actionTabFragmentToPdfPreviewFragment(it))
+                    findNavController().navigate(
+                        TabFragmentDirections
+                            .actionTabFragmentToPdfPreviewFragment(it)
+                    )
                 }
             }
 
             setEditOnClickListener {
                 getCurrentDiary()?.let {
-                    findNavController().navigate(TabFragmentDirections
-                        .actionTabFragmentToDiaryWritingFragment(it, EDIT_MODE))
+                    findNavController().navigate(
+                        TabFragmentDirections
+                            .actionTabFragmentToDiaryWritingFragment(it, EDIT_MODE)
+                    )
                 }
             }
 
@@ -102,8 +116,10 @@ class DiariesFragment: Fragment(), KakaoTalkOptionBottomSheetDialogFragment.Kaka
                         setKakaoTalkOptionClickListener(this@DiariesFragment)
                     }
 
-                bottomSheetDialogFragment.show(requireActivity().supportFragmentManager,
-                    bottomSheetDialogFragment.tag)
+                bottomSheetDialogFragment.show(
+                    requireActivity().supportFragmentManager,
+                    bottomSheetDialogFragment.tag
+                )
             }
 
             setUpdateListener {
@@ -115,17 +131,14 @@ class DiariesFragment: Fragment(), KakaoTalkOptionBottomSheetDialogFragment.Kaka
             }
         }
 
-        binding.recyclerViewDiary.layoutManager = StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL)
+        binding.recyclerViewDiary.layoutManager = StaggeredGridLayoutManager(
+            1,
+            StaggeredGridLayoutManager.VERTICAL
+        )
         binding.recyclerViewDiary.adapter = diaryAdapter
 
         viewModel.diaries.observe(requireActivity()) { diaries ->
-            diaryAdapter.addHeaderAndSubmitList(diaries)
-
-            CoroutineScope(Dispatchers.Main).launch {
-                delay(200L)
-                (binding.recyclerViewDiary.itemAnimator as SimpleItemAnimator)
-                    .supportsChangeAnimations = true  // TODO: 정렬때매 달아놧던거 같은데.. 확인. 가물가물하노. insert 시 봉인용?
-            }
+            diaryAdapter.addHeaderAndSubmitList(diaries, false)
 
             if (viewModel.status == DiariesViewModel.UNINITIALIZED) {
                 binding.recyclerViewDiary.scrollToPosition(0)
@@ -189,8 +202,10 @@ class DiariesFragment: Fragment(), KakaoTalkOptionBottomSheetDialogFragment.Kaka
     override fun onSendTextClick() {
         println("KKKKKKK ${diaryAdapter.getCurrentDiary()?.title ?: "널이랑깨."}")
         diaryAdapter.getCurrentDiary()?.let {
-            ExportUtilities.sendDiaryToKakaoTalk(requireActivity(),
-                it, ExportUtilities.KAKAO_TALK_OPTION_SEND_TEXT)
+            ExportUtilities.sendDiaryToKakaoTalk(
+                requireActivity(),
+                it, ExportUtilities.KAKAO_TALK_OPTION_SEND_TEXT
+            )
         }
     }
 
@@ -198,22 +213,28 @@ class DiariesFragment: Fragment(), KakaoTalkOptionBottomSheetDialogFragment.Kaka
     /** 미디어 데이터를 선택받아 보내는 역할을 함. 인자들을 보낼 것이다. */
     override fun photoOnClick(pickedPhotoUris: List<String>) {
         diaryAdapter.getCurrentDiary()?.let {
-            ExportUtilities.sendDiaryToKakaoTalk(requireActivity(),
-                it, ExportUtilities.KAKAO_TALK_OPTION_SEND_IMAGES, pickedPhotoUris)
+            ExportUtilities.sendDiaryToKakaoTalk(
+                requireActivity(),
+                it, ExportUtilities.KAKAO_TALK_OPTION_SEND_IMAGES, pickedPhotoUris
+            )
         }
     }
 
     override fun videoOnClick(pickedVideoUri: String) {
         diaryAdapter.getCurrentDiary()?.let {
-            ExportUtilities.sendDiaryToKakaoTalk(requireActivity(),
-                it, ExportUtilities.KAKAO_TALK_OPTION_SEND_VIDEO, mediaUri = pickedVideoUri)
+            ExportUtilities.sendDiaryToKakaoTalk(
+                requireActivity(),
+                it, ExportUtilities.KAKAO_TALK_OPTION_SEND_VIDEO, mediaUri = pickedVideoUri
+            )
         }
     }
 
     override fun audioOnClick(pickedAudioUri: String) {
         diaryAdapter.getCurrentDiary()?.let {
-            ExportUtilities.sendDiaryToKakaoTalk(requireActivity(),
-                it, ExportUtilities.KAKAO_TALK_OPTION_SEND_AUDIO,  mediaUri = pickedAudioUri)
+            ExportUtilities.sendDiaryToKakaoTalk(
+                requireActivity(),
+                it, ExportUtilities.KAKAO_TALK_OPTION_SEND_AUDIO, mediaUri = pickedAudioUri
+            )
         }
     }
 }

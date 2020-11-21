@@ -39,8 +39,8 @@ import kotlin.Comparator
 private const val ITEM_VIEW_TYPE_HEADER = 0
 private const val ITEM_VIEW_TYPE_ITEM = 1
 
-private const val SORT_BY_LATEST = 0
-private const val SORT_BY_OLDEST = 1
+const val SORT_BY_LATEST = 0
+const val SORT_BY_OLDEST = 1
 
 const val LIST_VIEW_MODE = 0
 const val BRIEF_VIEW_MODE = 1
@@ -71,7 +71,7 @@ class DiaryAdapter(private val context: Context, noInitialization: Boolean = fal
     private val adapterScope = CoroutineScope(Dispatchers.Default)
     private var currentItem: DiaryModel? = null
     // TODO, load from shared pref.
-    private var sortingCriteria = SORT_BY_LATEST
+    var sortingCriteria = SORT_BY_OLDEST
     var viewMode = LIST_VIEW_MODE
 
     private var lastPosition = -1
@@ -164,7 +164,7 @@ class DiaryAdapter(private val context: Context, noInitialization: Boolean = fal
             loadSortingCriteriaViewMode()
     }
 
-    fun addHeaderAndSubmitList(list: List<DiaryModel>?) {
+    fun addHeaderAndSubmitList(list: List<DiaryModel>?, animate: Boolean = true) {
         adapterScope.launch {
             sort(list)
 
@@ -176,7 +176,9 @@ class DiaryAdapter(private val context: Context, noInitialization: Boolean = fal
             withContext(Dispatchers.Main) {
 
                 submitList(items) {
-                    recyclerView.scheduleLayoutAnimation()
+                    if (animate)
+                        recyclerView.scheduleLayoutAnimation()
+
                     notifyDataSetChanged()
                 }
             }
@@ -396,12 +398,8 @@ class DiaryAdapter(private val context: Context, noInitialization: Boolean = fal
         }
     }
 
-    inner class ViewHolder constructor(val binding: ViewDataBinding): RecyclerView.ViewHolder(
-        binding.root
-    ) {
-        fun clearAnimation() {
-            binding.root.clearAnimation()
-        }
+    inner class ViewHolder constructor(val binding: ViewDataBinding):
+        RecyclerView.ViewHolder(binding.root) {
 
         fun bind(binding: ItemDiaryBriefViewBinding, diary: DiaryModel) {
             val font = getFont(itemView.context, diary.textOptions.textFontId)
@@ -415,6 +413,11 @@ class DiaryAdapter(private val context: Context, noInitialization: Boolean = fal
             binding.textTitle.text = diary.title
             binding.textTitle.setTextColor(diary.textOptions.textColor)
             binding.textTitle.typeface = font
+
+            binding.imageMore.setOnClickListener {
+                currentItem = diary
+                showPopupMenu(context, it!!, diary, absoluteAdapterPosition)
+            }
 
             if (diary.hashTags.isEmpty())
                 binding.textHashTags.visibility = View.GONE
@@ -773,7 +776,7 @@ class DiaryAdapter(private val context: Context, noInitialization: Boolean = fal
             PREFERENCES_DIARY_ADAPTER,
             Context.MODE_PRIVATE
         )
-        sortingCriteria = sharedPreferences.getInt(KEY_SORTING_CRITERIA, SORT_BY_LATEST)
+        sortingCriteria = sharedPreferences.getInt(KEY_SORTING_CRITERIA, SORT_BY_OLDEST)
         viewMode = sharedPreferences.getInt(KEY_VIEW_MODE, LIST_VIEW_MODE)
     }
 

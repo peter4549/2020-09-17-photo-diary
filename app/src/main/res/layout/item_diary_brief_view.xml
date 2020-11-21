@@ -73,27 +73,29 @@
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:gravity="center_vertical|end">
+                    android:gravity="end">
 
                     <ImageView
                         android:id="@+id/image_weather_icon"
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
                         android:layout_toStartOf="@id/imageMore"
-                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:layout_centerVertical="true"
+                        android:layout_marginEnd="8dp"
                         tools:ignore="ContentDescription"
                         tools:srcCompat="@drawable/ic_sun_24" />
 
                     <ImageView
                         android:id="@+id/imageMore"
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
                         android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
                         android:layout_marginEnd="8dp"
                         android:background="?attr/selectableItemBackgroundBorderless"
+                        app:srcCompat="@drawable/ic_round_more_vert_36"
                         app:tint="@color/icon_color"
-                        tools:ignore="ContentDescription"
-                        tools:srcCompat="@drawable/ic_round_more_vert_36" />
+                        tools:ignore="ContentDescription" />
 
                 </RelativeLayout>
 

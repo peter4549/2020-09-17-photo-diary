@@ -1097,19 +1097,21 @@ class DiaryWritingFragment: Fragment() {
     }
 
     private fun updateDiary() {
-        viewModel.originDiary?.let { diary ->
-            diary.title = binding.editTextTitle.text.toString()
-            diary.content = binding.editTextContent.text.toString()
-            diary.textOptions = createTextOptions()
-            diary.mediaArray = mediaAdapter.getMediaArray()
-            diary.weatherIconIndex = viewModel.weatherIconIndex
-            diary.hashTags = viewModel.selectedHashTags.toTypedArray()
-        } ?: run {
-            showToast(requireContext(), "원본 다이어리가 손상되었습니다.") // TODO change to resource
-            saveDiary(createDiary())
-        }
+        if (isChanged()) {
+            viewModel.originDiary?.let { diary ->
+                diary.title = binding.editTextTitle.text.toString()
+                diary.content = binding.editTextContent.text.toString()
+                diary.textOptions = createTextOptions()
+                diary.mediaArray = mediaAdapter.getMediaArray()
+                diary.weatherIconIndex = viewModel.weatherIconIndex
+                diary.hashTags = viewModel.selectedHashTags.toTypedArray()
+            } ?: run {
+                showToast(requireContext(), "원본 다이어리가 손상되었습니다.") // TODO change to resource
+                saveDiary(createDiary())
+            }
 
-        (requireActivity() as MainActivity).updateDiary(viewModel.originDiary!!)
+            (requireActivity() as MainActivity).updateDiary(viewModel.originDiary!!)
+        }
 
         findNavController().popBackStack()
     }

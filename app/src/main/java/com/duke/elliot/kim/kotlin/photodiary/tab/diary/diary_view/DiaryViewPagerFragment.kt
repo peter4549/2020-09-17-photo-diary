@@ -16,8 +16,13 @@ import com.duke.elliot.kim.kotlin.photodiary.database.DiaryDatabase
 import com.duke.elliot.kim.kotlin.photodiary.databinding.FragmentDiaryViewPagerBinding
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryModel
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.EDIT_MODE
+import com.duke.elliot.kim.kotlin.photodiary.tab.diary.SORT_BY_LATEST
+import com.duke.elliot.kim.kotlin.photodiary.tab.diary.SORT_BY_OLDEST
 import com.duke.elliot.kim.kotlin.photodiary.utility.FileUtilities
 import com.duke.elliot.kim.kotlin.photodiary.utility.showToast
+import java.util.*
+import kotlin.Comparator
+import kotlin.collections.ArrayList
 
 class DiaryViewPagerFragment: Fragment() {
 
@@ -38,35 +43,50 @@ class DiaryViewPagerFragment: Fragment() {
         )
 
         val diaryViewPagerFragmentArgs by navArgs<DiaryViewPagerFragmentArgs>()
-
         val database = DiaryDatabase.getInstance(requireContext()).diaryDao()
-
         val viewModelFactory = DiaryViewPagerViewModelFactory(database, FileUtilities.getInstance(requireActivity().application))
         viewModel = ViewModelProvider(viewModelStore, viewModelFactory)[DiaryViewPagerViewModel::class.java]
-        viewModel.initialDiary = diaryViewPagerFragmentArgs.selectedDiary
 
         (requireActivity() as MainActivity).setSupportActionBar(binding.toolbar)
         (requireActivity() as MainActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
         setHasOptionsMenu(true)
 
-        viewModel.initialized = false
+        val sortingCriteria = diaryViewPagerFragmentArgs.sortingCriteria
+
         viewModel.diaries.observe(viewLifecycleOwner) { diaries ->
-            if (!viewModel.initialized) {
-                viewPagerAdapter =
-                    ViewPagerAdapter(requireActivity(), diaries as ArrayList<DiaryModel>)
-                binding.viewPager.apply {
-                    adapter = viewPagerAdapter
+            Collections.sort(diaries,
+                Comparator { o1: DiaryModel, o2: DiaryModel ->
+                    when (sortingCriteria) {
+                        SORT_BY_LATEST -> {
+                            return@Comparator (o1.time - o2.time).toInt()
+                        }
+                        SORT_BY_OLDEST -> {
+                            return@Comparator (o2.time - o1.time).toInt()
+                        }
+                        else -> 0
+                    }
                 }
+            )
 
-                binding.viewPager.setCurrentItem(viewModel.getInitialDiaryPosition(), false)
-                viewModel.initialized = true
-            } else {
-                when (viewModel.status) {
-                    DiaryViewPagerViewModel.DELETED -> viewPagerAdapter.removeFragment(binding.viewPager.currentItem)
-                    DiaryViewPagerViewModel.UPDATED -> viewPagerAdapter.updateFragment(binding.viewPager.currentItem)
-                }
-
+            viewPagerAdapter =
+                ViewPagerAdapter(requireActivity(), diaries as ArrayList<DiaryModel>)
+            binding.viewPager.apply {
+                adapter = viewPagerAdapter
             }
+
+            if (!viewModel.initialized) {
+                viewModel.currentDiary = diaryViewPagerFragmentArgs.selectedDiary
+                viewModel.initialized = true
+            }
+
+            if (viewModel.status == DiaryViewPagerViewModel.DELETED) {
+                if (viewModel.deletedDiaryPosition >= diaries.size)
+                    viewModel.deletedDiaryPosition -= 1
+
+                binding.viewPager.setCurrentItem(viewModel.deletedDiaryPosition, false)
+                viewModel.status = DiaryViewPagerViewModel.DEFAULT
+            } else
+                binding.viewPager.setCurrentItem(viewModel.getCurrentDiaryPosition(), false)
         }
 
         binding.viewPager.registerOnPageChangeCallback(object: ViewPager2.OnPageChangeCallback() {
@@ -123,6 +143,8 @@ class DiaryViewPagerFragment: Fragment() {
     private fun navigateToDiaryWritingFragment() {
         val diary = viewModel.getItem(binding.viewPager.currentItem)
         diary?.let {
+            viewModel.currentDiary = diary
+            // viewModel.status = DiaryViewPagerViewModel.UPDATED
             findNavController().navigate(DiaryViewPagerFragmentDirections
                 .actionDiaryViewPagerFragmentToDiaryWritingFragment(it, EDIT_MODE))
         } ?: run {
@@ -140,6 +162,7 @@ class DiaryViewPagerFragment: Fragment() {
             return diaries.count()
         }
 
+        /*
         fun removeFragment(position: Int) {
             diaries.removeAt(position)
             notifyItemRangeChanged(position, diaries.size)
@@ -150,6 +173,7 @@ class DiaryViewPagerFragment: Fragment() {
             notifyItemRangeChanged(position, diaries.size)
             notifyDataSetChanged()
         }
+         */
 
         override fun createFragment(position: Int): Fragment {
             val diaryViewFragment = DiaryViewFragment()
