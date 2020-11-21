@@ -124,7 +124,7 @@ class DiariesFragment: Fragment(), KakaoTalkOptionBottomSheetDialogFragment.Kaka
             CoroutineScope(Dispatchers.Main).launch {
                 delay(200L)
                 (binding.recyclerViewDiary.itemAnimator as SimpleItemAnimator)
-                    .supportsChangeAnimations = true
+                    .supportsChangeAnimations = true  // TODO: 정렬때매 달아놧던거 같은데.. 확인. 가물가물하노. insert 시 봉인용?
             }
 
             if (viewModel.status == DiariesViewModel.UNINITIALIZED) {

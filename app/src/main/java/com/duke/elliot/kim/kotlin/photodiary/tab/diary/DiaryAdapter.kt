@@ -7,6 +7,8 @@ import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import android.widget.ArrayAdapter
 import android.widget.PopupMenu
 import android.widget.TextView
@@ -72,6 +74,8 @@ class DiaryAdapter(private val context: Context, noInitialization: Boolean = fal
     private var sortingCriteria = SORT_BY_LATEST
     var viewMode = LIST_VIEW_MODE
 
+    private var lastPosition = -1
+
     private val exportTypes = arrayOf(
         Pair(context.getString(R.string.export_text), R.drawable.ic_text_file_24),
         Pair(context.getString(R.string.export_pdf_file), R.drawable.ic_pdf_file_24),
@@ -91,6 +95,8 @@ class DiaryAdapter(private val context: Context, noInitialization: Boolean = fal
             val text = view.text
             val image = view.image
 
+            // TODO.. maybe not used.. setAnimation(view, position)
+
             text.text = exportTypes[position].first
             text.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16F)
             image.setImageResource(exportTypes[position].second)
@@ -103,7 +109,7 @@ class DiaryAdapter(private val context: Context, noInitialization: Boolean = fal
         MaterialAlertDialogBuilder(context)
             .setTitle(context.getString(R.string.export))
             .setAdapter(exportTypeAdapter) { _, exportType ->
-                recyclerView.scheduleLayoutAnimation()
+                // TODO check.. why here? => recyclerView.scheduleLayoutAnimation()
                 when(exportType) {
                     EXPORT_AS_TEXT_FILE -> {
                         showInputDialog(
@@ -168,7 +174,11 @@ class DiaryAdapter(private val context: Context, noInitialization: Boolean = fal
             }
 
             withContext(Dispatchers.Main) {
-                submitList(items)
+
+                submitList(items) {
+                    recyclerView.scheduleLayoutAnimation()
+                    notifyDataSetChanged()
+                }
             }
         }
     }
@@ -177,6 +187,7 @@ class DiaryAdapter(private val context: Context, noInitialization: Boolean = fal
         adapterScope.launch {
             withContext(Dispatchers.Main) {
                 submitList(list.map { AdapterItem.DiaryItem(it) })
+                recyclerView.scheduleLayoutAnimation()
             }
         }
     }
@@ -284,8 +295,11 @@ class DiaryAdapter(private val context: Context, noInitialization: Boolean = fal
         }
     }
 
+
+
     fun sort() {
         val modifiableList = ArrayList(currentList).filterIsInstance<AdapterItem.DiaryItem>()
+
         Collections.sort(modifiableList,
             Comparator { o1: AdapterItem, o2: AdapterItem ->
                 when (sortingCriteria) {
@@ -300,10 +314,10 @@ class DiaryAdapter(private val context: Context, noInitialization: Boolean = fal
             }
         )
 
-        recyclerView.scheduleLayoutAnimation()
         val diaries = modifiableList.toList()
             .requireNoNulls().map { it.diary }
         addHeaderAndSubmitList(diaries)
+        // notifyDataSetChanged()
     }
 
     inner class HeaderViewHolder constructor(val binding: ViewModeSortBarBinding): RecyclerView.ViewHolder(
@@ -345,7 +359,7 @@ class DiaryAdapter(private val context: Context, noInitialization: Boolean = fal
                 MaterialAlertDialogBuilder(binding.root.context)
                     .setTitle(binding.root.context.getString(R.string.view_mode))
                     .setAdapter(viewModeAdapter) { _, viewMode ->
-                        recyclerView.scheduleLayoutAnimation()
+                        //TODO:  why here? recyclerView.scheduleLayoutAnimation()
                         when(viewMode) {
                             LIST_VIEW_MODE -> {
                                 (recyclerView.layoutManager as StaggeredGridLayoutManager).spanCount =
@@ -361,8 +375,11 @@ class DiaryAdapter(private val context: Context, noInitialization: Boolean = fal
                             }
                         }
 
-                        this@DiaryAdapter.viewMode = viewMode
-                        recyclerView.adapter = this@DiaryAdapter
+                        if (this@DiaryAdapter.viewMode != viewMode) {
+                            this@DiaryAdapter.viewMode = viewMode
+                            recyclerView.scheduleLayoutAnimation()
+                            recyclerView.adapter = this@DiaryAdapter
+                        }
                     }
                     .show()
             }
@@ -382,6 +399,10 @@ class DiaryAdapter(private val context: Context, noInitialization: Boolean = fal
     inner class ViewHolder constructor(val binding: ViewDataBinding): RecyclerView.ViewHolder(
         binding.root
     ) {
+        fun clearAnimation() {
+            binding.root.clearAnimation()
+        }
+
         fun bind(binding: ItemDiaryBriefViewBinding, diary: DiaryModel) {
             val font = getFont(itemView.context, diary.textOptions.textFontId)
 
@@ -754,6 +775,15 @@ class DiaryAdapter(private val context: Context, noInitialization: Boolean = fal
         )
         sortingCriteria = sharedPreferences.getInt(KEY_SORTING_CRITERIA, SORT_BY_LATEST)
         viewMode = sharedPreferences.getInt(KEY_VIEW_MODE, LIST_VIEW_MODE)
+    }
+
+    private fun setAnimation(viewToAnimate: View, position: Int) {
+        if (position > lastPosition) {
+            val animation: Animation =
+                AnimationUtils.loadAnimation(context, android.R.anim.slide_in_left)
+            viewToAnimate.startAnimation(animation)
+            lastPosition = position
+        }
     }
 }
 

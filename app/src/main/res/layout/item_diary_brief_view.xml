@@ -15,18 +15,24 @@
             android:layout_height="wrap_content">
 
             <LinearLayout
-                android:id="@+id/date_time_container"
+                android:id="@+id/textContainer"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:orientation="vertical"
                 android:layout_marginStart="4dp"
                 android:layout_marginTop="4dp"
                 android:layout_marginEnd="4dp"
-                android:background="@drawable/background_white_rounded_corners"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
                 app:layout_constraintEnd_toStartOf="@+id/imageMedia"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
+
+            <LinearLayout
+                android:id="@+id/date_time_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/background_white_rounded_corners"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
                 <TextView
                     android:id="@+id/text_date"
@@ -64,53 +70,53 @@
                     app:layout_constraintTop_toBottomOf="@+id/toolbar"
                     tools:text="오후 3:30" />
 
-                <ImageView
-                    android:id="@+id/image_weather_icon"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:layout_marginEnd="24dp"
-                    android:layout_marginStart="24dp"
-                    tools:ignore="ContentDescription"
-                    tools:srcCompat="@drawable/ic_sun_24" />
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical|end">
+
+                    <ImageView
+                        android:id="@+id/image_weather_icon"
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:layout_toStartOf="@id/imageMore"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        tools:ignore="ContentDescription"
+                        tools:srcCompat="@drawable/ic_sun_24" />
+
+                    <ImageView
+                        android:id="@+id/imageMore"
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_marginEnd="8dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        app:tint="@color/icon_color"
+                        tools:ignore="ContentDescription"
+                        tools:srcCompat="@drawable/ic_round_more_vert_36" />
+
+                </RelativeLayout>
 
             </LinearLayout>
 
-            <ImageView
-                android:id="@+id/imageMedia"
-                android:layout_width="96dp"
-                android:layout_height="96dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginBottom="8dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/date_time_container"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:ignore="ContentDescription" />
-
             <TextView
                 android:id="@+id/textTitle"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:layout_marginBottom="4dp"
+                android:layout_marginTop="4dp"
                 android:background="@drawable/background_white_rounded_corners"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:paddingBottom="8dp"
-                android:paddingEnd="16dp"
                 android:paddingStart="8dp"
                 android:paddingTop="8dp"
-                app:layout_constraintBottom_toTopOf="@+id/textHashTags"
-                app:layout_constraintEnd_toEndOf="@+id/date_time_container"
-                app:layout_constraintStart_toStartOf="@+id/date_time_container"
-                app:layout_constraintTop_toBottomOf="@+id/date_time_container"
+                android:paddingEnd="16dp"
+                android:paddingBottom="8dp"
                 tools:text="제목입니다." />
 
             <TextView
                 android:id="@+id/textHashTags"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="4dp"
                 android:background="@drawable/background_white_rounded_corners"
@@ -126,7 +132,21 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="@+id/textTitle"
                 app:layout_constraintStart_toStartOf="@+id/textTitle"
+                app:layout_constraintTop_toBottomOf="@+id/textTitle"
                 tools:text="#해시태그 #입니다." />
+
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/imageMedia"
+                android:layout_width="96dp"
+                android:layout_height="96dp"
+                android:layout_margin="4dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/textContainer"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="ContentDescription" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
