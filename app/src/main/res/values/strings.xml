@@ -194,4 +194,7 @@
     <string name="confirm_date_title">날짜 변경</string>
     <string name="confirm_date_message">선택한 날짜에 다이어리를 작성하시겠습니까?</string>
     <string name="no_registered_diaries">등록된 다이어리가 없습니다.</string>
+
+    <!-- Facebook -->
+    <string name="facebook_app_id">390282592409873</string>
 </resources>

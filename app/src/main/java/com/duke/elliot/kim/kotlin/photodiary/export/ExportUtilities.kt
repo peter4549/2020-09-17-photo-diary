@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.LabeledIntent
 import android.content.pm.PackageManager
+import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
@@ -17,14 +18,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import androidx.annotation.RequiresApi
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import com.duke.elliot.kim.kotlin.photodiary.R
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryModel
-import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.MediaModel
-import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.media_helper.MediaHelper
-import com.duke.elliot.kim.kotlin.photodiary.tab.diary.*
 import com.duke.elliot.kim.kotlin.photodiary.utility.*
-import com.duke.elliot.kim.kotlin.photodiary.utility.MediaScanner
+import com.facebook.share.model.ShareMediaContent
+import com.facebook.share.model.SharePhoto
+import com.facebook.share.widget.ShareDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.item_select_dialog_28.view.*
 import kotlinx.coroutines.CoroutineScope
@@ -284,9 +285,11 @@ object ExportUtilities {
         return null
     }
 
-    fun sendDiaryToKakaoTalk(activity: Activity, diary: DiaryModel, option: Int,
-                             mediaUris: List<String>? = null, mediaUri: String? = null,
-                             afterSendCallback: (() -> Unit)? = null) {
+    fun sendDiaryToKakaoTalk(
+        activity: Activity, diary: DiaryModel, option: Int,
+        mediaUris: List<String>? = null, mediaUri: String? = null,
+        afterSendCallback: (() -> Unit)? = null
+    ) {
         if (!::weatherWords.isInitialized)
             weatherWords = activity.resources.getStringArray(R.array.weatherWords)
 
@@ -312,11 +315,21 @@ object ExportUtilities {
         val shareIntent = Intent(Intent.ACTION_SEND_MULTIPLE)
 
         shareIntent.type = "image/*"
-        shareIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, photoUris.map { toContentUri(activity, it) } as ArrayList)
+        shareIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, photoUris.map {
+            toContentUri(
+                activity,
+                it
+            )
+        } as ArrayList)
         shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         shareIntent.setPackage("com.kakao.talk")
 
-        activity.startActivity(Intent.createChooser(shareIntent, activity.getString(R.string.send_diary_to_kakao_talk)))
+        activity.startActivity(
+            Intent.createChooser(
+                shareIntent,
+                activity.getString(R.string.send_diary_to_kakao_talk)
+            )
+        )
     }
 
     private fun sendVideoToKakaoTalk(activity: Activity, videoUri: String?) {
@@ -329,7 +342,12 @@ object ExportUtilities {
         shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         shareIntent.setPackage("com.kakao.talk")
 
-        activity.startActivity(Intent.createChooser(shareIntent, activity.getString(R.string.send_diary_to_kakao_talk)))
+        activity.startActivity(
+            Intent.createChooser(
+                shareIntent,
+                activity.getString(R.string.send_diary_to_kakao_talk)
+            )
+        )
     }
 
     private fun sendAudioToKakaoTalk(activity: Activity, audioUri: String?) {
@@ -343,7 +361,12 @@ object ExportUtilities {
         shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         shareIntent.setPackage("com.kakao.talk")
 
-        activity.startActivity(Intent.createChooser(shareIntent, activity.getString(R.string.send_diary_to_kakao_talk)))
+        activity.startActivity(
+            Intent.createChooser(
+                shareIntent,
+                activity.getString(R.string.send_diary_to_kakao_talk)
+            )
+        )
     }
 
     private fun sendTextToKakaoTalk(activity: Activity, diary: DiaryModel) {
@@ -363,11 +386,18 @@ object ExportUtilities {
         shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         shareIntent.setPackage("com.kakao.talk")
 
-        activity.startActivity(Intent.createChooser(shareIntent, activity.getString(R.string.send_diary_to_kakao_talk)))
+        activity.startActivity(
+            Intent.createChooser(
+                shareIntent,
+                activity.getString(R.string.send_diary_to_kakao_talk)
+            )
+        )
     }
 
     // TODO: Test
     fun sendDiaryToFacebook(activity: Activity, diary: DiaryModel) {
+        ExportUtilities.facebookTest(activity)
+        /*
         if (!::weatherWords.isInitialized)
             weatherWords = activity.resources.getStringArray(R.array.weatherWords)
 
@@ -392,6 +422,8 @@ object ExportUtilities {
         shareIntent.setPackage("com.facebook.katana")
 
         activity.startActivity(shareIntent)
+
+         */
     }
 
     fun isKakaoTalkInstalled(context: Context): Boolean {
@@ -414,16 +446,21 @@ object ExportUtilities {
         return false
     }
 
-    fun showExportTypeDialog(context: Context, diary: DiaryModel,
-                                     convertPdfClickListener: () -> Unit,
-                                     shareOnClickListener: () -> Unit,
-                                     sendDiaryToKakaoTalkClickListener: () -> Unit,
-                                     sendDiaryToFacebookClickListener: () -> Unit) {
+    fun showExportTypeDialog(
+        context: Context, diary: DiaryModel,
+        convertPdfClickListener: () -> Unit,
+        shareOnClickListener: () -> Unit,
+        sendDiaryToKakaoTalkClickListener: () -> Unit,
+        sendDiaryToFacebookClickListener: () -> Unit
+    ) {
         val exportTypes = arrayOf(
             Pair(context.getString(R.string.export_text), R.drawable.ic_text_file_24),
             Pair(context.getString(R.string.export_pdf_file), R.drawable.ic_pdf_file_24),
             Pair(context.getString(R.string.share_diary), R.drawable.ic_round_share_24),
-            Pair(context.getString(R.string.send_diary_to_kakao_talk), R.drawable.ic_kakao_talk_150px),
+            Pair(
+                context.getString(R.string.send_diary_to_kakao_talk),
+                R.drawable.ic_kakao_talk_150px
+            ),
             Pair(context.getString(R.string.send_diary_to_facebook), R.drawable.ic_facebook_24)
         )
 
@@ -488,5 +525,19 @@ object ExportUtilities {
                 }
             }
             .show()
+    }
+
+    fun facebookTest(activity: Activity) {
+        val drawable = ContextCompat.getDrawable(activity, R.drawable.ic_kakao_talk_150px)
+        val bitmap = (drawable as BitmapDrawable).bitmap
+        val sharePhoto = SharePhoto.Builder().setBitmap(bitmap).build()
+
+        val shareContent = ShareMediaContent.Builder()
+            .addMedium(sharePhoto)
+            .build()
+
+        val shareDialog = ShareDialog(activity)
+
+        shareDialog.show(shareContent, ShareDialog.Mode.AUTOMATIC)
     }
 }
