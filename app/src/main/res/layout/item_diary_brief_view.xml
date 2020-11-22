@@ -22,7 +22,7 @@
                 android:layout_marginStart="4dp"
                 android:layout_marginTop="4dp"
                 android:layout_marginEnd="4dp"
-                app:layout_constraintEnd_toStartOf="@+id/imageMedia"
+                app:layout_constraintEnd_toStartOf="@+id/mediaContainer"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
@@ -139,16 +139,38 @@
 
             </LinearLayout>
 
-            <ImageView
-                android:id="@+id/imageMedia"
-                android:layout_width="96dp"
-                android:layout_height="96dp"
+            <RelativeLayout
+                android:id="@+id/mediaContainer"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
                 android:layout_margin="4dp"
+                android:elevation="2dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/textContainer"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:ignore="ContentDescription" />
+                app:layout_constraintTop_toTopOf="parent">
+
+                <com.duke.elliot.kim.kotlin.photodiary.view.ClickableViewPager
+                    android:id="@+id/view_pager"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_centerInParent="true"/>
+
+                <com.rd.PageIndicatorView
+                    android:id="@+id/page_indicator_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginBottom="8dp"
+                    app:piv_viewPager="@id/view_pager"
+                    app:piv_padding="8dp"
+                    app:piv_radius="4dp"
+                    app:piv_animationType="worm"
+                    tools:piv_padding="8dp"
+                    tools:piv_radius="4dp" />
+
+            </RelativeLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>

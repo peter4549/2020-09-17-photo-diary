@@ -143,6 +143,8 @@
                     android:layout_height="wrap_content"
                     android:background="@drawable/media_recycler_view_background_rounded_corners"
                     android:visibility="gone"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginStart="8dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/edit_text_title" />

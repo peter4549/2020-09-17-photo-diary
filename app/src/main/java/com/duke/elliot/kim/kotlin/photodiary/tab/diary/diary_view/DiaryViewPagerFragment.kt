@@ -16,19 +16,34 @@ import com.duke.elliot.kim.kotlin.photodiary.database.DiaryDatabase
 import com.duke.elliot.kim.kotlin.photodiary.databinding.FragmentDiaryViewPagerBinding
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryModel
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.EDIT_MODE
+import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.media_helper.MediaHelper
+import com.duke.elliot.kim.kotlin.photodiary.export.ExportUtilities
+import com.duke.elliot.kim.kotlin.photodiary.export.KakaoTalkOptionBottomSheetDialogFragment
+import com.duke.elliot.kim.kotlin.photodiary.picker.MediaPickerBottomSheetDialogFragment
+import com.duke.elliot.kim.kotlin.photodiary.tab.TabFragmentDirections
 import com.duke.elliot.kim.kotlin.photodiary.tab.diary.SORT_BY_LATEST
 import com.duke.elliot.kim.kotlin.photodiary.tab.diary.SORT_BY_OLDEST
 import com.duke.elliot.kim.kotlin.photodiary.utility.FileUtilities
 import com.duke.elliot.kim.kotlin.photodiary.utility.showToast
+import com.duke.elliot.kim.kotlin.photodiary.utility.toDateFormat
 import java.util.*
 import kotlin.Comparator
 import kotlin.collections.ArrayList
 
-class DiaryViewPagerFragment: Fragment() {
+class DiaryViewPagerFragment: Fragment(),
+    KakaoTalkOptionBottomSheetDialogFragment.KakaoTalkOptionClickListener,
+    MediaPickerBottomSheetDialogFragment.OnMediaClickListener {
 
     private lateinit var binding: FragmentDiaryViewPagerBinding
     private lateinit var viewModel: DiaryViewPagerViewModel
     private lateinit var viewPagerAdapter: ViewPagerAdapter
+    private lateinit var bottomSheetDialogFragment: KakaoTalkOptionBottomSheetDialogFragment
+    private lateinit var mediaPicker: MediaPickerBottomSheetDialogFragment
+
+    private lateinit var convertPdfClickListener: () -> Unit
+    private lateinit var shareOnClickListener: () -> Unit
+    private lateinit var sendDiaryToKakaoTalkClickListener: () -> Unit
+    private lateinit var sendDiaryToFacebookClickListener: () -> Unit
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -43,15 +58,54 @@ class DiaryViewPagerFragment: Fragment() {
         )
 
         val diaryViewPagerFragmentArgs by navArgs<DiaryViewPagerFragmentArgs>()
+        val sortingCriteria = diaryViewPagerFragmentArgs.sortingCriteria
+        val selectedDate = diaryViewPagerFragmentArgs.selectedDate
+
         val database = DiaryDatabase.getInstance(requireContext()).diaryDao()
-        val viewModelFactory = DiaryViewPagerViewModelFactory(database, FileUtilities.getInstance(requireActivity().application))
+        val viewModelFactory = DiaryViewPagerViewModelFactory(database,
+            FileUtilities.getInstance(requireActivity().application), selectedDate)
         viewModel = ViewModelProvider(viewModelStore, viewModelFactory)[DiaryViewPagerViewModel::class.java]
 
         (requireActivity() as MainActivity).setSupportActionBar(binding.toolbar)
         (requireActivity() as MainActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
         setHasOptionsMenu(true)
 
-        val sortingCriteria = diaryViewPagerFragmentArgs.sortingCriteria
+        bottomSheetDialogFragment =
+            KakaoTalkOptionBottomSheetDialogFragment().apply {
+                setKakaoTalkOptionClickListener(this@DiaryViewPagerFragment)
+            }
+
+        mediaPicker = MediaPickerBottomSheetDialogFragment().apply {
+            setMediaClickListener(this@DiaryViewPagerFragment)
+        }
+
+        convertPdfClickListener = {
+            viewModel.getItem(binding.viewPager.currentItem)?.let {
+                findNavController().navigate(
+                    TabFragmentDirections
+                        .actionTabFragmentToPdfPreviewFragment(it)
+                )
+            }
+        }
+
+        shareOnClickListener = {
+            viewModel.getItem(binding.viewPager.currentItem)?.let {
+                ExportUtilities.sendDiary(requireActivity(), it)
+            }
+        }
+
+        sendDiaryToKakaoTalkClickListener = {
+            bottomSheetDialogFragment.show(
+                requireActivity().supportFragmentManager,
+                bottomSheetDialogFragment.tag
+            )
+        }
+
+        sendDiaryToFacebookClickListener = {
+            viewModel.getItem(binding.viewPager.currentItem)?.let {
+                ExportUtilities.sendDiaryToFacebook(requireActivity(), it)
+            }
+        }
 
         viewModel.diaries.observe(viewLifecycleOwner) { diaries ->
             Collections.sort(diaries,
@@ -122,13 +176,20 @@ class DiaryViewPagerFragment: Fragment() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val diary = viewModel.getItem(binding.viewPager.currentItem)
+            ?: return super.onOptionsItemSelected(item)
+
         when(item.itemId) {
             android.R.id.home -> findNavController().popBackStack()
             R.id.edit -> navigateToDiaryWritingFragment()
             R.id.set_category -> {
             }
             R.id.export -> {
-                // PdfUtilities.viewToPdf(binding.viewPager, binding.root.context) // TODO test,, 미리보기 페이지 이동 같은걸로 변경. scroll text view
+                ExportUtilities.showExportTypeDialog(requireContext(), diary,
+                    convertPdfClickListener = convertPdfClickListener,
+                    shareOnClickListener = shareOnClickListener,
+                    sendDiaryToFacebookClickListener = sendDiaryToFacebookClickListener,
+                    sendDiaryToKakaoTalkClickListener = sendDiaryToKakaoTalkClickListener)
             }
             R.id.delete -> viewModel.getItem(binding.viewPager.currentItem)?.let {
                 viewModel.delete(it)
@@ -141,9 +202,8 @@ class DiaryViewPagerFragment: Fragment() {
     }
 
     private fun navigateToDiaryWritingFragment() {
-        val diary = viewModel.getItem(binding.viewPager.currentItem)
-        diary?.let {
-            viewModel.currentDiary = diary
+        viewModel.getItem(binding.viewPager.currentItem)?.let {
+            viewModel.currentDiary = it
             // viewModel.status = DiaryViewPagerViewModel.UPDATED
             findNavController().navigate(DiaryViewPagerFragmentDirections
                 .actionDiaryViewPagerFragmentToDiaryWritingFragment(it, EDIT_MODE))
@@ -187,6 +247,75 @@ class DiaryViewPagerFragment: Fragment() {
 
         override fun containsItem(itemId: Long): Boolean {
             return pageIds.contains(itemId)
+        }
+    }
+
+    override fun onSendImagesClick() {
+        viewModel.getItem(binding.viewPager.currentItem)?.let {
+            mediaPicker.setDiary(it)
+            mediaPicker.setMediaType(MediaHelper.MediaType.PHOTO)
+            mediaPicker.show(requireActivity().supportFragmentManager, mediaPicker.tag)
+        }
+    }
+
+    override fun onSendVideoClick() {
+        viewModel.getItem(binding.viewPager.currentItem)?.let {
+            mediaPicker.setDiary(it)
+            mediaPicker.setMediaType(MediaHelper.MediaType.VIDEO)
+            mediaPicker.show(requireActivity().supportFragmentManager, mediaPicker.tag)
+        }
+    }
+
+    override fun onSendAudioClick() {
+        viewModel.getItem(binding.viewPager.currentItem)?.let {
+            mediaPicker.setDiary(it)
+            mediaPicker.setMediaType(MediaHelper.MediaType.AUDIO)
+            mediaPicker.show(requireActivity().supportFragmentManager, mediaPicker.tag)
+        }
+    }
+
+    override fun onSendTextClick() {
+        viewModel.getItem(binding.viewPager.currentItem)?.let {
+            ExportUtilities.sendDiaryToKakaoTalk(
+                requireActivity(),
+                it, ExportUtilities.KAKAO_TALK_OPTION_SEND_TEXT
+            ) {
+                bottomSheetDialogFragment.dismiss()
+            }
+        }
+    }
+
+    // Media Picker Interfaces
+    override fun photoOnClick(pickedPhotoUris: List<String>) {
+        viewModel.getItem(binding.viewPager.currentItem)?.let {
+            ExportUtilities.sendDiaryToKakaoTalk(
+                requireActivity(),
+                it, ExportUtilities.KAKAO_TALK_OPTION_SEND_IMAGES, pickedPhotoUris
+            ) {
+                bottomSheetDialogFragment.dismiss()
+            }
+        }
+    }
+
+    override fun videoOnClick(pickedVideoUri: String) {
+        viewModel.getItem(binding.viewPager.currentItem)?.let {
+            ExportUtilities.sendDiaryToKakaoTalk(
+                requireActivity(),
+                it, ExportUtilities.KAKAO_TALK_OPTION_SEND_VIDEO, mediaUri = pickedVideoUri
+            ) {
+                bottomSheetDialogFragment.dismiss()
+            }
+        }
+    }
+
+    override fun audioOnClick(pickedAudioUri: String) {
+        viewModel.getItem(binding.viewPager.currentItem)?.let {
+            ExportUtilities.sendDiaryToKakaoTalk(
+                requireActivity(),
+                it, ExportUtilities.KAKAO_TALK_OPTION_SEND_AUDIO, mediaUri = pickedAudioUri
+            ) {
+                bottomSheetDialogFragment.dismiss()
+            }
         }
     }
 }

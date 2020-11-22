@@ -12,17 +12,24 @@ import android.os.Build
 import android.os.Environment
 import android.os.Parcelable
 import android.provider.MediaStore
+import android.util.TypedValue
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import androidx.annotation.RequiresApi
 import androidx.core.content.FileProvider
 import com.duke.elliot.kim.kotlin.photodiary.R
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryModel
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.MediaModel
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.media_helper.MediaHelper
+import com.duke.elliot.kim.kotlin.photodiary.tab.diary.*
+import com.duke.elliot.kim.kotlin.photodiary.utility.*
 import com.duke.elliot.kim.kotlin.photodiary.utility.MediaScanner
-import com.duke.elliot.kim.kotlin.photodiary.utility.getDocumentDirectory
-import com.duke.elliot.kim.kotlin.photodiary.utility.showToast
-import com.duke.elliot.kim.kotlin.photodiary.utility.toDateFormat
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.android.synthetic.main.item_select_dialog_28.view.*
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.File
@@ -36,6 +43,12 @@ object ExportUtilities {
     const val KAKAO_TALK_OPTION_SEND_VIDEO = 1
     const val KAKAO_TALK_OPTION_SEND_AUDIO = 2
     const val KAKAO_TALK_OPTION_SEND_TEXT = 3
+
+    private const val EXPORT_AS_TEXT_FILE = 0
+    private const val EXPORT_AS_PDF_FILE = 1
+    private const val SHARE_DIARY = 2
+    private const val SEND_DIARY_TO_KAKAO_TALK = 3
+    private const val SEND_DIARY_TO_FACEBOOK = 4
 
     private lateinit var mediaScanner : MediaScanner
 
@@ -272,7 +285,8 @@ object ExportUtilities {
     }
 
     fun sendDiaryToKakaoTalk(activity: Activity, diary: DiaryModel, option: Int,
-                             mediaUris: List<String>? = null, mediaUri: String? = null) {
+                             mediaUris: List<String>? = null, mediaUri: String? = null,
+                             afterSendCallback: (() -> Unit)? = null) {
         if (!::weatherWords.isInitialized)
             weatherWords = activity.resources.getStringArray(R.array.weatherWords)
 
@@ -287,6 +301,8 @@ object ExportUtilities {
             KAKAO_TALK_OPTION_SEND_AUDIO -> sendAudioToKakaoTalk(activity, mediaUri)
             KAKAO_TALK_OPTION_SEND_TEXT -> sendTextToKakaoTalk(activity, diary)
         }
+
+        afterSendCallback?.invoke()
     }
 
     private fun sendPhotosToKakaoTalk(activity: Activity, photoUris: List<String>?) {
@@ -396,5 +412,81 @@ object ExportUtilities {
                 return true
 
         return false
+    }
+
+    fun showExportTypeDialog(context: Context, diary: DiaryModel,
+                                     convertPdfClickListener: () -> Unit,
+                                     shareOnClickListener: () -> Unit,
+                                     sendDiaryToKakaoTalkClickListener: () -> Unit,
+                                     sendDiaryToFacebookClickListener: () -> Unit) {
+        val exportTypes = arrayOf(
+            Pair(context.getString(R.string.export_text), R.drawable.ic_text_file_24),
+            Pair(context.getString(R.string.export_pdf_file), R.drawable.ic_pdf_file_24),
+            Pair(context.getString(R.string.share_diary), R.drawable.ic_round_share_24),
+            Pair(context.getString(R.string.send_diary_to_kakao_talk), R.drawable.ic_kakao_talk_150px),
+            Pair(context.getString(R.string.send_diary_to_facebook), R.drawable.ic_facebook_24)
+        )
+
+        val exportTypeAdapter = object : ArrayAdapter<Pair<String, Int>>(
+            context,
+            R.layout.item_select_dialog_28,
+            R.id.text,
+            exportTypes
+        ) {
+            override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+                val view = super.getView(position, convertView, parent)
+                val text = view.text
+                val image = view.image
+
+                text.text = exportTypes[position].first
+                text.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16F)
+                image.setImageResource(exportTypes[position].second)
+
+                return view
+            }
+        }
+
+        MaterialAlertDialogBuilder(context)
+            .setTitle(context.getString(R.string.export))
+            .setAdapter(exportTypeAdapter) { _, exportType ->
+                when(exportType) {
+                    EXPORT_AS_TEXT_FILE -> {
+                        showInputDialog(
+                            context,
+                            context.getString(R.string.text_file_name_input_message)
+                        ) { fileName ->
+                            CoroutineScope(Dispatchers.IO).launch {
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+                                    exportAsTextFileQ(
+                                        context,
+                                        diary,
+                                        fileName
+                                    )
+                                else
+                                    exportAsTextFile(
+                                        context,
+                                        diary,
+                                        fileName
+                                    )
+                            }
+                        }
+                    }
+                    EXPORT_AS_PDF_FILE -> convertPdfClickListener.invoke()
+                    SHARE_DIARY -> shareOnClickListener.invoke()
+                    SEND_DIARY_TO_KAKAO_TALK -> {
+                        if (isKakaoTalkInstalled(context))
+                            sendDiaryToKakaoTalkClickListener.invoke()
+                        else
+                            showToast(context, context.getString(R.string.kakao_talk_not_found))
+                    }
+                    SEND_DIARY_TO_FACEBOOK -> {
+                        if (isFacebookInstalled(context))
+                            sendDiaryToFacebookClickListener.invoke()
+                        else
+                            showToast(context, context.getString(R.string.facebook_not_found))
+                    }
+                }
+            }
+            .show()
     }
 }

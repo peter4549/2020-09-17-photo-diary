@@ -8,16 +8,25 @@ import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.media_helper.Me
 import com.duke.elliot.kim.kotlin.photodiary.utility.FileUtilities
 import kotlinx.coroutines.*
 import timber.log.Timber
+import java.sql.Date
+import java.time.LocalDate
+import java.time.ZoneId
 
-class DiaryViewPagerViewModel(val database: DiaryDao,  private val fileUtilities: FileUtilities): ViewModel() {
+class DiaryViewPagerViewModel(val database: DiaryDao,  private val fileUtilities: FileUtilities,
+                              val selectedDate: LocalDate?): ViewModel() {
     lateinit var currentDiary: DiaryModel
     private val job = Job()
     private val coroutineScope = CoroutineScope(Dispatchers.Main + job)
     var deletedDiaryPosition = -1
     var initialized = false
     var status = DEFAULT
+    var tomorrow = selectedDate?.plusDays(1)
 
-    var diaries = database.getAll()
+    var diaries =
+        if (selectedDate == null)
+            database.getAll()
+        else
+            database.getSelectedDateDiaries(selectedDate.toLong(), tomorrow?.toLong() ?: -1)
 
     fun getCurrentDiaryPosition() = diaries.value?.indexOf(currentDiary) ?: -1
 
@@ -55,4 +64,11 @@ class DiaryViewPagerViewModel(val database: DiaryDao,  private val fileUtilities
         const val DEFAULT = 0
         const val DELETED = 1
     }
+}
+
+fun LocalDate.toLong(): Long {
+    val defaultZoneId = ZoneId.systemDefault()
+    val date = Date.from(this.atStartOfDay(defaultZoneId).toInstant())
+
+    return date.time
 }

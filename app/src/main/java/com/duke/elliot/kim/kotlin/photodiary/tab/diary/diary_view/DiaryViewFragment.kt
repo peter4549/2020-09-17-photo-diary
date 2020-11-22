@@ -1,5 +1,6 @@
 package com.duke.elliot.kim.kotlin.photodiary.tab.diary.diary_view
 
+import android.content.Intent
 import android.graphics.Typeface
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,10 +9,14 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import com.duke.elliot.kim.kotlin.photodiary.R
 import com.duke.elliot.kim.kotlin.photodiary.databinding.FragmentDiaryViewBinding
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryModel
+import com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryWritingFragment
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.TextOptionsModel
+import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.media_helper.ExoPlayerActivity
+import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.media_helper.MediaHelper
 import com.duke.elliot.kim.kotlin.photodiary.tab.diary.MediaPagerAdapter
 import com.duke.elliot.kim.kotlin.photodiary.utility.getFont
 import com.duke.elliot.kim.kotlin.photodiary.utility.toDateFormat
@@ -22,6 +27,7 @@ class DiaryViewFragment: Fragment() {
     private lateinit var binding: FragmentDiaryViewBinding
     private lateinit var diary: DiaryModel
     private lateinit var viewModel: DiaryViewViewModel
+    private lateinit var mediaPagerAdapter: MediaPagerAdapter
 
     fun setDiary(diary: DiaryModel) {
         this.diary = diary
@@ -44,6 +50,11 @@ class DiaryViewFragment: Fragment() {
 
         bind(viewModel.getDiary())
 
+        mediaPagerAdapter = MediaPagerAdapter().apply {
+            setContext(requireContext())
+            setMediaList(diary.mediaArray.toList())
+        }
+
         return binding.root
     }
 
@@ -60,6 +71,16 @@ class DiaryViewFragment: Fragment() {
             binding.viewPager.adapter = MediaPagerAdapter().apply {
                 setContext(requireContext())
                 setMediaList(diary.mediaArray.toList())
+            }
+
+            binding.viewPager.setSingleTapUpListener {
+                mediaPagerAdapter.getItem(binding.viewPager.currentItem)?.let {
+                    when (it.type) {
+                        MediaHelper.MediaType.PHOTO -> navigateToPhotoViewerFragment(it.uriString)
+                        MediaHelper.MediaType.VIDEO -> startExoPlayerActivity(it.uriString)
+                        MediaHelper.MediaType.AUDIO -> startExoPlayerActivity(it.uriString)
+                    }
+                }
             }
         }
 
@@ -91,5 +112,16 @@ class DiaryViewFragment: Fragment() {
             binding.textContent.setTypeface(font, Typeface.ITALIC)
 
         binding.textContent.gravity = textOptions.textAlignment
+    }
+
+    private fun startExoPlayerActivity(uriString: String) {
+        startActivity(Intent(requireContext(), ExoPlayerActivity::class.java).apply {
+            putExtra(DiaryWritingFragment.EXTRA_MEDIA_URI, uriString)
+        })
+    }
+
+    private fun navigateToPhotoViewerFragment(uriString: String) {
+        findNavController().navigate(DiaryViewPagerFragmentDirections
+            .actionDiaryViewPagerFragmentToPhotoViewerFragment(uriString))
     }
 }

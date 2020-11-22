@@ -19,10 +19,12 @@ import com.duke.elliot.kim.kotlin.photodiary.databinding.FragmentCalendarBinding
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.CREATE_MODE
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.DATE_OTHER_THAN_TODAY
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryModel
+import com.duke.elliot.kim.kotlin.photodiary.diary_writing.EDIT_MODE
 import com.duke.elliot.kim.kotlin.photodiary.tab.TabFragment
 import com.duke.elliot.kim.kotlin.photodiary.tab.TabFragmentDirections
 import com.duke.elliot.kim.kotlin.photodiary.tab.diary.BRIEF_VIEW_MODE
 import com.duke.elliot.kim.kotlin.photodiary.tab.diary.DiaryAdapter
+import com.duke.elliot.kim.kotlin.photodiary.tab.diary.SORT_BY_OLDEST
 import com.duke.elliot.kim.kotlin.photodiary.utility.ColorUtilities
 import com.duke.elliot.kim.kotlin.photodiary.utility.GridLayoutManagerWrapper
 import com.duke.elliot.kim.kotlin.photodiary.utility.OkCancelDialogFragment
@@ -32,6 +34,7 @@ import com.kizitonwose.calendarview.model.DayOwner
 import com.kizitonwose.calendarview.ui.DayBinder
 import com.kizitonwose.calendarview.ui.ViewContainer
 import com.kizitonwose.calendarview.utils.yearMonth
+import timber.log.Timber
 import java.sql.Date
 import java.time.LocalDate
 import java.time.YearMonth
@@ -105,7 +108,32 @@ class CalendarFragment : Fragment(), RegisterAnniversaryDialogFragment.OnButtonC
             }
         })
 
-        diaryAdapter = DiaryAdapter(requireContext(), true)
+        diaryAdapter = DiaryAdapter(requireContext(), true).apply {
+            setViewOnClickListener {
+                getCurrentDiary()?.let { diary ->
+                    findNavController().navigate(
+                        TabFragmentDirections
+                            .actionTabFragmentToDiaryViewPagerFragment(
+                                diary,
+                                SORT_BY_OLDEST,
+                                diary.getLocalDate()
+                            )
+                    )
+                } ?: run {
+                    Timber.e("Diary not found.")
+                    showToast(requireContext(), getString(R.string.diary_not_found))
+                }
+            }
+
+            setEditOnClickListener {
+                getCurrentDiary()?.let {
+                    findNavController().navigate(
+                        TabFragmentDirections
+                            .actionTabFragmentToDiaryWritingFragment(it, EDIT_MODE)
+                    )
+                }
+            }
+        }
         diaryAdapter.viewMode = BRIEF_VIEW_MODE
         binding.diaryRecyclerView.layoutManager =
             GridLayoutManagerWrapper(requireContext(), 1)
@@ -182,6 +210,7 @@ class CalendarFragment : Fragment(), RegisterAnniversaryDialogFragment.OnButtonC
                                     )
 
                                     navigateToDiaryWritingFragment(date.time)
+                                    TabFragment.diaryWritingMode = CREATE_MODE
                                 }
                             } else
                                 TabFragment.diaryWritingMode = CREATE_MODE

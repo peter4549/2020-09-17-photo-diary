@@ -32,15 +32,22 @@ class MediaAdapter(layoutId: Int, mediaArrayList: ArrayList<MediaModel>)
 
         when (media.type) {
             MediaHelper.MediaType.PHOTO -> {
+                holder.view.image_audio.visibility = View.GONE
+                holder.view.image_play.visibility = View.GONE
+
                 Glide.with(holder.view.image.context).clear(holder.view.image)
                 setImage(holder.view.image, media.uriString.toUri())
             }
             MediaHelper.MediaType.VIDEO -> {
+                holder.view.image_audio.visibility = View.GONE
+
                 Glide.with(holder.view.image.context).clear(holder.view.image)
                 setImage(holder.view.image, media.uriString.toUri())
                 holder.view.image_play.visibility = View.VISIBLE
             }
             MediaHelper.MediaType.AUDIO -> {
+                holder.view.image_play.visibility = View.GONE
+
                 Glide.with(holder.view.image.context).clear(holder.view.image)
 
                 val albumArt = AudioHelper.getAudioAlbumArt(holder.view.context, media.uriString)

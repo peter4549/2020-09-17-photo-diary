@@ -20,6 +20,35 @@
         tools:ignore="ContentDescription" />
 
     <ImageView
+        android:id="@+id/image_play"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:elevation="4dp"
+        android:src="@drawable/exo_icon_play"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/exo_white_opacity_70"
+        tools:ignore="ContentDescription" />
+
+    <ImageView
+        android:id="@+id/image_audio"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_gravity="center"
+        android:elevation="4dp"
+        android:src="@drawable/ic_sharp_music_note_silver_112"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/exo_white_opacity_70"
+        tools:ignore="ContentDescription" />
+
+    <ImageView
         android:id="@+id/imagePicker"
         android:layout_width="24dp"
         android:layout_height="24dp"

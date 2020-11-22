@@ -13,7 +13,6 @@ import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.util.Util
 
-
 class ExoPlayerActivity: AppCompatActivity() {
     private lateinit var binding: ActivityVideoPlayerBinding
     private var currentWindow = 0

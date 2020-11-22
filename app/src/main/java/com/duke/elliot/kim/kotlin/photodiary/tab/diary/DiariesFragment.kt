@@ -200,7 +200,6 @@ class DiariesFragment: Fragment(), KakaoTalkOptionBottomSheetDialogFragment.Kaka
     }
 
     override fun onSendTextClick() {
-        println("KKKKKKK ${diaryAdapter.getCurrentDiary()?.title ?: "널이랑깨."}")
         diaryAdapter.getCurrentDiary()?.let {
             ExportUtilities.sendDiaryToKakaoTalk(
                 requireActivity(),

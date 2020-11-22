@@ -98,9 +98,10 @@ class MediaPickerBottomSheetDialogFragment: BottomSheetDialogFragment() {
                 binding.textTitle.text = getString(R.string.select_photos)
                 binding.textButtonContainer.visibility = View.VISIBLE
                 binding.ok.setOnClickListener {
-                    if (mediaPickerAdapter.pickedPhotoUris.isNotEmpty())
+                    if (mediaPickerAdapter.pickedPhotoUris.isNotEmpty()) {
                         mediaClickListener.photoOnClick(mediaPickerAdapter.pickedPhotoUris)
-                    else
+                        dismiss()
+                    } else
                         showToast(requireContext(), getString(R.string.no_picture_is_selected))
                 }
             }
@@ -136,44 +137,54 @@ class MediaPickerBottomSheetDialogFragment: BottomSheetDialogFragment() {
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             val media = mediaList[position]
 
-            if (mediaType == MediaHelper.MediaType.PHOTO) {
-                holder.view.setOnClickListener {
-                    if (pickedPhotoUris.contains(media.uriString)) {
-                        pickedPhotoUris.remove(media.uriString)
-                        holder.view.imagePicker.scaleUp(0.8F, 100L) {
-                            holder.view.imagePicker.setBackgroundResource(R.drawable.circle_border)
-                            holder.view.imagePicker.setImageResource(android.R.color.transparent)
-                            holder.view.imagePicker.scaleUp(1F, 100L)
-                        }
-                        //holder.view.imagePicker.scaleUp(1F, 400L)
-                    } else {
-                        pickedPhotoUris.add(media.uriString)
+            when(mediaType) {
+                MediaHelper.MediaType.PHOTO -> {
+                    holder.view.image_play.visibility = View.GONE
+                    holder.view.image_audio.visibility = View.GONE
 
-                        println("ADDED: ${pickedPhotoUris}")
-                        holder.view.imagePicker.scaleUp(0.8F, 100L) {
-                            holder.view.imagePicker.setBackgroundResource(R.drawable.circle_transparent_background)
-                            holder.view.imagePicker.setImageResource(R.drawable.ic_sharp_check_circle_24)
-                            holder.view.imagePicker.scaleUp(1F, 100L)
+                    setImage(holder.view.imageContent, media.uriString)
+                    holder.view.setOnClickListener {
+                        if (pickedPhotoUris.contains(media.uriString)) {
+                            pickedPhotoUris.remove(media.uriString)
+                            holder.view.imagePicker.scaleUp(0.8F, 100L) {
+                                holder.view.imagePicker.setBackgroundResource(R.drawable.circle_border)
+                                holder.view.imagePicker.setImageResource(android.R.color.transparent)
+                                holder.view.imagePicker.scaleUp(1F, 100L)
+                            }
+                        } else {
+                            pickedPhotoUris.add(media.uriString)
+
+                            holder.view.imagePicker.scaleUp(0.8F, 100L) {
+                                holder.view.imagePicker.setBackgroundResource(R.drawable.circle_transparent_background)
+                                holder.view.imagePicker.setImageResource(R.drawable.ic_sharp_check_circle_24)
+                                holder.view.imagePicker.scaleUp(1F, 100L)
+                            }
                         }
                     }
                 }
-            }
-
-            when(mediaType) {
-                MediaHelper.MediaType.PHOTO -> setImage(holder.view.imageContent, media.uriString)
                 MediaHelper.MediaType.VIDEO -> {
+                    holder.view.image_play.visibility = View.VISIBLE
+                    holder.view.image_audio.visibility = View.GONE
+
                     setImage(holder.view.imageContent, media.uriString)
                     holder.view.setOnClickListener {
                         mediaClickListener.videoOnClick(media.uriString)
+                        dismiss()
                     }
                 }
                 MediaHelper.MediaType.AUDIO -> {
+                    holder.view.image_play.visibility = View.GONE
+                    holder.view.image_audio.visibility = View.VISIBLE
+
                     val albumArt = AudioHelper.getAudioAlbumArt(holder.view.context, media.uriString)
                     albumArt?.let {
                         setImage(holder.view.imageContent, it)
                         holder.view.setOnClickListener {
                             mediaClickListener.audioOnClick(media.uriString)
+                            dismiss()
                         }
+                    } ?: run {
+                        setImage(holder.view.imageContent, R.drawable.blue_gradation_background)
                     }
                 }
             }

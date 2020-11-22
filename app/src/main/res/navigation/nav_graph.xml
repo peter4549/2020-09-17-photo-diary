@@ -87,6 +87,14 @@
         <argument
             android:name="sortingCriteria"
             app:argType="integer" />
+        <argument
+            android:name="selectedDate"
+            app:argType="java.time.LocalDate"
+            app:nullable="true"
+            android:defaultValue="@null" />
+        <action
+            android:id="@+id/action_diaryViewPagerFragment_to_photoViewerFragment"
+            app:destination="@id/photoViewerFragment" />
     </fragment>
     <fragment
         android:id="@+id/pdfPreviewFragment"
@@ -98,5 +106,13 @@
             app:argType="com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryModel"
             app:nullable="true" />
 
+    </fragment>
+    <fragment
+        android:id="@+id/photoViewerFragment"
+        android:name="com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.media_helper.PhotoViewerFragment"
+        android:label="PhotoViewerFragment" >
+        <argument
+            android:name="uriString"
+            app:argType="string" />
     </fragment>
 </navigation>

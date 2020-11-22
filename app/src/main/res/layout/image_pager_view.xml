@@ -1,12 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto">
 
     <ImageView
         android:id="@+id/image_media"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:contentDescription="@string/media" />
-</FrameLayout>
+
+    <ImageView
+        android:id="@+id/image_play"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_gravity="center"
+        android:elevation="8dp"
+        android:src="@drawable/exo_icon_play"
+        android:visibility="gone"
+        card_view:tint="@color/exo_white_opacity_70"
+        tools:ignore="ContentDescription" />
+
+    <ImageView
+        android:id="@+id/image_audio"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_gravity="center"
+        android:elevation="8dp"
+        android:src="@drawable/ic_sharp_music_note_silver_112"
+        android:visibility="gone"
+        card_view:tint="@color/exo_white_opacity_70"
+        tools:ignore="ContentDescription"/>
+</androidx.cardview.widget.CardView>

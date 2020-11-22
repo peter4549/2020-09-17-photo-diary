@@ -824,8 +824,18 @@ class DiaryWritingFragment: Fragment() {
                     hideKeyboard(binding.root, inputMethodManager)
 
                 when (viewModel.mode) {
-                    CREATE_MODE -> saveDiary(createDiary())
-                    DATE_OTHER_THAN_TODAY -> saveDiary(createDiary())
+                    CREATE_MODE -> {
+                        if (diaryContentNotEmpty())
+                            saveDiary(createDiary())
+                        else
+                            findNavController().popBackStack()
+                    }
+                    DATE_OTHER_THAN_TODAY -> {
+                        if (diaryContentNotEmpty())
+                            saveDiary(createDiary())
+                        else
+                            findNavController().popBackStack()
+                    }
                     EDIT_MODE -> updateDiary()
                 }
             }
@@ -1389,6 +1399,19 @@ class DiaryWritingFragment: Fragment() {
         }
 
         confirmDateDialogFragment.show(requireActivity().supportFragmentManager, confirmDateDialogFragment.tag)
+    }
+
+    private fun diaryContentNotEmpty(): Boolean {
+        if (binding.editTextTitle.text.isNotBlank())
+            return true
+
+        if (binding.editTextContent.text.isNotBlank())
+            return true
+
+        if (viewModel.mediaArrayListSize > 0)
+            return true
+
+        return false
     }
 
     companion object {

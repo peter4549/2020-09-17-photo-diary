@@ -95,8 +95,6 @@ class DiaryAdapter(private val context: Context, noInitialization: Boolean = fal
             val text = view.text
             val image = view.image
 
-            // TODO.. maybe not used.. setAnimation(view, position)
-
             text.text = exportTypes[position].first
             text.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16F)
             image.setImageResource(exportTypes[position].second)
@@ -109,7 +107,6 @@ class DiaryAdapter(private val context: Context, noInitialization: Boolean = fal
         MaterialAlertDialogBuilder(context)
             .setTitle(context.getString(R.string.export))
             .setAdapter(exportTypeAdapter) { _, exportType ->
-                // TODO check.. why here? => recyclerView.scheduleLayoutAnimation()
                 when(exportType) {
                     EXPORT_AS_TEXT_FILE -> {
                         showInputDialog(
@@ -419,6 +416,12 @@ class DiaryAdapter(private val context: Context, noInitialization: Boolean = fal
                 showPopupMenu(context, it!!, diary, absoluteAdapterPosition)
             }
 
+            binding.viewPager.setSingleTapUpListener {
+                currentItem = diary
+                MainViewModel.selectedDiaryPosition = absoluteAdapterPosition
+                binding.root.callOnClick()
+            }
+
             if (diary.hashTags.isEmpty())
                 binding.textHashTags.visibility = View.GONE
             else {
@@ -427,10 +430,14 @@ class DiaryAdapter(private val context: Context, noInitialization: Boolean = fal
             }
 
             if (diary.mediaArray.isEmpty())
-                binding.imageMedia.visibility = View.GONE
+                binding.mediaContainer.visibility = View.GONE
             else {
-                binding.imageMedia.visibility = View.VISIBLE
-                setImage(binding.imageMedia, diary.mediaArray[0].uriString)
+                binding.mediaContainer.visibility = View.VISIBLE
+                binding.viewPager.removeAllViews()
+                binding.viewPager.adapter = MediaPagerAdapter().apply {
+                    setContext(itemView.context)
+                    setMediaList(diary.mediaArray.toList())
+                }
             }
 
             binding.root.setOnClickListener {
