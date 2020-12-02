@@ -19,8 +19,8 @@ class MainViewModel(application: Application): AndroidViewModel(application) {
     private val fileUtilities = FileUtilities.getInstance(application)
     // var diariesFragmentAction = Action.UNINITIALIZED
     var photosFragmentAction = Action.UNINITIALIZED
+    var lockScreenOn = false
     private lateinit var database: DiaryDao
-
     private lateinit var diaries: LiveData<MutableList<DiaryModel>>
 
     init {
@@ -70,10 +70,6 @@ class MainViewModel(application: Application): AndroidViewModel(application) {
                 }
             }
         }
-    }
-
-    fun getDiariesForSelectedDate(localDate: LocalDate) {
-
     }
 
     object Action {

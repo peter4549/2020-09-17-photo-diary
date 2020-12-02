@@ -13,7 +13,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/colorDefaultThemeLight">
+        android:background="@color/colorDefaultThemeSecondary">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
@@ -67,7 +67,7 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/toolbar"
                         app:drawableStartCompat="@drawable/ic_round_date_range_24"
-                        app:drawableTint="@color/colorDefaultThemeDark"
+                        app:drawableTint="@color/colorDefaultThemePrimary"
                         tools:text="9월 17일 금요일" />
 
                     <TextView
@@ -84,7 +84,7 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/toolbar"
                         app:drawableStartCompat="@drawable/ic_round_access_time_20"
-                        app:drawableTint="@color/colorDefaultThemeDark"
+                        app:drawableTint="@color/colorDefaultThemePrimary"
                         tools:text="오후 3시 30분" />
 
                     <RelativeLayout
@@ -191,7 +191,7 @@
                 android:id="@+id/frame_layout_dropdown"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/colorDefaultThemeLight"
+                android:background="@color/colorDefaultThemeSecondary"
                 android:elevation="2dp"
                 app:layout_constraintBottom_toTopOf="@+id/bottom_navigation_view"
                 app:layout_constraintEnd_toEndOf="parent"

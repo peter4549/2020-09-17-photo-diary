@@ -1,5 +1,6 @@
 package com.duke.elliot.kim.kotlin.photodiary.tab.diary
 
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,7 +9,6 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.RecyclerView.ItemAnimator
 import androidx.recyclerview.widget.SimpleItemAnimator
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.duke.elliot.kim.kotlin.photodiary.MainViewModel
@@ -16,28 +16,29 @@ import com.duke.elliot.kim.kotlin.photodiary.R
 import com.duke.elliot.kim.kotlin.photodiary.database.DiaryDatabase
 import com.duke.elliot.kim.kotlin.photodiary.databinding.FragmentDairiesBinding
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.CREATE_MODE
-import com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryModel
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.EDIT_MODE
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.media_helper.MediaHelper
 import com.duke.elliot.kim.kotlin.photodiary.export.ExportUtilities
+import com.duke.elliot.kim.kotlin.photodiary.export.FacebookOptionBottomSheetDialogFragment
 import com.duke.elliot.kim.kotlin.photodiary.export.KakaoTalkOptionBottomSheetDialogFragment
 import com.duke.elliot.kim.kotlin.photodiary.picker.MediaPickerBottomSheetDialogFragment
+import com.duke.elliot.kim.kotlin.photodiary.picker.TypelessMediaPickerBottomSheetDialogFragment
 import com.duke.elliot.kim.kotlin.photodiary.tab.TabFragment
 import com.duke.elliot.kim.kotlin.photodiary.tab.TabFragmentDirections
 import com.duke.elliot.kim.kotlin.photodiary.utility.showToast
 import kotlinx.coroutines.*
 import timber.log.Timber
-import java.util.*
-import kotlin.Comparator
-
 
 class DiariesFragment: Fragment(), KakaoTalkOptionBottomSheetDialogFragment.KakaoTalkOptionClickListener,
-    MediaPickerBottomSheetDialogFragment.OnMediaClickListener {
+    MediaPickerBottomSheetDialogFragment.OnMediaClickListener,
+    FacebookOptionBottomSheetDialogFragment.OnFacebookOptionClickListener,
+    TypelessMediaPickerBottomSheetDialogFragment.OnMediaClickListener {
 
     private lateinit var diaryAdapter: DiaryAdapter
     private lateinit var binding: FragmentDairiesBinding
     private lateinit var viewModel: DiariesViewModel
     private lateinit var mediaPicker: MediaPickerBottomSheetDialogFragment
+    private lateinit var typelessMediaPicker: TypelessMediaPickerBottomSheetDialogFragment
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -54,6 +55,10 @@ class DiariesFragment: Fragment(), KakaoTalkOptionBottomSheetDialogFragment.Kaka
         binding.diariesViewModel = viewModel
 
         mediaPicker = MediaPickerBottomSheetDialogFragment().apply {
+            setMediaClickListener(this@DiariesFragment)
+        }
+
+        typelessMediaPicker = TypelessMediaPickerBottomSheetDialogFragment().apply {
             setMediaClickListener(this@DiariesFragment)
         }
 
@@ -105,9 +110,14 @@ class DiariesFragment: Fragment(), KakaoTalkOptionBottomSheetDialogFragment.Kaka
             }
 
             setSendDiaryToFacebookClickListener {
-                getCurrentDiary()?.let {
-                    ExportUtilities.sendDiaryToFacebook(requireActivity(), it)
+                val bottomSheetDialogFragment = FacebookOptionBottomSheetDialogFragment().apply {
+                    setOnFacebookOptionClickListener(this@DiariesFragment)
                 }
+
+                bottomSheetDialogFragment.show(
+                    requireActivity().supportFragmentManager,
+                    bottomSheetDialogFragment.tag
+                )
             }
 
             setSendDiaryToKakaoTalkClickListener {
@@ -168,6 +178,7 @@ class DiariesFragment: Fragment(), KakaoTalkOptionBottomSheetDialogFragment.Kaka
     override fun onResume() {
         super.onResume()
         TabFragment.diaryWritingMode = CREATE_MODE
+        diaryAdapter.notifyDataSetChanged()
     }
 
     override fun onStop() {
@@ -175,6 +186,7 @@ class DiariesFragment: Fragment(), KakaoTalkOptionBottomSheetDialogFragment.Kaka
         diaryAdapter.saveSortingCriteriaViewMode()
     }
 
+    /** Kakao Talk */
     override fun onSendImagesClick() {
         diaryAdapter.getCurrentDiary()?.let {
             mediaPicker.setDiary(it)
@@ -235,5 +247,27 @@ class DiariesFragment: Fragment(), KakaoTalkOptionBottomSheetDialogFragment.Kaka
                 it, ExportUtilities.KAKAO_TALK_OPTION_SEND_AUDIO, mediaUri = pickedAudioUri
             )
         }
+    }
+
+    /** Facebook */
+    override fun onSendMediaClick() {
+        diaryAdapter.getCurrentDiary()?.let {
+            typelessMediaPicker.setDiary(it)
+            typelessMediaPicker.show(requireActivity().supportFragmentManager, typelessMediaPicker.tag)
+        }
+    }
+
+    override fun onSendOnlyTextClick() {
+        diaryAdapter.getCurrentDiary()?.let {
+            ExportUtilities.sendTextToFacebook(
+                requireActivity(),
+                it
+            )
+        }
+    }
+
+    // Typeless Media Picker
+    override fun onClick(pickedMediaUris: List<Pair<Int, Uri>>) {
+        ExportUtilities.sendDiaryToFacebook(requireActivity(), pickedMediaUris)
     }
 }

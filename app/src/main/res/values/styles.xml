@@ -1,6 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
+    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
@@ -15,6 +15,15 @@
         <item name="chipStyle">@style/Widget.App.Chip</item>
 
         <item name="actionBarTheme">@style/ToolbarTheme</item>
+
+        <!-- Lock Screen -->
+        <item name="pf_lock_screen">@style/LockScreenStyle</item >
+        <item name="pf_fingerprint_button">@style/LockScreenFingerprintButtonStyle</item>
+        <item name="pf_key_button">@style/LockScreenButtonStyle</item>
+        <item name="pf_delete_button">@style/LockScreenDeleteButtonStyle</item>
+        <item name="pf_next">@style/LockNextButtonStyle</item>
+        <item name="pf_hint">@style/LockHintStyle</item>
+        <item name="pf_code_view">@style/LockScreenCodeStyle</item>
     </style>
 
     <style name="Widget.App.Chip" parent="Widget.MaterialComponents.Chip.Entry">
@@ -66,4 +75,46 @@
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar" />
+
+    <!-- Lock Screen -->
+    <style name="LockScreenStyle">
+        <item name="android:background">@color/colorLockScreenBackground</item>
+    </style>
+
+    <style name="LockScreenFingerprintButtonStyle">
+        <item name="android:tint">@color/color_text_dark</item>
+        <item name="android:background">@drawable/lock_screen_button_ripple</item>
+    </style>
+
+    <style name="LockScreenButtonStyle">
+        <item name="android:textColor">@color/color_text_dark</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:background">@drawable/lock_screen_button_ripple</item>
+    </style>
+
+    <style name="LockScreenDeleteButtonStyle">
+        <item name="android:tint">@color/color_text_dark</item>
+        <item name="android:background">@drawable/lock_screen_button_ripple</item>
+    </style>
+
+    <style name="LockNextButtonStyle">
+        <item name="android:foreground">@drawable/lock_screen_button_ripple_without_background</item>
+        <item name="android:background">@drawable/ic_sharp_check_circle_24</item>
+        <item name="android:elevation">2dp</item>
+        <item name="android:padding">8dp</item>
+        <item name="android:textColor">@color/color_text_dark</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:layout_margin">48dp</item>
+    </style>
+
+    <style name="LockHintStyle">
+        <item name="android:background">@drawable/lock_screen_button_ripple</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <style name="LockScreenCodeStyle">
+        <item name="android:button">@drawable/lock_screen_code_selector</item>
+        <item name="android:layout_marginTop">16dp</item>
+    </style>
+
 </resources>

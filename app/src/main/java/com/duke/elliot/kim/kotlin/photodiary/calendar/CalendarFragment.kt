@@ -58,7 +58,7 @@ class CalendarFragment : Fragment(), RegisterAnniversaryDialogFragment.OnButtonC
     private var selectedAnniversary: AnniversaryModel? = null
 
     @ColorInt
-    private var colorCalendarBackground = MainActivity.themeColorDark
+    private var colorCalendarBackground = MainActivity.themeColorPrimary
 
     override fun onCreateView(
         inflater: LayoutInflater,

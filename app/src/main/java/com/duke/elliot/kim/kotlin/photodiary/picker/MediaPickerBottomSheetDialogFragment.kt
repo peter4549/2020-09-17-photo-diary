@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.duke.elliot.kim.kotlin.photodiary.R
@@ -14,7 +13,6 @@ import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.MediaModel
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.media_helper.AudioHelper
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.media_helper.MediaHelper
 import com.duke.elliot.kim.kotlin.photodiary.utility.GridLayoutManagerWrapper
-import com.duke.elliot.kim.kotlin.photodiary.utility.scaleDown
 import com.duke.elliot.kim.kotlin.photodiary.utility.scaleUp
 import com.duke.elliot.kim.kotlin.photodiary.utility.setImage
 import com.duke.elliot.kim.kotlin.photodiary.utility.showToast
@@ -65,8 +63,10 @@ class MediaPickerBottomSheetDialogFragment: BottomSheetDialogFragment() {
                 if (photos.isNotEmpty()) {
                     mediaPickerAdapter = MediaPickerAdapter(photos)
                     binding.recyclerView.adapter = mediaPickerAdapter
-                } else
+                } else {
                     showToast(requireContext(), getString(R.string.photo_not_found))
+                    dismiss()
+                }
             }
             MediaHelper.MediaType.VIDEO -> {
                 val videos = diary.mediaArray.filter { it.type == MediaHelper.MediaType.VIDEO }
@@ -74,8 +74,10 @@ class MediaPickerBottomSheetDialogFragment: BottomSheetDialogFragment() {
                 if (videos.isNotEmpty()) {
                     mediaPickerAdapter = MediaPickerAdapter(videos)
                     binding.recyclerView.adapter = mediaPickerAdapter
-                } else
+                } else {
                     showToast(requireContext(), getString(R.string.video_not_found))
+                    dismiss()
+                }
             }
             MediaHelper.MediaType.AUDIO -> {
                 val audios = diary.mediaArray.filter { it.type == MediaHelper.MediaType.AUDIO }
@@ -83,8 +85,10 @@ class MediaPickerBottomSheetDialogFragment: BottomSheetDialogFragment() {
                 if (audios.isNotEmpty()) {
                     mediaPickerAdapter = MediaPickerAdapter(audios)
                     binding.recyclerView.adapter = mediaPickerAdapter
-                } else
+                } else {
                     showToast(requireContext(), getString(R.string.audio_not_found))
+                    dismiss()
+                }
             }
             else -> showToast(requireContext(), getString(R.string.media_not_found))
         }
@@ -104,6 +108,10 @@ class MediaPickerBottomSheetDialogFragment: BottomSheetDialogFragment() {
                     } else
                         showToast(requireContext(), getString(R.string.no_picture_is_selected))
                 }
+
+                binding.selectAll.setOnClickListener {
+                    mediaPickerAdapter.selectAllPhotos()
+                }
             }
             MediaHelper.MediaType.VIDEO -> {
                 binding.textTitle.text = getString(R.string.select_video)
@@ -120,7 +128,79 @@ class MediaPickerBottomSheetDialogFragment: BottomSheetDialogFragment() {
 
         val pickedPhotoUris = mutableListOf<String>()
 
-        inner class ViewHolder(val view: View): RecyclerView.ViewHolder(view)
+        fun selectAllPhotos() {
+            for (media in mediaList) {
+                if (!pickedPhotoUris.contains(media.uriString))
+                    pickedPhotoUris.add(media.uriString)
+            }
+
+            notifyDataSetChanged()
+        }
+
+        inner class ViewHolder(val view: View): RecyclerView.ViewHolder(view) {
+            fun bind(media: MediaModel) {
+                when(mediaType) {
+                    MediaHelper.MediaType.PHOTO -> {
+                        view.image_play.visibility = View.GONE
+                        view.image_audio.visibility = View.GONE
+
+                        // Select all
+                        if (pickedPhotoUris.contains(media.uriString)) {
+                            view.imagePicker.scaleUp(0.8F, 100L) {
+                                view.imagePicker.setBackgroundResource(R.drawable.circle_transparent_background)
+                                view.imagePicker.setImageResource(R.drawable.ic_sharp_check_circle_24)
+                                view.imagePicker.scaleUp(1F, 100L)
+                            }
+                        }
+
+                        setImage(view.imageContent, media.uriString)
+                        view.setOnClickListener {
+                            if (pickedPhotoUris.contains(media.uriString)) {
+                                pickedPhotoUris.remove(media.uriString)
+                                view.imagePicker.scaleUp(0.8F, 100L) {
+                                    view.imagePicker.setBackgroundResource(R.drawable.circle_border)
+                                    view.imagePicker.setImageResource(android.R.color.transparent)
+                                    view.imagePicker.scaleUp(1F, 100L)
+                                }
+                            } else {
+                                pickedPhotoUris.add(media.uriString)
+
+                                view.imagePicker.scaleUp(0.8F, 100L) {
+                                    view.imagePicker.setBackgroundResource(R.drawable.circle_transparent_background)
+                                    view.imagePicker.setImageResource(R.drawable.ic_sharp_check_circle_24)
+                                    view.imagePicker.scaleUp(1F, 100L)
+                                }
+                            }
+                        }
+                    }
+                    MediaHelper.MediaType.VIDEO -> {
+                        view.image_play.visibility = View.VISIBLE
+                        view.image_audio.visibility = View.GONE
+
+                        setImage(view.imageContent, media.uriString)
+                        view.setOnClickListener {
+                            mediaClickListener.videoOnClick(media.uriString)
+                            dismiss()
+                        }
+                    }
+                    MediaHelper.MediaType.AUDIO -> {
+                        view.image_play.visibility = View.GONE
+                        view.image_audio.visibility = View.VISIBLE
+
+                        val albumArt = AudioHelper.getAudioAlbumArt(view.context, media.uriString)
+                        albumArt?.let {
+                            setImage(view.imageContent, it)
+                            view.setOnClickListener {
+                                mediaClickListener.audioOnClick(media.uriString)
+                                dismiss()
+                            }
+                        } ?: run {
+                            setImage(view.imageContent, R.drawable.blue_gradation_background)
+                        }
+                    }
+                }
+            }
+        }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             val view = LayoutInflater.from(parent.context).inflate(R.layout.item_media_picker, parent, false)
@@ -136,58 +216,7 @@ class MediaPickerBottomSheetDialogFragment: BottomSheetDialogFragment() {
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             val media = mediaList[position]
-
-            when(mediaType) {
-                MediaHelper.MediaType.PHOTO -> {
-                    holder.view.image_play.visibility = View.GONE
-                    holder.view.image_audio.visibility = View.GONE
-
-                    setImage(holder.view.imageContent, media.uriString)
-                    holder.view.setOnClickListener {
-                        if (pickedPhotoUris.contains(media.uriString)) {
-                            pickedPhotoUris.remove(media.uriString)
-                            holder.view.imagePicker.scaleUp(0.8F, 100L) {
-                                holder.view.imagePicker.setBackgroundResource(R.drawable.circle_border)
-                                holder.view.imagePicker.setImageResource(android.R.color.transparent)
-                                holder.view.imagePicker.scaleUp(1F, 100L)
-                            }
-                        } else {
-                            pickedPhotoUris.add(media.uriString)
-
-                            holder.view.imagePicker.scaleUp(0.8F, 100L) {
-                                holder.view.imagePicker.setBackgroundResource(R.drawable.circle_transparent_background)
-                                holder.view.imagePicker.setImageResource(R.drawable.ic_sharp_check_circle_24)
-                                holder.view.imagePicker.scaleUp(1F, 100L)
-                            }
-                        }
-                    }
-                }
-                MediaHelper.MediaType.VIDEO -> {
-                    holder.view.image_play.visibility = View.VISIBLE
-                    holder.view.image_audio.visibility = View.GONE
-
-                    setImage(holder.view.imageContent, media.uriString)
-                    holder.view.setOnClickListener {
-                        mediaClickListener.videoOnClick(media.uriString)
-                        dismiss()
-                    }
-                }
-                MediaHelper.MediaType.AUDIO -> {
-                    holder.view.image_play.visibility = View.GONE
-                    holder.view.image_audio.visibility = View.VISIBLE
-
-                    val albumArt = AudioHelper.getAudioAlbumArt(holder.view.context, media.uriString)
-                    albumArt?.let {
-                        setImage(holder.view.imageContent, it)
-                        holder.view.setOnClickListener {
-                            mediaClickListener.audioOnClick(media.uriString)
-                            dismiss()
-                        }
-                    } ?: run {
-                        setImage(holder.view.imageContent, R.drawable.blue_gradation_background)
-                    }
-                }
-            }
+            holder.bind(media)
         }
 
         override fun getItemCount(): Int = mediaList.count()

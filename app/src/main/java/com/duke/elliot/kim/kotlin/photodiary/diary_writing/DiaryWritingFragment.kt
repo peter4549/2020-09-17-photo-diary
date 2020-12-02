@@ -1029,6 +1029,7 @@ class DiaryWritingFragment: Fragment() {
                                                 copiedUri.toString()
                                             )
                                         )
+
                                     } ?: run {
                                         itemCount += 1
                                         if (itemCount >= totalItemCount)

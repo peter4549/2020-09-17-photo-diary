@@ -4,10 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <androidx.cardview.widget.CardView
+        android:id="@+id/cardView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:backgroundTint="@color/colorDefaultThemeLight"
+        app:cardBackgroundColor="@color/colorDefaultThemeSecondary"
         app:cardCornerRadius="8dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -46,7 +47,7 @@
                     android:textSize="12sp"
                     android:textStyle="bold"
                     app:drawableStartCompat="@drawable/ic_round_date_range_22"
-                    app:drawableTint="@color/colorDefaultThemeDark"
+                    app:drawableTint="@color/colorDefaultThemePrimary"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/toolbar"
@@ -64,7 +65,7 @@
                     android:textSize="12sp"
                     android:textStyle="bold"
                     app:drawableStartCompat="@drawable/ic_round_access_time_20"
-                    app:drawableTint="@color/colorDefaultThemeDark"
+                    app:drawableTint="@color/colorDefaultThemePrimary"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/toolbar"

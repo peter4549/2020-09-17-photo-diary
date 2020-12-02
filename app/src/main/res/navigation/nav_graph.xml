@@ -23,6 +23,9 @@
         <action
             android:id="@+id/action_tabFragment_to_pdfPreviewFragment"
             app:destination="@id/pdfPreviewFragment" />
+        <action
+            android:id="@+id/action_tabFragment_to_changeThemeFragment"
+            app:destination="@id/changeThemeFragment" />
     </fragment>
     <fragment
         android:id="@+id/diaryWritingFragment"
@@ -115,4 +118,8 @@
             android:name="uriString"
             app:argType="string" />
     </fragment>
+    <fragment
+        android:id="@+id/changeThemeFragment"
+        android:name="com.duke.elliot.kim.kotlin.photodiary.drawer_items.ChangeThemeFragment"
+        android:label="ChangeThemeFragment" />
 </navigation>

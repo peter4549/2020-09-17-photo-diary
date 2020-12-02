@@ -9,6 +9,7 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.GET_TASKS" />
 
     <application
         android:name=".DiaryApplication"
@@ -41,6 +42,8 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
+        <activity android:name=".drawer_items.lock_screen.SetLockScreenActivity" />
+
         <receiver
             android:name=".alarm.DeviceBootReceiver"
             android:enabled="false">
@@ -51,7 +54,7 @@
         <receiver android:name=".alarm.AlarmReceiver" />
 
         <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
-        
+
         <activity android:name="com.facebook.FacebookActivity"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
             android:label="@string/app_name" />

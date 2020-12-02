@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.duke.elliot.kim.kotlin.photodiary.MainActivity
 import com.duke.elliot.kim.kotlin.photodiary.MainViewModel
 import com.duke.elliot.kim.kotlin.photodiary.R
 import com.duke.elliot.kim.kotlin.photodiary.databinding.ItemDiaryBinding
@@ -401,6 +402,9 @@ class DiaryAdapter(private val context: Context, noInitialization: Boolean = fal
         fun bind(binding: ItemDiaryBriefViewBinding, diary: DiaryModel) {
             val font = getFont(itemView.context, diary.textOptions.textFontId)
 
+            // Apply theme color
+            binding.cardView.setCardBackgroundColor(MainActivity.themeColorSecondary)
+
             binding.textDate.text = diary.time.toDateFormat(binding.root.context.getString(R.string.date_format_short))
             binding.textTime.text = diary.time.toDateFormat(binding.root.context.getString(R.string.time_format_short))
             setImage(
@@ -451,6 +455,9 @@ class DiaryAdapter(private val context: Context, noInitialization: Boolean = fal
 
         fun bind(binding: ItemDiaryBinding, diary: DiaryModel) {
             val font = getFont(itemView.context, diary.textOptions.textFontId)
+
+            // Apply theme color
+            binding.cardView.setCardBackgroundColor(MainActivity.themeColorSecondary)
 
             binding.textDate.text = diary.time.toDateFormat(binding.root.context.getString(R.string.date_format_short))
             binding.textTime.text = diary.time.toDateFormat(binding.root.context.getString(R.string.time_format_short))
@@ -571,6 +578,9 @@ class DiaryAdapter(private val context: Context, noInitialization: Boolean = fal
 
         fun bind(binding: ItemDiaryFrameViewBinding, diary: DiaryModel) {
             val font = getFont(itemView.context, diary.textOptions.textFontId)
+
+            // Apply theme color
+            binding.cardView.setCardBackgroundColor(MainActivity.themeColorSecondary)
 
             binding.textDate.text = diary.time.toDateFormat(binding.root.context.getString(R.string.date_format_short))
             binding.imageWeatherIcon.setImageResource(DiaryWritingViewModel.weatherIconIds[diary.weatherIconIndex])

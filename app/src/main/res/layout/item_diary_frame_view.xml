@@ -10,12 +10,13 @@
     </data>
 
     <androidx.cardview.widget.CardView
+        android:id="@+id/cardView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
         android:layout_marginEnd="2dp"
         android:layout_marginStart="2dp"
-        android:backgroundTint="@color/colorDefaultThemeLight"
+        android:backgroundTint="@color/colorDefaultThemeSecondary"
         app:cardCornerRadius="8dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout

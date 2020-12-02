@@ -1,5 +1,6 @@
 package com.duke.elliot.kim.kotlin.photodiary.tab.diary.diary_view
 
+import android.net.Uri
 import android.os.Bundle
 import android.view.*
 import androidx.databinding.DataBindingUtil
@@ -18,27 +19,31 @@ import com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryModel
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.EDIT_MODE
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.media_helper.MediaHelper
 import com.duke.elliot.kim.kotlin.photodiary.export.ExportUtilities
+import com.duke.elliot.kim.kotlin.photodiary.export.FacebookOptionBottomSheetDialogFragment
 import com.duke.elliot.kim.kotlin.photodiary.export.KakaoTalkOptionBottomSheetDialogFragment
 import com.duke.elliot.kim.kotlin.photodiary.picker.MediaPickerBottomSheetDialogFragment
+import com.duke.elliot.kim.kotlin.photodiary.picker.TypelessMediaPickerBottomSheetDialogFragment
 import com.duke.elliot.kim.kotlin.photodiary.tab.TabFragmentDirections
 import com.duke.elliot.kim.kotlin.photodiary.tab.diary.SORT_BY_LATEST
 import com.duke.elliot.kim.kotlin.photodiary.tab.diary.SORT_BY_OLDEST
 import com.duke.elliot.kim.kotlin.photodiary.utility.FileUtilities
 import com.duke.elliot.kim.kotlin.photodiary.utility.showToast
-import com.duke.elliot.kim.kotlin.photodiary.utility.toDateFormat
 import java.util.*
 import kotlin.Comparator
 import kotlin.collections.ArrayList
 
 class DiaryViewPagerFragment: Fragment(),
     KakaoTalkOptionBottomSheetDialogFragment.KakaoTalkOptionClickListener,
-    MediaPickerBottomSheetDialogFragment.OnMediaClickListener {
+    MediaPickerBottomSheetDialogFragment.OnMediaClickListener,
+    FacebookOptionBottomSheetDialogFragment.OnFacebookOptionClickListener,
+    TypelessMediaPickerBottomSheetDialogFragment.OnMediaClickListener{
 
     private lateinit var binding: FragmentDiaryViewPagerBinding
     private lateinit var viewModel: DiaryViewPagerViewModel
     private lateinit var viewPagerAdapter: ViewPagerAdapter
     private lateinit var bottomSheetDialogFragment: KakaoTalkOptionBottomSheetDialogFragment
     private lateinit var mediaPicker: MediaPickerBottomSheetDialogFragment
+    private lateinit var typelessMediaPicker: TypelessMediaPickerBottomSheetDialogFragment
 
     private lateinit var convertPdfClickListener: () -> Unit
     private lateinit var shareOnClickListener: () -> Unit
@@ -79,6 +84,10 @@ class DiaryViewPagerFragment: Fragment(),
             setMediaClickListener(this@DiaryViewPagerFragment)
         }
 
+        typelessMediaPicker = TypelessMediaPickerBottomSheetDialogFragment().apply {
+            setMediaClickListener(this@DiaryViewPagerFragment)
+        }
+
         convertPdfClickListener = {
             viewModel.getItem(binding.viewPager.currentItem)?.let {
                 findNavController().navigate(
@@ -102,9 +111,14 @@ class DiaryViewPagerFragment: Fragment(),
         }
 
         sendDiaryToFacebookClickListener = {
-            viewModel.getItem(binding.viewPager.currentItem)?.let {
-                ExportUtilities.sendDiaryToFacebook(requireActivity(), it)
+            val bottomSheetDialogFragment = FacebookOptionBottomSheetDialogFragment().apply {
+                setOnFacebookOptionClickListener(this@DiaryViewPagerFragment)
             }
+
+            bottomSheetDialogFragment.show(
+                requireActivity().supportFragmentManager,
+                bottomSheetDialogFragment.tag
+            )
         }
 
         viewModel.diaries.observe(viewLifecycleOwner) { diaries ->
@@ -317,5 +331,26 @@ class DiaryViewPagerFragment: Fragment(),
                 bottomSheetDialogFragment.dismiss()
             }
         }
+    }
+
+    /** Facebook */
+    override fun onSendMediaClick() {
+        viewModel.getItem(binding.viewPager.currentItem)?.let {
+            typelessMediaPicker.setDiary(it)
+            typelessMediaPicker.show(requireActivity().supportFragmentManager, typelessMediaPicker.tag)
+        }
+    }
+
+    override fun onSendOnlyTextClick() {
+        viewModel.getItem(binding.viewPager.currentItem)?.let {
+            ExportUtilities.sendTextToFacebook(
+                requireActivity(),
+                it
+            )
+        }
+    }
+
+    override fun onClick(pickedMediaUris: List<Pair<Int, Uri>>) {
+        ExportUtilities.sendDiaryToFacebook(requireActivity(), pickedMediaUris)
     }
 }

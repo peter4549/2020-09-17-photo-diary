@@ -34,14 +34,17 @@ class KakaoTalkOptionBottomSheetDialogFragment: BottomSheetDialogFragment() {
 
         binding.sendImages.setOnClickListener {
             kakaoTalkOptionClickListener.onSendImagesClick()
+            dismiss()
         }
 
         binding.sendVideo.setOnClickListener {
             kakaoTalkOptionClickListener.onSendVideoClick()
+            dismiss()
         }
 
         binding.sendAudio.setOnClickListener {
             kakaoTalkOptionClickListener.onSendAudioClick()
+            dismiss()
         }
 
         binding.sendText.setOnClickListener {

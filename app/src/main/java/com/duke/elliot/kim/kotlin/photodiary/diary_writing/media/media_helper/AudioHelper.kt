@@ -8,9 +8,6 @@ import android.media.MediaMetadataRetriever
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import com.duke.elliot.kim.kotlin.photodiary.R
-import com.duke.elliot.kim.kotlin.photodiary.utility.setImage
-import kotlinx.android.synthetic.main.item_media.view.*
-
 
 object AudioHelper {
     fun dispatchAudioPickerIntent(fragment: Fragment, getContent: Boolean) {

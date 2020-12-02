@@ -22,9 +22,10 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import com.duke.elliot.kim.kotlin.photodiary.R
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryModel
+import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.media_helper.MediaHelper
 import com.duke.elliot.kim.kotlin.photodiary.utility.*
-import com.facebook.share.model.ShareMediaContent
-import com.facebook.share.model.SharePhoto
+import com.facebook.share.model.*
+import com.facebook.share.widget.MessageDialog
 import com.facebook.share.widget.ShareDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.item_select_dialog_28.view.*
@@ -37,7 +38,6 @@ import java.io.File
 import java.io.FileWriter
 import java.util.*
 import kotlin.collections.ArrayList
-
 
 object ExportUtilities {
     const val KAKAO_TALK_OPTION_SEND_IMAGES = 0
@@ -370,6 +370,9 @@ object ExportUtilities {
     }
 
     private fun sendTextToKakaoTalk(activity: Activity, diary: DiaryModel) {
+        if (!::weatherWords.isInitialized)
+            weatherWords = activity.resources.getStringArray(R.array.weatherWords)
+
         val stringBuilder = StringBuilder()
         val date = diary.time.toDateFormat(activity.getString(R.string.date_format))
         val time = diary.time.toDateFormat(activity.getString(R.string.time_format))
@@ -394,16 +397,37 @@ object ExportUtilities {
         )
     }
 
-    // TODO: Test
-    fun sendDiaryToFacebook(activity: Activity, diary: DiaryModel) {
-        ExportUtilities.facebookTest(activity)
-        /*
+    fun sendDiaryToFacebook(activity: Activity, mediaUris: List<Pair<Int, Uri>>) {
         if (!::weatherWords.isInitialized)
             weatherWords = activity.resources.getStringArray(R.array.weatherWords)
 
-        val shareIntent = Intent(Intent.ACTION_SEND)
+        val sharePhotos = mutableListOf<SharePhoto>()
+        val shareVideos = mutableListOf<ShareVideo>()
 
-        val imageUris = diary.mediaArray.map { toContentUri(activity, it.uriString) } as ArrayList
+        for (media in mediaUris) {
+            if (media.first == MediaHelper.MediaType.PHOTO)
+                sharePhotos.add(SharePhoto.Builder().setImageUrl(media.second).build())
+            else
+                shareVideos.add(ShareVideo.Builder().setLocalUrl(media.second).build())
+        }
+
+        val shareMediaContentBuilder = ShareMediaContent.Builder()
+
+        if (sharePhotos.isNotEmpty())
+            shareMediaContentBuilder.addMedia(sharePhotos.toList())
+
+        if (shareVideos.isNotEmpty())
+            shareMediaContentBuilder.addMedia(shareVideos.toList())
+
+        val shareMediaContent = shareMediaContentBuilder.build()
+        val shareDialog = ShareDialog(activity)
+        shareDialog.show(shareMediaContent, ShareDialog.Mode.AUTOMATIC)
+        // shareDialog.registerCallback(callbackManager, new FacebookCallback<Sharer.Result>() { ... });
+    }
+
+    fun sendTextToFacebook(activity: Activity, diary: DiaryModel) {
+        if (!::weatherWords.isInitialized)
+            weatherWords = activity.resources.getStringArray(R.array.weatherWords)
 
         val stringBuilder = StringBuilder()
         val date = diary.time.toDateFormat(activity.getString(R.string.date_format))
@@ -415,15 +439,20 @@ object ExportUtilities {
         stringBuilder.append(diary.title + "\n\n")
         stringBuilder.append(diary.content)
 
-        shareIntent.putExtra(Intent.EXTRA_TEXT, stringBuilder.toString())
-        // shareIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, imageUris)
-        shareIntent.type = "text/plain"
-        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        shareIntent.setPackage("com.facebook.katana")
+        val uri = Uri.parse("R.drawable.ic_moon_24")
 
-        activity.startActivity(shareIntent)
+        val shareLinkContent = ShareLinkContent.Builder()
+            .setContentUrl(uri)
+            .setQuote(stringBuilder.toString())
+            .setShareHashtag(
+                ShareHashtag.Builder()
+                    .setHashtag("#ConnectTheWorld #howtoconcat #hahaha")
+                    .build()
+            )
+            .build()
 
-         */
+        val shareDialog = ShareDialog(activity)
+        shareDialog.show(shareLinkContent, ShareDialog.Mode.AUTOMATIC)
     }
 
     fun isKakaoTalkInstalled(context: Context): Boolean {
@@ -525,19 +554,5 @@ object ExportUtilities {
                 }
             }
             .show()
-    }
-
-    fun facebookTest(activity: Activity) {
-        val drawable = ContextCompat.getDrawable(activity, R.drawable.ic_kakao_talk_150px)
-        val bitmap = (drawable as BitmapDrawable).bitmap
-        val sharePhoto = SharePhoto.Builder().setBitmap(bitmap).build()
-
-        val shareContent = ShareMediaContent.Builder()
-            .addMedium(sharePhoto)
-            .build()
-
-        val shareDialog = ShareDialog(activity)
-
-        shareDialog.show(shareContent, ShareDialog.Mode.AUTOMATIC)
     }
 }

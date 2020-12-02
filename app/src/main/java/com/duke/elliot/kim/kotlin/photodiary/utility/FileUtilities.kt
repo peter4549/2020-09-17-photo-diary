@@ -310,32 +310,32 @@ class FileUtilities private constructor (private val context: Context) {
     @SuppressLint("Recycle")
     suspend fun copyFileToInternalStorage(sourceUri: Uri, prefix: String = "", suffix: String = ""): Uri? {
         return withContext(Dispatchers.IO) {
-        val cursor = context.contentResolver.query(
-            sourceUri, arrayOf(
-                OpenableColumns.DISPLAY_NAME, OpenableColumns.SIZE
-            ), null, null, null
-        ) ?: return@withContext null
+            val cursor = context.contentResolver.query(
+                sourceUri, arrayOf(
+                    OpenableColumns.DISPLAY_NAME, OpenableColumns.SIZE
+                ), null, null, null
+            ) ?: return@withContext null
 
-        /**
-         * Get the column indexes of the data in the Cursor,
-         *     * move to the first row in the Cursor, get the data,
-         *     * and display it.
-         */
-        val displayNameIndex: Int = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-        val sizeIndex: Int = cursor.getColumnIndex(OpenableColumns.SIZE)
-        cursor.moveToFirst()
-        val displayName: String = cursor.getString(displayNameIndex)
-        val size = cursor.getLong(sizeIndex).toString()
+            /**
+             * Get the column indexes of the data in the Cursor,
+             *     * move to the first row in the Cursor, get the data,
+             *     * and display it.
+             */
+            val displayNameIndex: Int = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+            val sizeIndex: Int = cursor.getColumnIndex(OpenableColumns.SIZE)
+            cursor.moveToFirst()
+            val displayName: String = cursor.getString(displayNameIndex)
+            val size = cursor.getLong(sizeIndex).toString()
 
-        val fileName = displayName.substringBeforeLast(".")
+            val fileName = displayName.substringBeforeLast(".")
 
-        var newDisplayName = displayName.replace(fileName, "${fileName}$suffix")
-        if (prefix != "")
-            newDisplayName = prefix + newDisplayName
+            var newDisplayName = displayName.replace(fileName, "${fileName}$suffix")
+            if (prefix != "")
+                newDisplayName = prefix + newDisplayName
 
-        replaceLast(displayName, fileName, "${prefix}$fileName${suffix}")
+            replaceLast(displayName, fileName, "${prefix}$fileName${suffix}")
 
-        val outputFile = File(context.getExternalFilesDir(null).toString() + "/${newDisplayName}")
+            val outputFile = File(context.getExternalFilesDir(null).toString() + "/${newDisplayName}")
 
             try {
                 val inputStream = context.contentResolver.openInputStream(sourceUri)
@@ -355,7 +355,6 @@ class FileUtilities private constructor (private val context: Context) {
                 Timber.e(e)
                 return@withContext null
             }
-
 
             return@withContext outputFile.toUri()
         }

@@ -11,10 +11,12 @@
     <color name="colorTextCalendar">@color/colorJet</color>
     <color name="colorTextSpinnerItem">@color/colorDavyGrey</color>
 
-    <color name="colorDefaultThemeDark">#B39DDB</color>
-    <color name="colorDefaultThemeLight">#EDE7F6</color>
+    <color name="colorDefaultThemePrimary">#B39DDB</color>
+    <color name="colorDefaultThemeSecondary">#EDE7F6</color>
     <color name="colorTextDisabledDark">@color/colorSilver</color>
     <color name="colorTextEnabledDark">@color/colorJet</color>
+
+    <color name="colorTextSecondaryGrey">@color/colorSilver</color>
 
     <color name="colorDialogText">@color/colorGhostWhite</color>
     <color name="colorDialogBackgroundDark">@color/colorSemiBlackTransparent</color>
@@ -32,8 +34,11 @@
     <color name="colorTextOptionItemsSelected">@color/colorGrey600</color>
     <color name="colorTextOptionItemsUnselected">@color/colorSilver</color>
     <color name="colorTextViewBackground">@color/colorGhostWhite</color>
-    <color name="colorToolbarBackground">@color/colorDefaultThemeDark</color>
+    <color name="colorToolbarBackground">@color/colorDefaultThemePrimary</color>
     <color name="colorToolbarTitle">@color/colorWhite</color>
+
+    <color name="colorLockScreenBackground">@color/colorGhostWhite</color>
+    <color name="colorLockScreenNextButton">@color/colorSnowWhite</color>
 
     <color name="colorBlueGrey900">#263238</color>
     <color name="colorDarkGray">#A9A9A9</color>
@@ -43,8 +48,9 @@
     <color name="colorDarkGreyTransparent">#809E9E9E</color>
     <color name="colorJet">#343434</color>
     <color name="colorDavyGrey">#555555</color>
-    <color name="colorSilver">#C0C0C0</color>
+    <color name="colorSilver">#BABACA</color>  <!-- customize #C0C0C0 to #BCBCCF -->
     <color name="colorWhite">#FEFEFE</color>
+    <color name="colorSnowWhite">#FFFAFA</color>
 
     <!-- PhotoEditor -->
     <color name="colorSemiBlackTransparent">#99000000</color>
@@ -92,7 +98,28 @@
     <color name="colorOrange200">#ffcc80</color>
     <color name="colorDeepOrange200">#ffab91</color>
     <color name="colorBrown200">#bcaaa4</color>
-    <color name="colorBlueGrey">#b0bec5</color>
+    <color name="colorBlueGrey200">#b0bec5</color>
+
+    <!-- Default Colors 50 -->
+    <color name="colorRed50">#ffebee</color>
+    <color name="colorPink50">#fce4ec</color>
+    <color name="colorPurple50">#f3e5f5</color>
+    <color name="colorDeepPurple50">#ede7f6</color>
+    <color name="colorIndigo50">#e8eaf6</color>
+    <color name="colorBlue50">#e3f2fd</color>
+    <color name="colorLightBlue50">#e1f5fe</color>
+    <color name="colorCyan50">#e0f7fa</color>
+    <color name="colorTeal50">#e0f2f1</color>
+    <color name="colorGreen50">#e8f5e9</color>
+    <color name="colorLightGreen50">#f1f8e9</color>
+    <color name="colorLime50">#f9fbe7</color>
+    <color name="colorYellow50">#fffde7</color>
+    <color name="colorAmber50">#fff8e1</color>
+    <color name="colorOrange50">#fff3e0</color>
+    <color name="colorDeepOrange50">#fbe9e7</color>
+    <color name="colorBrown50">#efebe9</color>
+    <color name="colorBlueGrey50">#eceff1</color>
+
 
     <color name="colorBabyBlue">#89CFF0</color>
     <color name="colorCrushedIce">#C4FFF7</color>
@@ -136,8 +163,8 @@
     <color name="colorPickerRecyclerViewBackground">#BF000000</color> <!-- BF: 75% -->
 
     <!-- Calendar -->
-    <color name="calendarBackground">@color/colorDefaultThemeDark</color>
-    <color name="calendarBackgroundLight">@color/colorDefaultThemeLight</color>
+    <color name="calendarBackground">@color/colorDefaultThemePrimary</color>
+    <color name="calendarBackgroundLight">@color/colorDefaultThemeSecondary</color>
     <color name="calendarWhiteLight">#80FFFFFF</color>  <!-- 80: 50%, 99: 60%, B3: 70% -->
     <color name="calendarWhite">#D9FFFFFF</color> <!-- D9: 85% -->
     <color name="anniversaryColorPickerWhite">#F2F8F8FF</color> <!-- F2: 95% -->
@@ -150,4 +177,46 @@
     <color name="rainbowBlue">@color/colorBlue500</color>
     <color name="rainbowIndigo">@color/colorIndigo500</color>
     <color name="rainbowViolet">#9F00FF</color>  <!-- Vivid Violet -->
+
+    <array name="theme_colors">
+        <item>@color/colorRed200</item>
+        <item>@color/colorRed500</item>
+        <item>@color/colorPink200</item>
+        <item>@color/colorPink500</item>
+        <item>@color/colorPurple200</item>
+        <item>@color/colorPurple500</item>
+        <item>@color/colorDeepPurple200</item>
+        <item>@color/colorDeepPurple500</item>
+        <item>@color/colorIndigo200</item>
+        <item>@color/colorIndigo500</item>
+        <item>@color/colorBlue200</item>
+        <item>@color/colorBlue500</item>
+        <item>@color/colorLightBlue200</item>
+        <item>@color/colorLightBlue500</item>
+        <item>@color/colorCyan200</item>
+        <item>@color/colorCyan500</item>
+        <item>@color/colorTeal200</item>
+        <item>@color/colorTeal500</item>
+        <item>@color/colorGreen200</item>
+        <item>@color/colorGreen500</item>
+        <item>@color/colorLightGreen200</item>
+        <item>@color/colorLightGreen500</item>
+        <item>@color/colorLime200</item>
+        <item>@color/colorLime500</item>
+        <item>@color/colorYellow200</item>
+        <item>@color/colorYellow500</item>
+        <item>@color/colorAmber200</item>
+        <item>@color/colorAmber500</item>
+        <item>@color/colorOrange200</item>
+        <item>@color/colorOrange500</item>
+        <item>@color/colorDeepOrange200</item>
+        <item>@color/colorDeepOrange500</item>
+        <item>@color/colorBrown200</item>
+        <item>@color/colorBrown500</item>
+        <item>@color/colorBlueGrey200</item>
+        <item>@color/colorBlueGrey500</item>
+    </array>
+
+    <!-- Ripple -->
+    <color name="lavender">#F2E0E0FC</color>
 </resources>

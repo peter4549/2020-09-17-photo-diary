@@ -143,6 +143,7 @@
     <string name="select_photos">사진 선택</string>
     <string name="select_video">비디오 선택</string>
     <string name="select_audio">오디오 선택</string>
+    <string name="select_media">미디어 선택</string>
     <string name="select_all">모두 선택</string>
     <string name="no_picture_is_selected">선택된 사진이 없습니다.</string>
 
@@ -156,9 +157,7 @@
 
     <!-- Facebook -->
     <string name="send_diary_to_facebook">페이스북으로 보내기</string>
-    <string name="facebook_send_images">이미지 보내기</string>
-    <string name="facebook_send_video">비디오 보내기</string>
-    <string name="facebook_send_audio">오디오 보내기</string>
+    <string name="facebook_send_media">미디어 보내기</string>
     <string name="facebook_send_text">텍스트 보내기</string>
     <string name="facebook_not_found">페이스북을 찾을 수 없습니다.</string>
 
@@ -197,4 +196,33 @@
 
     <!-- Facebook -->
     <string name="facebook_app_id">390282592409873</string>
+
+    <!-- Drawer -->
+    <string name="change_theme">테마 변경</string>
+    <string name="set_lock_screen">잠금 설정</string>
+
+    <!-- Change Theme -->
+    <string name="change_theme_color">테마 색상 변경</string>
+    <string name="change_theme_color_message">메인 테마 색상을 변경합니다.</string>
+    <string name="night_mode">야간 모드</string>
+    <string name="failed_to_choose_color">색상을 선택하지 못했습니다.</string>
+    <string name="system_night_mode">시스템 야간 모드</string>
+    <string name="battery_saver_mode">배터리 세이버 모드</string>
+    <string name="system_night_mode_message">시스템의 야간 모드 설정을 따릅니다.</string>
+    <string name="battery_saver_mode_message">배터리 상태에 따라 야간 모드가 설정됩니다.</string>
+
+    <!-- Lock Screen -->
+    <string name="lock_screen_set">잠금 화면이 설정되었습니다.</string>
+    <string name="change_lock_screen_password">비밀번호 변경</string>
+    <string name="recovery_email_setting">복구 이메일 설정</string>
+    <string name="initialize_lock_screen_password">비밀번호 초기화</string>
+    <string name="lock_screen_password_initialized">비밀번호가 초기화되었습니다.</string>
+    <string name="passwords_do_not_match">비밀번호가 일치하지 않습니다.</string>
+    <string name="fingerprint_authorization_failed">지문인증에 실패했습니다.</string>
+    <string name="no_password_set">설정된 비밀번호가 없습니다.</string>
+    <string name="please_enter_your_existing_password">기존 비밀번호를 입력하세요.</string>
+    <string name="please_enter_a_new_password">새 비밀번호를 입력하세요.</string>
+    <string name="please_enter_a_password">비밀번호를 입력하세요.</string>
+    <string name="password_changed">비밀번호가 변경되었습니다.</string>
+    <string name="forgot_your_password">비밀번호 찾기</string>
 </resources>
