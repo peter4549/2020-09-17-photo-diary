@@ -219,4 +219,7 @@
 
     <!-- Ripple -->
     <color name="lavender">#F2E0E0FC</color>
+
+    <!-- Error -->
+    <color name="colorError">#E25822</color>  <!-- Flame -->
 </resources>

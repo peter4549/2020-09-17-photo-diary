@@ -60,25 +60,13 @@
         </LinearLayout>
 
         <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginStart="32dp"
-            android:layout_marginEnd="8dp"
-            android:padding="8dp"
-            android:text="@string/change_lock_screen_password"
-            android:textSize="18sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/setLockScreen"/>
-
-        <TextView
             android:id="@+id/changePassword"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginStart="32dp"
             android:layout_marginEnd="8dp"
+            android:layout_marginTop="16dp"
             android:padding="8dp"
             android:text="@string/change_lock_screen_password"
             android:textSize="18sp"
@@ -87,14 +75,15 @@
             app:layout_constraintTop_toBottomOf="@id/setLockScreen"/>
 
         <TextView
-            android:id="@+id/recoveryEmailSetting"
+            android:id="@+id/setSecurityQuestion"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginStart="32dp"
             android:layout_marginEnd="8dp"
+            android:layout_marginTop="16dp"
             android:padding="8dp"
-            android:text="@string/recovery_email_setting"
+            android:text="@string/set_up_security_questions"
             android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -107,12 +96,13 @@
             android:layout_weight="1"
             android:layout_marginStart="32dp"
             android:layout_marginEnd="8dp"
+            android:layout_marginTop="16dp"
             android:padding="8dp"
             android:text="@string/initialize_lock_screen_password"
             android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/recoveryEmailSetting"/>
+            app:layout_constraintTop_toBottomOf="@id/setSecurityQuestion"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

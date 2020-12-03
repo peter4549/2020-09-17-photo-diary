@@ -5,7 +5,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.core.view.GravityCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
@@ -13,6 +15,7 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
 import com.duke.elliot.kim.kotlin.photodiary.MainActivity
+import com.duke.elliot.kim.kotlin.photodiary.MainViewModel
 import com.duke.elliot.kim.kotlin.photodiary.R
 import com.duke.elliot.kim.kotlin.photodiary.base.BaseFragment
 import com.duke.elliot.kim.kotlin.photodiary.calendar.CalendarFragment
@@ -60,6 +63,22 @@ class TabFragment: BaseFragment() {
             }
         }
 
+        /** onBackPressed */
+        val onBackPressedCallback: OnBackPressedCallback =
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    if (binding.drawerLayout.isDrawerOpen(GravityCompat.START))
+                        binding.drawerLayout.closeDrawer(GravityCompat.START, true)
+                    else
+                        requireActivity().finish()
+                }
+            }
+
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            onBackPressedCallback
+        )
+
         // TODO: 안쓸듯..
         binding.tabFragment.alarm_test_btn.setOnClickListener {
             // TODO: test. 잘되면 존나 개꿀. 관건은 다이나믹하게 가능한가.. MAINACTIVITY에도 있음.
@@ -78,6 +97,7 @@ class TabFragment: BaseFragment() {
 
         binding.textSetLockScreen.setOnClickListener {
             val intent = Intent(requireActivity(), SetLockScreenActivity::class.java)
+            MainViewModel.lockScreenException = true
             startActivity(intent)
         }
 

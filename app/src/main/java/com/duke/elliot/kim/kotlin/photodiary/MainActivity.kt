@@ -20,6 +20,8 @@ import com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryWritingFragment
 import com.duke.elliot.kim.kotlin.photodiary.drawer_items.getNightMode
 import com.duke.elliot.kim.kotlin.photodiary.drawer_items.loadPrimaryThemeColor
 import com.duke.elliot.kim.kotlin.photodiary.drawer_items.loadSecondaryThemeColor
+import com.duke.elliot.kim.kotlin.photodiary.drawer_items.lock_screen.LOCK_SCREEN_TAG
+import com.duke.elliot.kim.kotlin.photodiary.drawer_items.lock_screen.LockScreenHelper
 import com.duke.elliot.kim.kotlin.photodiary.fluid_keyboard_resize.FluidContentResize
 import com.duke.elliot.kim.kotlin.photodiary.utility.TypefaceUtil
 import com.duke.elliot.kim.kotlin.photodiary.utility.printHashKey
@@ -31,7 +33,6 @@ class MainActivity : AppCompatActivity() {
 
     // TODO must be private, provide fun as interface.
     lateinit var viewModel: MainViewModel
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,7 +52,7 @@ class MainActivity : AppCompatActivity() {
 
         themeColorPrimary = loadPrimaryThemeColor(this)
         themeColorSecondary = loadSecondaryThemeColor(this)
-        AppCompatDelegate.setDefaultNightMode(getNightMode(this))
+        // AppCompatDelegate.setDefaultNightMode(getNightMode(this))
 
         // TODO: Implement.
         //AlarmUtilities.setReminder(this, 0L, "")
@@ -82,86 +83,34 @@ class MainActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
     }
 
-    override fun onStop() {
-        super.onStop()
-        println("THIS CALL WHEN POWER OFF?")
-        val f = supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
-        if (f is DiaryWritingFragment) // do something with f
-            showToast(this, "GOOD WORKING")
+    override fun onBackPressed() {
+        if (isLockScreenOn())
+            return
 
-        val fragments: List<*> = supportFragmentManager.fragments
-        val mCurrentFragment = fragments[fragments.size - 1]
-        if (mCurrentFragment is DiaryWritingFragment) // do something with f
-            showToast(this, "GOOD WORKING 22222")
-
-        val navHostFragment =
-            supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
-        val k = navHostFragment!!.childFragmentManager.primaryNavigationFragment
-        println("KKKKKK, $k")
-        val ss = findNavController(R.id.nav_host_fragment).currentDestination?.getId()
-        println("SSSSSSS, $ss")
-
-        println("CHECK BACK: ${isApplicationSentToBackground(this)}")
+        super.onBackPressed()
     }
 
-    override fun onUserLeaveHint() {
-        super.onUserLeaveHint()
-        println("HINT CALLLLLL")
+    override fun onStop() {
+        super.onStop()
+        if (!MainViewModel.lockScreenException) {
+            MainViewModel.screenWasOff = true
+        }
+
+        MainViewModel.lockScreenException = false
     }
 
     override fun onResume() {
         super.onResume()
+
+        if (LockScreenHelper.loadLockScreenOnState(this) && MainViewModel.screenWasOff && !isLockScreenOn())
+            LockScreenHelper.showAuthLockScreen(this, LockScreenHelper.loadEncodedPinCode(this))
+
+        MainViewModel.screenWasOff = false
     }
 
-    fun isApplicationSentToBackground(context: Context): Boolean {
-        val am = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-        val tasks = am.getRunningTasks(1)
-        if (!tasks.isEmpty()) {
-            val topActivity = tasks[0].topActivity
-            if (topActivity!!.packageName != context.getPackageName()) {
-                return true
-            }
-        }
-        return false
-    }
-
-    private fun showLockScreen() {
-        val pfLockScreenFragment = PFLockScreenFragment()
-        val builder = PFFLockScreenConfiguration.Builder(this)
-            .setMode(PFFLockScreenConfiguration.MODE_AUTH)
-            .setUseFingerprint(true)
-        pfLockScreenFragment.setConfiguration(builder.build())
-        pfLockScreenFragment.setEncodedPinCode("123123123123")
-        pfLockScreenFragment.setLoginListener(object :
-            PFLockScreenFragment.OnPFLockScreenLoginListener {
-            override fun onCodeInputSuccessful() {
-
-                showToast(this@MainActivity, "코드성공 ")
-            }
-
-            override fun onFingerprintSuccessful() {
-                showToast(this@MainActivity, "지문로긴성")
-            }
-
-            override fun onPinLoginFailed() {
-                showToast(this@MainActivity, "핀로긴실패")
-            }
-
-            override fun onFingerprintLoginFailed() {
-                showToast(this@MainActivity, "지문로긴실패. ")
-            }
-        })
-
-        pfLockScreenFragment.setOnLeftButtonClickListener {
-            showToast(this@MainActivity, "FUCK 777")
-        }
-
-        supportFragmentManager.beginTransaction()
-            .addToBackStack(null)
-            .setCustomAnimations(R.anim.fragment_fade_enter, R.anim.fragment_fade_exit)
-            .replace(R.id.nav_host_fragment, pfLockScreenFragment)
-            .commit()
-
+    private fun isLockScreenOn(): Boolean {
+        val fragment = supportFragmentManager.findFragmentByTag(LOCK_SCREEN_TAG)
+        return fragment != null && fragment.isVisible
     }
 
     private fun setFontNameIdMap() {

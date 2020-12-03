@@ -7,6 +7,7 @@ import com.beautycoder.pflockscreen.PFFLockScreenConfiguration
 import com.beautycoder.pflockscreen.fragments.PFLockScreenFragment
 import com.beautycoder.pflockscreen.fragments.PFLockScreenFragment.OnPFLockScreenCodeCreateListener
 import com.beautycoder.pflockscreen.security.PFSecurityManager
+import com.duke.elliot.kim.kotlin.photodiary.MainViewModel
 import com.duke.elliot.kim.kotlin.photodiary.R
 import com.duke.elliot.kim.kotlin.photodiary.databinding.ActivitySetLockScreenBinding
 import com.duke.elliot.kim.kotlin.photodiary.utility.showToast
@@ -18,6 +19,7 @@ class SetLockScreenActivity: AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         binding = DataBindingUtil.setContentView(this, R.layout.activity_set_lock_screen)
 
         binding.switchSetLockScreen.isChecked = LockScreenHelper.loadLockScreenOnState(this)
@@ -41,6 +43,15 @@ class SetLockScreenActivity: AppCompatActivity() {
                 showChangeCodeLockScreen()
             else
                 showToast(this, getString(R.string.no_password_set))
+        }
+
+        binding.setSecurityQuestion.setOnClickListener {
+            val securityQuestionsDialogFragment = SecurityQuestionsDialogFragment().apply {
+                setTitle(it.context.getString(R.string.set_up_security_questions))
+                setMode(SET_SECURITY_QUESTION)
+            }
+
+            securityQuestionsDialogFragment.show(supportFragmentManager, securityQuestionsDialogFragment.tag)
         }
 
         binding.initializePassword.setOnClickListener {
@@ -75,7 +86,7 @@ class SetLockScreenActivity: AppCompatActivity() {
             .setMode(PFFLockScreenConfiguration.MODE_CREATE)
             .setUseFingerprint(true)
             .setTitle(title)
-            .setNextButton(" ")
+            .setNextButton(getString(R.string.ok))
 
         pfLockScreenFragment.setConfiguration(builder.build())
         pfLockScreenFragment.setCodeCreateListener(object : OnPFLockScreenCodeCreateListener {
@@ -107,7 +118,8 @@ class SetLockScreenActivity: AppCompatActivity() {
             .setMode(PFFLockScreenConfiguration.MODE_AUTH)
             .setUseFingerprint(true)
             .setTitle(getString(R.string.please_enter_your_existing_password))
-            .setLeftButton(getString(R.string.forgot_your_password))
+            .setLeftButton(getString(R.string.find_by_security_question))
+            .setClearCodeOnError(true)
         pfLockScreenFragment.setConfiguration(builder.build())
         pfLockScreenFragment.setEncodedPinCode(LockScreenHelper.loadEncodedPinCode(this))
         pfLockScreenFragment.setLoginListener(object : PFLockScreenFragment.OnPFLockScreenLoginListener {
@@ -130,13 +142,33 @@ class SetLockScreenActivity: AppCompatActivity() {
             }
         })
 
+        pfLockScreenFragment.setOnLeftButtonClickListener {
+            val securityQuestionIndexAnswerPair = LockScreenHelper.loadSecurityQuestionIndexAnswerPair(it.context)
+            val correctSecurityQuestionIndex = securityQuestionIndexAnswerPair?.first ?: -1
+            val correctAnswer = securityQuestionIndexAnswerPair?.second
+
+            if (correctSecurityQuestionIndex == -1 || correctAnswer.isNullOrBlank())
+                showToast(it.context, it.context.getString(R.string.security_question_is_not_set))
+            else {
+                val securityQuestionDialogFragment = SecurityQuestionsDialogFragment().apply {
+                    setTitle(it.context.getString(R.string.forgot_your_password))
+                    setMode(AUTHORIZE_SECURITY_QUESTION)
+                    setContainerViewId(R.id.activity_set_lock_screen_container)
+                }
+                securityQuestionDialogFragment.show(
+                    supportFragmentManager,
+                    securityQuestionDialogFragment.tag
+                )
+            }
+        }
+
         supportFragmentManager.beginTransaction()
             .addToBackStack(null)
             .setCustomAnimations(
                 R.anim.anim_slide_in_from_bottom,
                 R.anim.anim_slide_out_to_top,
-                R.anim.anim_slide_in_from_bottom,
-                R.anim.fade_out)
+                R.anim.anim_slide_in_from_top,
+                R.anim.anim_slide_out_to_bottom)
             .replace(R.id.activity_set_lock_screen_container, pfLockScreenFragment)
             .commit()
     }
@@ -148,6 +180,7 @@ class SetLockScreenActivity: AppCompatActivity() {
             .setUseFingerprint(true)
             .setTitle(getString(R.string.please_enter_your_existing_password))
             .setLeftButton(getString(R.string.forgot_your_password))
+            .setClearCodeOnError(true)
         pfLockScreenFragment.setConfiguration(builder.build())
         pfLockScreenFragment.setEncodedPinCode(LockScreenHelper.loadEncodedPinCode(this))
         pfLockScreenFragment.setLoginListener(object : PFLockScreenFragment.OnPFLockScreenLoginListener {
@@ -185,8 +218,23 @@ class SetLockScreenActivity: AppCompatActivity() {
         })
 
         pfLockScreenFragment.setOnLeftButtonClickListener {
-            // TODO 비번 찾기.
-            println("aaaaa")
+            val securityQuestionIndexAnswerPair = LockScreenHelper.loadSecurityQuestionIndexAnswerPair(it.context)
+            val correctSecurityQuestionIndex = securityQuestionIndexAnswerPair?.first ?: -1
+            val correctAnswer = securityQuestionIndexAnswerPair?.second
+
+            if (correctSecurityQuestionIndex == -1 || correctAnswer.isNullOrBlank())
+                showToast(it.context, it.context.getString(R.string.security_question_is_not_set))
+            else {
+                val securityQuestionDialogFragment = SecurityQuestionsDialogFragment().apply {
+                    setTitle(it.context.getString(R.string.forgot_your_password))
+                    setMode(AUTHORIZE_SECURITY_QUESTION)
+                    setContainerViewId(R.id.activity_set_lock_screen_container)
+                }
+                securityQuestionDialogFragment.show(
+                    supportFragmentManager,
+                    securityQuestionDialogFragment.tag
+                )
+            }
         }
 
         supportFragmentManager.beginTransaction()

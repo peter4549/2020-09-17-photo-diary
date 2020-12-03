@@ -99,9 +99,13 @@
 
     <style name="LockNextButtonStyle">
         <item name="android:foreground">@drawable/lock_screen_button_ripple_without_background</item>
-        <item name="android:background">@drawable/ic_sharp_check_circle_24</item>
-        <item name="android:elevation">2dp</item>
-        <item name="android:padding">8dp</item>
+        <item name="android:backgroundTint">@color/colorLockScreenNextButton</item>
+        <item name="android:drawableLeft">@drawable/ic_sharp_check_circle_27</item>
+        <item name="android:gravity">center</item>
+        <item name="android:paddingBottom">12dp</item>
+        <item name="android:paddingEnd">16dp</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingTop">12dp</item>
         <item name="android:textColor">@color/color_text_dark</item>
         <item name="android:textSize">20sp</item>
         <item name="android:layout_margin">48dp</item>
@@ -117,4 +121,9 @@
         <item name="android:layout_marginTop">16dp</item>
     </style>
 
+    <!-- Cookie Run Font -->
+    <style name="CookieRunFontFamilyStyle">
+        <item name="android:fontFamily">@font/font_family_cookie_run</item>
+        <item name="android:includeFontPadding">false</item>
+    </style>
 </resources>

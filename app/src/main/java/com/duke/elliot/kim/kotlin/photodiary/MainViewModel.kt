@@ -8,6 +8,7 @@ import com.duke.elliot.kim.kotlin.photodiary.database.DiaryDao
 import com.duke.elliot.kim.kotlin.photodiary.database.DiaryDatabase
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryModel
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.media_helper.MediaHelper
+import com.duke.elliot.kim.kotlin.photodiary.drawer_items.lock_screen.LockScreenHelper
 import com.duke.elliot.kim.kotlin.photodiary.utility.FileUtilities
 import kotlinx.coroutines.*
 import timber.log.Timber
@@ -19,7 +20,6 @@ class MainViewModel(application: Application): AndroidViewModel(application) {
     private val fileUtilities = FileUtilities.getInstance(application)
     // var diariesFragmentAction = Action.UNINITIALIZED
     var photosFragmentAction = Action.UNINITIALIZED
-    var lockScreenOn = false
     private lateinit var database: DiaryDao
     private lateinit var diaries: LiveData<MutableList<DiaryModel>>
 
@@ -84,5 +84,8 @@ class MainViewModel(application: Application): AndroidViewModel(application) {
         var inserted = false
         var updated = false
         var selectedDiaryPosition = -1
+
+        var screenWasOff = true
+        var lockScreenException = false
     }
 }
