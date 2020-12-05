@@ -8,6 +8,8 @@ import androidx.room.TypeConverters
 import com.duke.elliot.kim.kotlin.photodiary.calendar.AnniversaryModel
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryModel
 
+const val DIARY_DATABASE_NAME = "diary_database_debug_14"
+
 @Database(entities = [DiaryModel::class, AnniversaryModel::class], version = 1, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class DiaryDatabase : RoomDatabase() {
@@ -26,7 +28,7 @@ abstract class DiaryDatabase : RoomDatabase() {
                     instance = Room.databaseBuilder(
                         context.applicationContext,
                         DiaryDatabase::class.java,
-                        "diary_database_debug_12"
+                        DIARY_DATABASE_NAME
                     )
                         .fallbackToDestructiveMigration()
                         .build()

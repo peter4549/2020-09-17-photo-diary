@@ -20,6 +20,7 @@ import android.widget.ArrayAdapter
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import com.duke.elliot.kim.kotlin.photodiary.MainViewModel
 import com.duke.elliot.kim.kotlin.photodiary.R
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryModel
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.media_helper.MediaHelper
@@ -38,6 +39,8 @@ import java.io.File
 import java.io.FileWriter
 import java.util.*
 import kotlin.collections.ArrayList
+
+const val EXPORT_REQUEST_CODE = 9001
 
 object ExportUtilities {
     const val KAKAO_TALK_OPTION_SEND_IMAGES = 0
@@ -61,6 +64,7 @@ object ExportUtilities {
         if (diary == null)
             return
 
+        @Suppress("BlockingMethodInNonBlockingContext")
         withContext(Dispatchers.IO) {
             if (!::mediaScanner.isInitialized)
                 mediaScanner = MediaScanner.newInstance(context)
@@ -69,7 +73,7 @@ object ExportUtilities {
                 weatherWords = context.resources.getStringArray(R.array.weatherWords)
 
             try {
-                val path = getDocumentDirectory(context)
+                val path = getDocumentDirectory()
                 val directory = File(path, context.getString(R.string.app_name))
                 if (!directory.exists())
                     directory.mkdir()
@@ -113,6 +117,7 @@ object ExportUtilities {
         if (diary == null)
             return
 
+        @Suppress("BlockingMethodInNonBlockingContext")
         withContext(Dispatchers.IO) {
             if (!::mediaScanner.isInitialized)
                 mediaScanner = MediaScanner.newInstance(context)
@@ -127,16 +132,16 @@ object ExportUtilities {
                 values.put(
                     MediaStore.MediaColumns.RELATIVE_PATH,
                     Environment.DIRECTORY_DOCUMENTS.toString() + "/${
-                        context.getString(
-                            R.string.app_name
-                        )
+                        "ChouChouDiary"
                     }/"
                 )
                 val uri = context.contentResolver.insert(
                     MediaStore.Files.getContentUri("external"),
                     values
                 )
-                val outputStream = uri?.let { context.contentResolver.openOutputStream(it) }
+                val outputStream = uri?.let {
+                    context.contentResolver.openOutputStream(it)
+                }
 
                 // Write contents.
                 val stringBuilder = StringBuilder()
@@ -193,7 +198,7 @@ object ExportUtilities {
             activity.getString(R.string.share_diary)
         )
 
-        activity.startActivity(chooserIntent)
+        activity.startActivityForResult(chooserIntent, EXPORT_REQUEST_CODE)
     }
 
     private fun toContentUri(activity: Activity, uriString: String): Uri? {
@@ -298,6 +303,7 @@ object ExportUtilities {
             return
         }
 
+
         when(option) {
             KAKAO_TALK_OPTION_SEND_IMAGES -> sendPhotosToKakaoTalk(activity, mediaUris)
             KAKAO_TALK_OPTION_SEND_VIDEO -> sendVideoToKakaoTalk(activity, mediaUri)
@@ -324,11 +330,11 @@ object ExportUtilities {
         shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         shareIntent.setPackage("com.kakao.talk")
 
-        activity.startActivity(
+        activity.startActivityForResult(
             Intent.createChooser(
                 shareIntent,
                 activity.getString(R.string.send_diary_to_kakao_talk)
-            )
+            ), EXPORT_REQUEST_CODE
         )
     }
 
@@ -342,11 +348,11 @@ object ExportUtilities {
         shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         shareIntent.setPackage("com.kakao.talk")
 
-        activity.startActivity(
+        activity.startActivityForResult(
             Intent.createChooser(
                 shareIntent,
                 activity.getString(R.string.send_diary_to_kakao_talk)
-            )
+            ), EXPORT_REQUEST_CODE
         )
     }
 
@@ -361,11 +367,11 @@ object ExportUtilities {
         shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         shareIntent.setPackage("com.kakao.talk")
 
-        activity.startActivity(
+        activity.startActivityForResult(
             Intent.createChooser(
                 shareIntent,
                 activity.getString(R.string.send_diary_to_kakao_talk)
-            )
+            ), EXPORT_REQUEST_CODE
         )
     }
 
@@ -389,11 +395,11 @@ object ExportUtilities {
         shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         shareIntent.setPackage("com.kakao.talk")
 
-        activity.startActivity(
+        activity.startActivityForResult(
             Intent.createChooser(
                 shareIntent,
                 activity.getString(R.string.send_diary_to_kakao_talk)
-            )
+            ), EXPORT_REQUEST_CODE
         )
     }
 

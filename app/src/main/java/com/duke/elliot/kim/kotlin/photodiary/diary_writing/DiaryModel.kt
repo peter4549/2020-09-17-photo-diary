@@ -20,7 +20,8 @@ data class DiaryModel(@PrimaryKey(autoGenerate = true)
                       var textOptions: TextOptionsModel,
                       var liked: Boolean,
                       var weatherIconIndex: Int,
-                      var hashTags: Array<String>) : Parcelable {
+                      var hashTags: Array<String>,
+                      var backedUp: Boolean = false) : Parcelable {
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

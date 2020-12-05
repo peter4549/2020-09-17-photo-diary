@@ -4,30 +4,32 @@ import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.os.Environment
+import android.view.*
 import androidx.annotation.ColorInt
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
-import com.beautycoder.pflockscreen.PFFLockScreenConfiguration
-import com.beautycoder.pflockscreen.fragments.PFLockScreenFragment
+import com.duke.elliot.kim.kotlin.photodiary.database.DIARY_DATABASE_NAME
+import com.duke.elliot.kim.kotlin.photodiary.database.DatabaseOpenHelper
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryModel
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryWritingFragment
-import com.duke.elliot.kim.kotlin.photodiary.drawer_items.getNightMode
 import com.duke.elliot.kim.kotlin.photodiary.drawer_items.loadPrimaryThemeColor
 import com.duke.elliot.kim.kotlin.photodiary.drawer_items.loadSecondaryThemeColor
 import com.duke.elliot.kim.kotlin.photodiary.drawer_items.lock_screen.LOCK_SCREEN_TAG
 import com.duke.elliot.kim.kotlin.photodiary.drawer_items.lock_screen.LockScreenHelper
+import com.duke.elliot.kim.kotlin.photodiary.export.EXPORT_REQUEST_CODE
 import com.duke.elliot.kim.kotlin.photodiary.fluid_keyboard_resize.FluidContentResize
 import com.duke.elliot.kim.kotlin.photodiary.utility.TypefaceUtil
 import com.duke.elliot.kim.kotlin.photodiary.utility.printHashKey
 import com.duke.elliot.kim.kotlin.photodiary.utility.showToast
+import com.duke.elliot.kim.kotlin.photodiary.utility.toDateFormat
+import com.facebook.internal.CallbackManagerImpl
 import kotlinx.android.synthetic.main.item_diary.view.*
-
+import kotlinx.coroutines.withContext
+import timber.log.Timber
+import java.io.File
+import java.io.FileWriter
 
 class MainActivity : AppCompatActivity() {
 
@@ -79,10 +81,6 @@ class MainActivity : AppCompatActivity() {
         override fun getItemCount(): Int = diaries.count()
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-    }
-
     override fun onBackPressed() {
         if (isLockScreenOn())
             return
@@ -92,11 +90,25 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStop() {
         super.onStop()
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
+        if (navHostFragment?.childFragmentManager?.primaryNavigationFragment is DiaryWritingFragment)
+            MainViewModel.lockScreenException = true
+
         if (!MainViewModel.lockScreenException) {
             MainViewModel.screenWasOff = true
         }
 
         MainViewModel.lockScreenException = false
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        Timber.d("Request Code: $requestCode, Result Code: $resultCode")
+
+        val facebookShareRequestCode = CallbackManagerImpl.RequestCodeOffset.Share.toRequestCode()
+
+        if (requestCode == EXPORT_REQUEST_CODE || requestCode == facebookShareRequestCode)
+            MainViewModel.screenWasOff = false
     }
 
     override fun onResume() {
@@ -149,5 +161,33 @@ class MainActivity : AppCompatActivity() {
 
         @ColorInt
         var themeColorSecondary = 0
+    }
+
+    fun testman(context: Context) {
+        try {
+            val path = Environment.getExternalStorageDirectory().toString()
+            val directory = File(path, "AAAMANSTER")
+            if (!directory.exists())
+                directory.mkdir()
+
+            val file = File(directory, "/${"AAAA"}.txt")
+
+            val fileWriter = FileWriter(file)
+
+
+            fileWriter.write("stringBuilder.toString()")
+
+            //mediaScanner.scanMedia(file.absolutePath)
+
+            showToast(
+                context,
+                context.getString(R.string.text_file_created) + file.absolutePath
+            )
+
+            fileWriter.close()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            showToast(context, e.message.toString())
+        }
     }
 }

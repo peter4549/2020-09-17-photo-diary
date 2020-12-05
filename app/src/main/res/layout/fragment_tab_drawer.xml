@@ -29,6 +29,7 @@
                     android:layout_height="match_parent"
                     android:text="@string/change_theme"
                     android:gravity="center"
+                    android:padding="16dp"
                     app:drawableStartCompat="@drawable/ic_round_color_lens_32"
                     app:drawableTint="@color/icon_color"/>
 
@@ -38,7 +39,18 @@
                     android:layout_height="match_parent"
                     android:text="@string/set_lock_screen"
                     android:gravity="center"
-                    app:drawableStartCompat="@drawable/ic_round_lock_24"
+                    android:padding="16dp"
+                    app:drawableStartCompat="@drawable/ic_round_lock_32"
+                    app:drawableTint="@color/icon_color"/>
+
+                <TextView
+                    android:id="@+id/textDataBackup"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="@string/data_backup"
+                    android:gravity="center"
+                    android:padding="16dp"
+                    app:drawableStartCompat="@drawable/ic_round_backup_32"
                     app:drawableTint="@color/icon_color"/>
 
             </LinearLayout>

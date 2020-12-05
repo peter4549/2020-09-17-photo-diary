@@ -75,7 +75,7 @@
     <string name="save_image_dialog_fragment_message">편집된 이미지를 저장하시겠습니까?</string>
     <string name="save_image_dialog_fragment_title">이미지 저장</string>
     <string name="undo">Undo</string>
-    <string name="write_external_storage_permission_request_message">편집한 이미지를 저장하려면 외부 저장소 권한이 필요합니다.</string>
+    <string name="write_external_storage_permission_request_message">저장공간 권한이 필요한 작업입니다. \n권한을 허용하시겠습니까?</string>
 
     <!-- Editing Tools -->
     <string name="editing_tool_brush">브러시</string>
@@ -247,4 +247,20 @@
     <string name="security_question_set">보안질문이 설정되었습니다.</string>
     <string name="security_question_do_not_match">보안질문이 일치하지 않습니다.</string>
     <string name="find_by_security_question">보안질문으로 찾기</string>
+
+    <!-- Data Backup -->
+    <string name="backup_information">백업 정보</string>
+    <string name="backup_account">백업 계정</string>
+    <string name="google_drive">구글 드라이브</string>
+    <string name="data_backup">데이터 백업</string>
+    <string name="restore_data">데이터 복원</string>
+    <string name="backup_notification">백업 알림</string>
+    <string name="internal_storage">내부 저장소</string>
+    <string name="backup_to_internal_storage">내부 저장소로 백업</string>
+    <string name="restore_from_internal_storage">내부 저장소에서 복원</string>
+    <string name="auto_backup">자동 백업</string>
+    <string name="failed_to_restore_data_backup_file">데이터 백업 파일을 복원하지 못했습니다.</string>
+    <string name="data_backup_file_not_found">데이터 백업 파일을 찾지 못했습니다.</string>
+    <string name="data_backed_up">데이터를 백업했습니다.</string>
+    <string name="backup_data_restored">백업 데이터를 복원했습니다.</string>
 </resources>

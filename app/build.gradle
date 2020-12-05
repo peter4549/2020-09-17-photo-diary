@@ -121,4 +121,7 @@ dependencies {
 
     // PFLockScreen
     implementation 'com.github.thealeksandr:PFLockScreen-Android:1.0.0-beta7'
+
+    // Dexter
+    implementation 'com.karumi:dexter:6.2.2'
 }

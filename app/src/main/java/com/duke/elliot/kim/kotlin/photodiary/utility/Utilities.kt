@@ -401,7 +401,7 @@ fun showInputDialog(context: Context, title: String, okEvent: (text: String) -> 
 }
 
 @Suppress("DEPRECATION")
-fun getDocumentDirectory(context: Context): String {
+fun getDocumentDirectory(): String {
     return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).toString()
 }
 

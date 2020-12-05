@@ -8,6 +8,7 @@ import android.media.MediaMetadataRetriever
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import com.duke.elliot.kim.kotlin.photodiary.R
+import timber.log.Timber
 
 object AudioHelper {
     fun dispatchAudioPickerIntent(fragment: Fragment, getContent: Boolean) {
@@ -41,19 +42,25 @@ object AudioHelper {
         val albumArt: Bitmap
         val bitmapFactoryOptions = BitmapFactory.Options()
 
-        mediaMetadataRetriever.setDataSource(context, uriString.toUri())
-        byteArray = mediaMetadataRetriever.embeddedPicture
+        try {
+            mediaMetadataRetriever.setDataSource(context, uriString.toUri())
+            byteArray = mediaMetadataRetriever.embeddedPicture
 
-        byteArray?.size?.let {
-            albumArt = BitmapFactory.decodeByteArray(
-                byteArray,
-                0,
-                it,
-                bitmapFactoryOptions
-            )
+            byteArray?.size?.let {
+                albumArt = BitmapFactory.decodeByteArray(
+                    byteArray,
+                    0,
+                    it,
+                    bitmapFactoryOptions
+                )
 
-            return albumArt
-        } ?: run {
+                return albumArt
+            } ?: run {
+                return null
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Timber.e(e)
             return null
         }
     }

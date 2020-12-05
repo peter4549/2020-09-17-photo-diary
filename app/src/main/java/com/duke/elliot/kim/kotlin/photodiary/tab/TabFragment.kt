@@ -1,6 +1,9 @@
 package com.duke.elliot.kim.kotlin.photodiary.tab
 
+import android.content.Context
+import android.content.Context.MODE_PRIVATE
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -19,6 +22,7 @@ import com.duke.elliot.kim.kotlin.photodiary.MainViewModel
 import com.duke.elliot.kim.kotlin.photodiary.R
 import com.duke.elliot.kim.kotlin.photodiary.base.BaseFragment
 import com.duke.elliot.kim.kotlin.photodiary.calendar.CalendarFragment
+import com.duke.elliot.kim.kotlin.photodiary.database.DiaryDatabase
 import com.duke.elliot.kim.kotlin.photodiary.databinding.FragmentTabDrawerBinding
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.CREATE_MODE
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.DATE_OTHER_THAN_TODAY
@@ -29,7 +33,7 @@ import com.duke.elliot.kim.kotlin.photodiary.utility.TypefaceUtil
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_tab_layout.view.*
-import java.lang.IllegalArgumentException
+
 
 class TabFragment: BaseFragment() {
 
@@ -44,7 +48,11 @@ class TabFragment: BaseFragment() {
     ): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_tab_drawer, container, false)
         // tabIcons = arrayOf(R.drawable.ic_sharp_library_books_24, R.drawable.ic_sharp_photo_library_24)
-        tabTexts = arrayOf(getString(R.string.diary),  getString(R.string.calendar), getString(R.string.media))
+        tabTexts = arrayOf(
+            getString(R.string.diary),
+            getString(R.string.calendar),
+            getString(R.string.media)
+        )
 
         initializeNavigationDrawer()
         initializeTabLayoutViewPager(binding.tabFragment.tab_layout, binding.tabFragment.view_pager)
@@ -83,7 +91,11 @@ class TabFragment: BaseFragment() {
         binding.tabFragment.alarm_test_btn.setOnClickListener {
             // TODO: test. 잘되면 존나 개꿀. 관건은 다이나믹하게 가능한가.. MAINACTIVITY에도 있음.
             // 설계할것..
-            TypefaceUtil.overrideFont(requireContext(), "SERIF", "fonts/nanum_square_round_regular.otf")
+            TypefaceUtil.overrideFont(
+                requireContext(),
+                "SERIF",
+                "fonts/nanum_square_round_regular.otf"
+            )
             //requireActivity().window?.decorView?.findViewById<View>(android.R.id.content)?.invalidate()
             //binding.invalidateAll()
             //binding.tabFragment.invalidate() // 리사이클러뷰를 노티해줘야함.
@@ -99,6 +111,12 @@ class TabFragment: BaseFragment() {
             val intent = Intent(requireActivity(), SetLockScreenActivity::class.java)
             MainViewModel.lockScreenException = true
             startActivity(intent)
+        }
+
+        binding.textDataBackup.setOnClickListener {
+            findNavController().navigate(
+                TabFragmentDirections.actionTabFragmentToBackupFragment()
+            )
         }
 
         return binding.root

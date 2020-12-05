@@ -26,6 +26,9 @@
         <action
             android:id="@+id/action_tabFragment_to_changeThemeFragment"
             app:destination="@id/changeThemeFragment" />
+        <action
+            android:id="@+id/action_tabFragment_to_backupFragment"
+            app:destination="@id/backupFragment" />
     </fragment>
     <fragment
         android:id="@+id/diaryWritingFragment"
@@ -122,4 +125,8 @@
         android:id="@+id/changeThemeFragment"
         android:name="com.duke.elliot.kim.kotlin.photodiary.drawer_items.ChangeThemeFragment"
         android:label="ChangeThemeFragment" />
+    <fragment
+        android:id="@+id/backupFragment"
+        android:name="com.duke.elliot.kim.kotlin.photodiary.drawer_items.backup.BackupFragment"
+        android:label="BackupFragment" />
 </navigation>

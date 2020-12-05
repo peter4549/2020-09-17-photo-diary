@@ -63,7 +63,6 @@ class DiariesFragment: Fragment(), KakaoTalkOptionBottomSheetDialogFragment.Kaka
         }
 
         diaryAdapter = DiaryAdapter(requireContext()).apply {
-
             setViewOnClickListener {
                 getCurrentDiary()?.let { diary ->
                     findNavController().navigate(

@@ -146,7 +146,7 @@ class PdfPreviewFragment: Fragment() {
         coroutineScope.launch(Dispatchers.IO) {
             val pdfDocument = PdfDocument()
             try {
-                val path = getDocumentDirectory(requireContext())
+                val path = getDocumentDirectory()
                 val directory = File(path, getString(R.string.app_name))
                 if (!directory.exists())
                     directory.mkdir()
