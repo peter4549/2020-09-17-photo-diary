@@ -23,6 +23,17 @@ data class DiaryModel(@PrimaryKey(autoGenerate = true)
                       var hashTags: Array<String>,
                       var backedUp: Boolean = false) : Parcelable {
 
+
+
+    fun getLocalDate(): LocalDate {
+        return Instant.ofEpochMilli(this.time)
+            .atZone(ZoneId.systemDefault()).toLocalDate()
+    }
+
+    fun getAllMediaAbsolutePaths(): List<String> {
+        return mediaArray.map { it.uriString }
+    }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -38,6 +49,7 @@ data class DiaryModel(@PrimaryKey(autoGenerate = true)
         if (liked != other.liked) return false
         if (weatherIconIndex != other.weatherIconIndex) return false
         if (!hashTags.contentEquals(other.hashTags)) return false
+        if (backedUp != other.backedUp) return false
 
         return true
     }
@@ -52,11 +64,7 @@ data class DiaryModel(@PrimaryKey(autoGenerate = true)
         result = 31 * result + liked.hashCode()
         result = 31 * result + weatherIconIndex
         result = 31 * result + hashTags.contentHashCode()
+        result = 31 * result + backedUp.hashCode()
         return result
-    }
-
-    fun getLocalDate(): LocalDate {
-        return Instant.ofEpochMilli(this.time)
-            .atZone(ZoneId.systemDefault()).toLocalDate()
     }
 }

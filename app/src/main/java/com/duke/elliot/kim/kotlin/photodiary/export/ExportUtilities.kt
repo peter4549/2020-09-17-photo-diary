@@ -131,9 +131,7 @@ object ExportUtilities {
                 values.put(MediaStore.MediaColumns.MIME_TYPE, "text/plain")
                 values.put(
                     MediaStore.MediaColumns.RELATIVE_PATH,
-                    Environment.DIRECTORY_DOCUMENTS.toString() + "/${
-                        "ChouChouDiary"
-                    }/"
+                    Environment.DIRECTORY_DOCUMENTS.toString() + "/DayStory/"
                 )
                 val uri = context.contentResolver.insert(
                     MediaStore.Files.getContentUri("external"),

@@ -10,6 +10,9 @@ interface DiaryDao {
     @Query("SELECT * FROM diary ORDER BY id DESC")
     fun getAll(): LiveData<MutableList<DiaryModel>>
 
+    @Query("SELECT * FROM diary")
+    fun getAllValues(): List<DiaryModel>
+
     @Query("SELECT * FROM diary WHERE time BETWEEN :today AND :tomorrow")
     fun getSelectedDateDiaries(today: Long, tomorrow: Long): LiveData<MutableList<DiaryModel>>
 

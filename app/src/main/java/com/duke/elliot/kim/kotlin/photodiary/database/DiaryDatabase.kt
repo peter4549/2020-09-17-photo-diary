@@ -20,6 +20,12 @@ abstract class DiaryDatabase : RoomDatabase() {
         @Volatile
         private var INSTANCE: DiaryDatabase? = null
 
+        fun releaseInstance() {
+            if (INSTANCE?.isOpen == true)
+                INSTANCE?.close()
+            INSTANCE = null
+        }
+
         fun getInstance(context: Context): DiaryDatabase {
             synchronized(this) {
                 var instance = INSTANCE

@@ -1,126 +1,212 @@
 package com.duke.elliot.kim.kotlin.photodiary.drawer_items.backup
 
+import android.annotation.SuppressLint
+import android.content.ContentResolver
+import android.content.ContentUris
+import android.content.ContentValues
 import android.content.Context
+import android.net.Uri
+import android.os.Build
 import android.os.Environment
-import com.duke.elliot.kim.kotlin.photodiary.R
+import android.provider.MediaStore
+import androidx.annotation.RequiresApi
+import androidx.core.net.toFile
 import com.duke.elliot.kim.kotlin.photodiary.database.DIARY_DATABASE_NAME
-import com.duke.elliot.kim.kotlin.photodiary.database.DatabaseOpenHelper
-import com.duke.elliot.kim.kotlin.photodiary.database.DiaryDatabase
-import com.duke.elliot.kim.kotlin.photodiary.utility.showToast
-import timber.log.Timber
-import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
-import java.nio.channels.FileChannel
+import java.io.*
+import java.util.zip.ZipEntry
+import java.util.zip.ZipInputStream
+import java.util.zip.ZipOutputStream
 
-const val DATA_BACKUP_FILE_NAME = "diary_backup.db"
-const val BACKUP_DIR = "ChouChouDiary/backup"
-const val DATABASE_NAME_WITH_FORMAT = "$DIARY_DATABASE_NAME"
+const val BACKUP_DIR_PATH = "/DayStory/"
+const val BACKUP_FILE_NAME = "backup_day_story.zip"
+
+private const val BUFFER = 2048
 
 object BackupUtil {
-    fun backupToInternalStorage(context: Context) {
-        val database: DiaryDatabase = DiaryDatabase.getInstance(context)
-        // database.close()
-        // database.openHelper.close()
-
-        val databaseFile = File(context.getDatabasePath(DIARY_DATABASE_NAME).absolutePath)
-        val saveDir = File(Environment.getExternalStorageDirectory(), BACKUP_DIR)
-        val fileName = DIARY_DATABASE_NAME
-        val saveFilePath = saveDir.path + File.separator.toString() + fileName
-
-        if (!saveDir.exists())
-            saveDir.mkdirs()
-
-        val saveFile = File(saveFilePath)
-
-        if (saveFile.exists()) {
-            saveFile.delete()
-        }
-
+    fun backupToInternalZipFile(context: Context, files: List<String>, zipDirPath: String, zipFileName: String): Boolean {
         try {
-            if (saveFile.createNewFile()) {
-                val bufferSize = 8 * 1024
-                val buffer = ByteArray(bufferSize)
-                var bytesRead = bufferSize
-                val fileOutputStream = FileOutputStream(saveFilePath)
-                val fileInputStream = FileInputStream(databaseFile)
-                while (fileInputStream.read(buffer, 0, bufferSize).also { bytesRead = it } > 0) {
-                    fileOutputStream.write(buffer, 0, bytesRead)
+            val zipDir = File(zipDirPath)
+
+            if (!zipDir.exists())
+                zipDir.mkdir()
+
+            val zipFilePath = zipDirPath + zipFileName
+            val zipFile = File(zipFilePath)
+
+            if (zipFile.exists())
+                zipFile.delete()
+
+            if (!zipFile.exists())
+                zipFile.createNewFile()
+
+            var src: BufferedInputStream?
+            val dst = FileOutputStream(zipFile)
+            val zipOutputStream = ZipOutputStream(BufferedOutputStream(dst))
+            val data = ByteArray(BUFFER)
+
+            val mutableFiles = mutableListOf<String>()
+            mutableFiles.addAll(files)
+            mutableFiles.add(context.getDatabasePath(DIARY_DATABASE_NAME).path)
+            mutableFiles.add(context.getDatabasePath("$DIARY_DATABASE_NAME-shm").path)
+            mutableFiles.add(context.getDatabasePath("$DIARY_DATABASE_NAME-wal").path)
+
+            for (file in mutableFiles) {
+                val fileInputStream = FileInputStream(Uri.parse(file).path)
+                src = BufferedInputStream(fileInputStream, BUFFER)
+                val entry = ZipEntry(file.substring(file.lastIndexOf("/") + 1))
+                zipOutputStream.putNextEntry(entry)
+                var count: Int
+                while (src.read(data, 0, BUFFER).also { count = it } != -1) {
+                    zipOutputStream.write(data, 0, count)
                 }
-                fileOutputStream.flush()
-                fileInputStream.close()
+                src.close()
+            }
+
+            zipOutputStream.close()
+            return true
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace()
+            return false
+        }
+    }
+
+    fun restoreFromInternalZipFile(context: Context, backupFilePath: String) {
+        try {
+            val fileInputStream = FileInputStream(backupFilePath)
+            val zipInputStream = ZipInputStream(fileInputStream)
+            var zipEntry: ZipEntry?
+            while (zipInputStream.nextEntry.also { zipEntry = it } != null) {
+                var fileOutputStream: FileOutputStream?
+                if (zipEntry?.name?.contains(DIARY_DATABASE_NAME) == true) {
+                    var databaseFilePath = context.getDatabasePath(DIARY_DATABASE_NAME).path
+                    if (zipEntry?.name?.endsWith("-shm") == true)
+                        databaseFilePath += "-shm"
+
+                    if (zipEntry?.name?.endsWith("-wal") == true)
+                        databaseFilePath += "--wal"
+
+                    fileOutputStream = FileOutputStream(databaseFilePath)
+                } else
+                    fileOutputStream = FileOutputStream(
+                        context.getExternalFilesDir(null)
+                            .toString() + "/${zipEntry?.name ?: throw Exception("Entry name not found.")}"
+                    )
+
+                val buffer = ByteArray(BUFFER)
+                var length: Int
+                while (zipInputStream.read(buffer).also { length = it } > 0) {
+                    fileOutputStream.write(buffer, 0, length)
+                }
+
+                zipInputStream.closeEntry()
                 fileOutputStream.close()
-                // TODO, change, information of backup will be stored.
-                /*
-                val sharedPreferences: SharedPreferences =
-                    context.getSharedPreferences(SHAREDPREF, Context.MODE_PRIVATE)
-                sharedPreferences.edit().putString("backupFileName", fileName).apply()
-                updateLastBackupTime(sharedPreferences)
-
-                 */
-                showToast(context, context.getString(R.string.data_backed_up))
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Timber.e(e)
-        }
 
-        // database.openHelper.writableDatabase
-    }
-
-    fun restoreInternalStorageDataBackupFile(context: Context) {
-        /** test */
-        if (DatabaseOpenHelper(context, DIARY_DATABASE_NAME).importDatabase(context))
-            showToast(context, "TRUE")
-        else
-            showToast(context, "FFFFF")
-    }
-
-    fun copyFile(fromFile: FileInputStream, toFile: FileOutputStream) {
-        var fromChannel: FileChannel? = null
-        var toChannel: FileChannel? = null
-        try {
-            fromChannel = fromFile.channel
-            toChannel = toFile.channel
-            fromChannel.transferTo(0, fromChannel.size(), toChannel)
-        } finally {
-            try {
-                fromChannel?.close()
-            } finally {
-                toChannel?.close()
-            }
-        }
-    }
-
-    fun exportDatabaseFile(context: Context) {
-
-        try {
-            copyDataFromOneToAnother(context.getDatabasePath(DATABASE_NAME_WITH_FORMAT).path, Environment.getExternalStorageDirectory().path + "/Download/" + "backup_" + DATABASE_NAME_WITH_FORMAT)
-            copyDataFromOneToAnother(context.getDatabasePath(DATABASE_NAME_WITH_FORMAT + "-shm").path, Environment.getExternalStorageDirectory().path + "/Download/" + "backup_" + DATABASE_NAME_WITH_FORMAT + "-shm")
-            copyDataFromOneToAnother(context.getDatabasePath(DATABASE_NAME_WITH_FORMAT + "-wal").path, Environment.getExternalStorageDirectory().path + "/Download/" + "backup_" + DATABASE_NAME_WITH_FORMAT + "-wal")
+            zipInputStream.close()
         } catch (e: Exception) {
             e.printStackTrace()
         }
     }
 
-    fun importDatabaseFile(context: Context) {
+    /** Above Q */
+    @SuppressLint("Recycle")
+    @RequiresApi(Build.VERSION_CODES.Q)
+    fun backupToInternalZipFileQ(context: Context, files: List<String>): Boolean {
         try {
-            copyDataFromOneToAnother(Environment.getExternalStorageDirectory().path + "/Download/" + "backup_" + DATABASE_NAME_WITH_FORMAT, context.getDatabasePath(DATABASE_NAME_WITH_FORMAT).path)
-            copyDataFromOneToAnother(Environment.getExternalStorageDirectory().path + "/Download/" + "backup_" + DATABASE_NAME_WITH_FORMAT + "-shm", context.getDatabasePath(DATABASE_NAME_WITH_FORMAT + "-shm").path)
-            copyDataFromOneToAnother(Environment.getExternalStorageDirectory().path + "/Download/" + "backup_" + DATABASE_NAME_WITH_FORMAT + "-wal", context.getDatabasePath(DATABASE_NAME_WITH_FORMAT + "-wal").path)
-        } catch (e: Exception) {
+
+            val projection = arrayOf(
+                MediaStore.MediaColumns._ID,
+                MediaStore.MediaColumns.DISPLAY_NAME,
+                MediaStore.MediaColumns.MIME_TYPE,
+                MediaStore.MediaColumns.RELATIVE_PATH
+            )
+
+            val query = context.contentResolver.query(
+                MediaStore.Files.getContentUri("external"),
+                projection,
+                null,
+                null,
+                null
+            )
+
+            query?.use { cursor ->
+                val idColumn = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns._ID)
+                val displayNameColumn = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DISPLAY_NAME)
+                val mimeTypeColumn = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.MIME_TYPE)
+                val relativePathColumn = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.RELATIVE_PATH)
+
+                while (cursor.moveToNext()) {
+                    val id = cursor.getLong(idColumn)
+                    val displayName = cursor.getString(displayNameColumn)
+                    val mimeType = cursor.getString(mimeTypeColumn)
+                    val relativePath = cursor.getString(relativePathColumn)
+
+                    if (displayName == BACKUP_FILE_NAME &&
+                        mimeType == "application/zip" &&
+                        relativePath.contains("DayStory")) {
+                        val contentUri: Uri = ContentUris.withAppendedId(
+                            MediaStore.Files.getContentUri("external"),
+                            id
+                        )
+
+                        val outputStream = contentUri.let {
+                            context.contentResolver.openOutputStream(it)
+                        } ?: throw Exception("outputStream is null.")
+
+                        writeZipFile(context, outputStream, files)
+                        return true
+                    }
+                }
+            }
+
+            val values = ContentValues()
+            values.put(MediaStore.MediaColumns.DISPLAY_NAME, BACKUP_FILE_NAME)
+            values.put(MediaStore.MediaColumns.MIME_TYPE, "application/zip")
+            values.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOCUMENTS.toString() + "/DayStory/")
+
+            val uri = context.contentResolver.insert(
+                MediaStore.Files.getContentUri("external"),
+                values
+            )
+
+            uri?.let {
+                context.contentResolver.openOutputStream(it)
+            }.use { outputStream ->
+                writeZipFile(context, outputStream ?: throw Exception("outputStream is null."), files)
+            }
+
+            return true
+        } catch (e: java.lang.Exception) {
             e.printStackTrace()
+            return false
         }
     }
 
-    private fun copyDataFromOneToAnother(fromPath: String, toPath: String) {
-        val inStream = File(fromPath).inputStream()
-        val outStream = FileOutputStream(toPath)
+    private fun writeZipFile(context: Context, outputStream: OutputStream, files: List<String>) {
+        var src: BufferedInputStream?
+        val zipOutputStream = ZipOutputStream(BufferedOutputStream(outputStream))
+        val data = ByteArray(BUFFER)
 
-        inStream.use { input ->
-            outStream.use { output ->
-                input.copyTo(output)
+        val mutableFiles = mutableListOf<String>()
+        mutableFiles.addAll(files)
+        mutableFiles.add(context.getDatabasePath(DIARY_DATABASE_NAME).path)
+        mutableFiles.add(context.getDatabasePath("$DIARY_DATABASE_NAME-shm").path)
+        mutableFiles.add(context.getDatabasePath("$DIARY_DATABASE_NAME-wal").path)
+
+        for (file in mutableFiles) {
+            val fileInputStream = FileInputStream(Uri.parse(file).path)
+            src = BufferedInputStream(fileInputStream, BUFFER)
+            val entry = ZipEntry(file.substring(file.lastIndexOf("/") + 1))
+            zipOutputStream.putNextEntry(entry)
+            var count: Int
+
+            while (src.read(data, 0, BUFFER).also { count = it } != -1) {
+                zipOutputStream.write(data, 0, count)
             }
+
+            src.close()
         }
+
+        zipOutputStream.close()
     }
 }

@@ -50,7 +50,7 @@
                     android:text="@string/data_backup"
                     android:gravity="center"
                     android:padding="16dp"
-                    app:drawableStartCompat="@drawable/ic_round_backup_32"
+                    app:drawableStartCompat="@drawable/ic_round_backup_30"
                     app:drawableTint="@color/icon_color"/>
 
             </LinearLayout>

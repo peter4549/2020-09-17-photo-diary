@@ -1,17 +1,16 @@
 package com.duke.elliot.kim.kotlin.photodiary
 
-import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Environment
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.annotation.ColorInt
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
-import com.duke.elliot.kim.kotlin.photodiary.database.DIARY_DATABASE_NAME
-import com.duke.elliot.kim.kotlin.photodiary.database.DatabaseOpenHelper
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryModel
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryWritingFragment
 import com.duke.elliot.kim.kotlin.photodiary.drawer_items.loadPrimaryThemeColor
@@ -23,10 +22,8 @@ import com.duke.elliot.kim.kotlin.photodiary.fluid_keyboard_resize.FluidContentR
 import com.duke.elliot.kim.kotlin.photodiary.utility.TypefaceUtil
 import com.duke.elliot.kim.kotlin.photodiary.utility.printHashKey
 import com.duke.elliot.kim.kotlin.photodiary.utility.showToast
-import com.duke.elliot.kim.kotlin.photodiary.utility.toDateFormat
 import com.facebook.internal.CallbackManagerImpl
 import kotlinx.android.synthetic.main.item_diary.view.*
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.File
 import java.io.FileWriter
@@ -139,6 +136,14 @@ class MainActivity : AppCompatActivity() {
 
     fun updateDiary(diary: DiaryModel) {
         viewModel.update(diary)
+    }
+
+    fun recreateNoAnimation() {
+        val intent = intent
+        finish()
+        overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
+        startActivity(intent)
+        overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
     }
 
     companion object {

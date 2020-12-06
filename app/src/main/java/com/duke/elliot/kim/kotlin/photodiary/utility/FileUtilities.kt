@@ -13,17 +13,16 @@ import android.provider.MediaStore
 import android.provider.OpenableColumns
 import android.text.TextUtils
 import androidx.core.net.toUri
-import androidx.room.Room
-import com.duke.elliot.kim.kotlin.photodiary.database.DiaryDatabase
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.media_helper.setConfigure
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.io.File
-import java.io.FileOutputStream
+import java.io.*
+import java.util.zip.ZipEntry
+import java.util.zip.ZipOutputStream
 import kotlin.math.min
 
-class FileUtilities private constructor (private val context: Context) {
+class FileUtilities private constructor(private val context: Context) {
 
     @SuppressLint("NewApi", "ObsoleteSdkInt", "Recycle")
     fun getPath(uri: Uri): String? {
@@ -307,6 +306,7 @@ class FileUtilities private constructor (private val context: Context) {
         return output.path
     }
 
+    @Suppress("BlockingMethodInNonBlockingContext")
     @SuppressLint("Recycle")
     suspend fun copyFileToInternalStorage(sourceUri: Uri, prefix: String = "", suffix: String = ""): Uri? {
         return withContext(Dispatchers.IO) {
@@ -329,13 +329,17 @@ class FileUtilities private constructor (private val context: Context) {
 
             val fileName = displayName.substringBeforeLast(".")
 
-            var newDisplayName = displayName.replace(fileName, "${fileName}$suffix")
+            val currentTimeString = getCurrentTime().toDateFormat("yyyyMMddHHmmssSSS")
+
+            var newDisplayName = displayName.replace(fileName, "${currentTimeString}$suffix")
             if (prefix != "")
                 newDisplayName = prefix + newDisplayName
 
             replaceLast(displayName, fileName, "${prefix}$fileName${suffix}")
 
-            val outputFile = File(context.getExternalFilesDir(null).toString() + "/${newDisplayName}")
+            val outputFile = File(
+                context.getExternalFilesDir(null).toString() + "/${newDisplayName}"
+            )
 
             try {
                 val inputStream = context.contentResolver.openInputStream(sourceUri)
@@ -360,7 +364,9 @@ class FileUtilities private constructor (private val context: Context) {
         }
     }
 
-    private fun getFilePathForWhatsApp(uri: Uri): String? {
+
+
+        private fun getFilePathForWhatsApp(uri: Uri): String? {
         @Suppress("SpellCheckingInspection")
         return copyFileToInternalStorage(uri, "whatsapp")
     }
