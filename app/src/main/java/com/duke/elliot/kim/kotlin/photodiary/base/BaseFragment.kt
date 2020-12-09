@@ -7,9 +7,15 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.duke.elliot.kim.kotlin.photodiary.MainActivity
 import com.duke.elliot.kim.kotlin.photodiary.utility.ProgressDialogFragment
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 
 open class BaseFragment: Fragment() {
     private lateinit var progressBar: ProgressDialogFragment
+    private val job = Job()
+    private val coroutineScope = CoroutineScope(Dispatchers.Main + job)
 
     protected fun setSimpleBackButton(toolbar: Toolbar) {
         (requireActivity() as MainActivity).setSupportActionBar(toolbar)
@@ -19,12 +25,16 @@ open class BaseFragment: Fragment() {
 
     protected fun showProgressBar() {
         progressBar = ProgressDialogFragment.instance
-        progressBar.show(requireActivity().supportFragmentManager, progressBar.tag)
+        coroutineScope.launch {
+            progressBar.show(requireActivity().supportFragmentManager, progressBar.tag)
+        }
     }
 
     protected fun dismissProgressBar() {
-        if (::progressBar.isInitialized)
-            progressBar.dismiss()
+        coroutineScope.launch {
+            if (::progressBar.isInitialized)
+                progressBar.dismiss()
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

@@ -1,15 +1,21 @@
 package com.duke.elliot.kim.kotlin.photodiary.utility
 
-import android.annotation.SuppressLint
-import android.app.Dialog
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import androidx.appcompat.app.AlertDialog
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.view.Window
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
 import com.duke.elliot.kim.kotlin.photodiary.R
-import kotlinx.android.synthetic.main.fragment_ok_cancel_dialog.view.*
+import com.duke.elliot.kim.kotlin.photodiary.databinding.FragmentOkCancelDialogBinding
+
 
 class OkCancelDialogFragment: DialogFragment() {
 
+    private lateinit var binding: FragmentOkCancelDialogBinding
     private lateinit var cancelButtonOnClick: () -> Unit
     private lateinit var okButtonOnClick: () -> Unit
     private lateinit var title: String
@@ -38,21 +44,29 @@ class OkCancelDialogFragment: DialogFragment() {
         }
     }
 
-    @SuppressLint("InflateParams")
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val builder = AlertDialog.Builder(requireContext())
-        val view = requireActivity().layoutInflater.inflate(R.layout.fragment_ok_cancel_dialog, null)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        binding = DataBindingUtil.inflate(
+            inflater,
+            R.layout.fragment_ok_cancel_dialog,
+            container,
+            false
+        )
 
-        view.text_title.text = title
-        view.text_message.text = message
-        view.button_cancel.setOnClickListener {
+        binding.textTitle.text = title
+        binding.textMessage.text = message
+
+        binding.buttonCancel.setOnClickListener {
             if(::cancelButtonOnClick.isInitialized)
                 cancelButtonOnClick.invoke()
 
             this.dismiss()
         }
 
-        view.button_ok.setOnClickListener {
+        binding.buttonOk.setOnClickListener {
             if (::okButtonOnClick.isInitialized)
                 okButtonOnClick.invoke()
 
@@ -60,14 +74,18 @@ class OkCancelDialogFragment: DialogFragment() {
         }
 
         cancelButtonText?.let {
-            view.button_cancel.text = it
+            binding.buttonCancel.text = it
         }
 
         okButtonText?.let {
-            view.button_ok.text = it
+            binding.buttonOk.text = it
         }
 
-        builder.setView(view)
-        return builder.create()
+        if (dialog != null && dialog?.window != null) {
+            dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            dialog?.window?.requestFeature(Window.FEATURE_NO_TITLE)
+        }
+
+        return binding.root
     }
 }

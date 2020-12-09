@@ -263,4 +263,5 @@
     <string name="data_backup_file_not_found">데이터 백업 파일을 찾지 못했습니다.</string>
     <string name="data_backed_up">데이터를 백업했습니다.</string>
     <string name="backup_data_restored">백업 데이터를 복원했습니다.</string>
+    <string name="data_backup_failed">데이터 백업에 실패했습니다.</string>
 </resources>

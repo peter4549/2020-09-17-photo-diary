@@ -470,4 +470,11 @@ class FileUtilities private constructor(private val context: Context) {
             }
         }
     }
+
+    suspend fun deleteFiles(paths: List<String>) {
+        paths.forEach { path ->
+            val file = File(path)
+            file.delete()
+        }
+    }
 }

@@ -522,7 +522,7 @@ class DiaryWritingFragment: Fragment() {
                 )
             }
 
-            saveDiaryDialogFragment.show(requireActivity().supportFragmentManager, tag)
+            saveDiaryDialogFragment.show(requireActivity().supportFragmentManager, saveDiaryDialogFragment.tag)
         } else
             findNavController().popBackStack()
     }
@@ -1389,7 +1389,8 @@ class DiaryWritingFragment: Fragment() {
     private fun showConfirmDateDialog(time: Long) {
         val title = getString(R.string.confirm_date_title)
         val message = getString(R.string.confirm_date_message)
-        val confirmDateDialogFragment = OkCancelDialogFragment().apply {
+        val confirmDateDialogFragment = OkCancelDialogFragment()
+            .apply {
             setDialogParameters(title, message) {
                 if (time != -1L) {
                     viewModel.time = time

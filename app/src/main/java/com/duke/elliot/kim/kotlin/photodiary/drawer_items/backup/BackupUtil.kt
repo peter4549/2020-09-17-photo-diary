@@ -1,7 +1,6 @@
 package com.duke.elliot.kim.kotlin.photodiary.drawer_items.backup
 
 import android.annotation.SuppressLint
-import android.content.ContentResolver
 import android.content.ContentUris
 import android.content.ContentValues
 import android.content.Context
@@ -10,7 +9,6 @@ import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
 import androidx.annotation.RequiresApi
-import androidx.core.net.toFile
 import com.duke.elliot.kim.kotlin.photodiary.database.DIARY_DATABASE_NAME
 import java.io.*
 import java.util.zip.ZipEntry
@@ -23,7 +21,13 @@ const val BACKUP_FILE_NAME = "backup_day_story.zip"
 private const val BUFFER = 2048
 
 object BackupUtil {
-    fun backupToInternalZipFile(context: Context, files: List<String>, zipDirPath: String, zipFileName: String): Boolean {
+
+    fun backupToInternalZipFile(
+        context: Context,
+        files: List<String>,
+        zipDirPath: String,
+        zipFileName: String
+    ): Boolean {
         try {
             val zipDir = File(zipDirPath)
 
@@ -70,7 +74,7 @@ object BackupUtil {
         }
     }
 
-    fun restoreFromInternalZipFile(context: Context, backupFilePath: String) {
+    fun restoreFromInternalZipFile(context: Context, backupFilePath: String): Boolean {
         try {
             val fileInputStream = FileInputStream(backupFilePath)
             val zipInputStream = ZipInputStream(fileInputStream)
@@ -83,7 +87,7 @@ object BackupUtil {
                         databaseFilePath += "-shm"
 
                     if (zipEntry?.name?.endsWith("-wal") == true)
-                        databaseFilePath += "--wal"
+                        databaseFilePath += "-wal"
 
                     fileOutputStream = FileOutputStream(databaseFilePath)
                 } else
@@ -103,8 +107,10 @@ object BackupUtil {
             }
 
             zipInputStream.close()
+            return true
         } catch (e: Exception) {
             e.printStackTrace()
+            return false
         }
     }
 
@@ -113,7 +119,6 @@ object BackupUtil {
     @RequiresApi(Build.VERSION_CODES.Q)
     fun backupToInternalZipFileQ(context: Context, files: List<String>): Boolean {
         try {
-
             val projection = arrayOf(
                 MediaStore.MediaColumns._ID,
                 MediaStore.MediaColumns.DISPLAY_NAME,
@@ -143,7 +148,8 @@ object BackupUtil {
 
                     if (displayName == BACKUP_FILE_NAME &&
                         mimeType == "application/zip" &&
-                        relativePath.contains("DayStory")) {
+                        relativePath.contains("Documents/DayStory")) {
+
                         val contentUri: Uri = ContentUris.withAppendedId(
                             MediaStore.Files.getContentUri("external"),
                             id
@@ -162,7 +168,10 @@ object BackupUtil {
             val values = ContentValues()
             values.put(MediaStore.MediaColumns.DISPLAY_NAME, BACKUP_FILE_NAME)
             values.put(MediaStore.MediaColumns.MIME_TYPE, "application/zip")
-            values.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOCUMENTS.toString() + "/DayStory/")
+            values.put(
+                MediaStore.MediaColumns.RELATIVE_PATH,
+                Environment.DIRECTORY_DOCUMENTS.toString() + "/DayStory/"
+            )
 
             val uri = context.contentResolver.insert(
                 MediaStore.Files.getContentUri("external"),
@@ -172,7 +181,11 @@ object BackupUtil {
             uri?.let {
                 context.contentResolver.openOutputStream(it)
             }.use { outputStream ->
-                writeZipFile(context, outputStream ?: throw Exception("outputStream is null."), files)
+                writeZipFile(
+                    context,
+                    outputStream ?: throw Exception("outputStream is null."),
+                    files
+                )
             }
 
             return true
@@ -208,5 +221,104 @@ object BackupUtil {
         }
 
         zipOutputStream.close()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.Q)
+    fun restoreFromInternalZipFileQ(context: Context): Boolean {
+        try {
+            val projection = arrayOf(
+                MediaStore.MediaColumns._ID,
+                MediaStore.MediaColumns.DISPLAY_NAME,
+                MediaStore.MediaColumns.MIME_TYPE,
+                MediaStore.MediaColumns.RELATIVE_PATH
+            )
+
+            val query = context.contentResolver.query(
+                MediaStore.Files.getContentUri("external"),
+                projection,
+                null,
+                null,
+                null
+            )
+
+            query?.use { cursor ->
+                val idColumn = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns._ID)
+                val displayNameColumn = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DISPLAY_NAME)
+                val mimeTypeColumn = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.MIME_TYPE)
+                val relativePathColumn = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.RELATIVE_PATH)
+
+                while (cursor.moveToNext()) {
+                    val id = cursor.getLong(idColumn)
+                    val displayName = cursor.getString(displayNameColumn)
+                    val mimeType = cursor.getString(mimeTypeColumn)
+                    val relativePath = cursor.getString(relativePathColumn)
+
+                    if (displayName == BACKUP_FILE_NAME &&
+                        mimeType == "application/zip" &&
+                        relativePath.contains("Documents/DayStory")) {
+
+                        val contentUri: Uri = ContentUris.withAppendedId(
+                            MediaStore.Files.getContentUri("external"),
+                            id
+                        )
+
+                        val inputStream = contentUri.let {
+                            context.contentResolver.openInputStream(it)
+                        } ?: throw Exception("outputStream is null.")
+
+                        val zipInputStream = ZipInputStream(inputStream)
+                        var zipEntry: ZipEntry?
+                        while (zipInputStream.nextEntry.also { zipEntry = it } != null) {
+                            var fileOutputStream: FileOutputStream
+                            if (zipEntry?.name?.contains(DIARY_DATABASE_NAME) == true) {
+                                var databaseFilePath = context.getDatabasePath(DIARY_DATABASE_NAME).path
+                                if (zipEntry?.name?.endsWith("-shm") == true)
+                                    databaseFilePath += "-shm"
+
+                                if (zipEntry?.name?.endsWith("-wal") == true)
+                                    databaseFilePath += "-wal"
+
+                                fileOutputStream = FileOutputStream(databaseFilePath)
+                            } else
+                                fileOutputStream = FileOutputStream(
+                                    context.getExternalFilesDir(null)
+                                        .toString() + "/${zipEntry?.name ?: throw Exception("Entry name not found.")}"
+                                )
+
+                            val buffer = ByteArray(BUFFER)
+                            var length: Int
+                            while (zipInputStream.read(buffer).also { length = it } > 0) {
+                                fileOutputStream.write(buffer, 0, length)
+                            }
+
+                            zipInputStream.closeEntry()
+                            fileOutputStream.close()
+                        }
+
+                        zipInputStream.close()
+
+                        return true
+                    }
+                }
+            }
+
+            return false
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return false
+        }
+    }
+    
+    fun copyFile(src: File, dst: File) {
+        FileInputStream(src).use { fileInputStream ->
+            FileOutputStream(dst).use { fileOutputStream ->
+                // Transfer bytes from in to out
+                val buffer = ByteArray(1024)
+                var bufferSize: Int
+                while (fileInputStream.read(buffer).also { bufferSize = it } > 0) {
+                    fileOutputStream.write(buffer, 0, bufferSize)
+                }
+            }
+        }
     }
 }

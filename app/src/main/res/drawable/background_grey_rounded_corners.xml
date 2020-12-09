@@ -10,5 +10,5 @@
         android:topRightRadius="8dp" />
 
     <stroke android:width="0dp"
-        android:color="#FFFFFF"/>
+        android:color="#FF000000"/>
 </shape>

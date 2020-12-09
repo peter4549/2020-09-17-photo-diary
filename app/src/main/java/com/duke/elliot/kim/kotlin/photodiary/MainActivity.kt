@@ -7,6 +7,7 @@ import android.os.Environment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import androidx.annotation.ColorInt
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
@@ -19,11 +20,18 @@ import com.duke.elliot.kim.kotlin.photodiary.drawer_items.lock_screen.LOCK_SCREE
 import com.duke.elliot.kim.kotlin.photodiary.drawer_items.lock_screen.LockScreenHelper
 import com.duke.elliot.kim.kotlin.photodiary.export.EXPORT_REQUEST_CODE
 import com.duke.elliot.kim.kotlin.photodiary.fluid_keyboard_resize.FluidContentResize
+import com.duke.elliot.kim.kotlin.photodiary.utility.Operation
 import com.duke.elliot.kim.kotlin.photodiary.utility.TypefaceUtil
 import com.duke.elliot.kim.kotlin.photodiary.utility.printHashKey
 import com.duke.elliot.kim.kotlin.photodiary.utility.showToast
 import com.facebook.internal.CallbackManagerImpl
+import kotlinx.android.synthetic.main.fragment_tab_layout.*
 import kotlinx.android.synthetic.main.item_diary.view.*
+import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.collect
 import timber.log.Timber
 import java.io.File
 import java.io.FileWriter
@@ -166,33 +174,5 @@ class MainActivity : AppCompatActivity() {
 
         @ColorInt
         var themeColorSecondary = 0
-    }
-
-    fun testman(context: Context) {
-        try {
-            val path = Environment.getExternalStorageDirectory().toString()
-            val directory = File(path, "AAAMANSTER")
-            if (!directory.exists())
-                directory.mkdir()
-
-            val file = File(directory, "/${"AAAA"}.txt")
-
-            val fileWriter = FileWriter(file)
-
-
-            fileWriter.write("stringBuilder.toString()")
-
-            //mediaScanner.scanMedia(file.absolutePath)
-
-            showToast(
-                context,
-                context.getString(R.string.text_file_created) + file.absolutePath
-            )
-
-            fileWriter.close()
-        } catch (e: Exception) {
-            e.printStackTrace()
-            showToast(context, e.message.toString())
-        }
     }
 }
