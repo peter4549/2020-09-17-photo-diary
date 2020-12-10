@@ -312,7 +312,6 @@ object BackupUtil {
     fun copyFile(src: File, dst: File) {
         FileInputStream(src).use { fileInputStream ->
             FileOutputStream(dst).use { fileOutputStream ->
-                // Transfer bytes from in to out
                 val buffer = ByteArray(1024)
                 var bufferSize: Int
                 while (fileInputStream.read(buffer).also { bufferSize = it } > 0) {

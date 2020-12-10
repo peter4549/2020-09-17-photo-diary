@@ -15,6 +15,8 @@
     <color name="colorDefaultThemeSecondary">#EDE7F6</color>
     <color name="colorTextDisabledDark">@color/colorSilver</color>
     <color name="colorTextEnabledDark">@color/colorJet</color>
+    <color name="colorTextDisabledLight">@color/colorAluminum</color>
+    <color name="colorTextEnabledLight">@color/colorSilver</color>
 
     <color name="colorTextSecondaryGrey">@color/colorSilver</color>
 
@@ -59,26 +61,26 @@
     <color name="colorSeekBarProgressTint">@color/colorWhite</color>
     <color name="colorSeekBarThumbTint">@color/colorWhite</color>
 
-    <!-- Default Colors 500 -->
-    <color name="colorRed500">#F44330</color>
-    <color name="colorPink500">#E91E63</color>
-    <color name="colorPurple500">#9C27B0</color>
-    <color name="colorDeepPurple500">#673AB7</color>
-    <color name="colorIndigo500">#3F51B5</color>
-    <color name="colorBlue500">#2196F3</color>
-    <color name="colorLightBlue500">#03A9F4</color>
-    <color name="colorCyan500">#00BCD4</color>
-    <color name="colorTeal500">#009688</color>
-    <color name="colorGreen500">#4CAF50</color>
-    <color name="colorLightGreen500">#8BC34A</color>
-    <color name="colorLime500">#CDDC39</color>
-    <color name="colorYellow500">#FFEB3B</color>
-    <color name="colorAmber500">#FFC107</color>
-    <color name="colorOrange500">#FF9800</color>
-    <color name="colorDeepOrange500">#FF5722</color>
-    <color name="colorBrown500">#795548</color>
-    <color name="colorGrey500">#9E9E9E</color>
-    <color name="colorBlueGrey500">#607D8B</color>
+    <!-- Default Colors 400 -->
+    <color name="colorRed400">#ef5350</color>
+    <color name="colorPink400">#ec407a</color>
+    <color name="colorPurple400">#ab47bc</color>
+    <color name="colorDeepPurple400">#7e57c2</color>
+    <color name="colorIndigo400">#5c6bc0</color>
+    <color name="colorBlue400">#42a5f5</color>
+    <color name="colorLightBlue400">#29b6f6</color>
+    <color name="colorCyan400">#26c6da</color>
+    <color name="colorTeal400">#26a69a</color>
+    <color name="colorGreen400">#66bb6a</color>
+    <color name="colorLightGreen400">#9ccc65</color>
+    <color name="colorLime400">#d4e157</color>
+    <color name="colorYellow400">#ffee58</color>
+    <color name="colorAmber400">#ffca28</color>
+    <color name="colorOrange400">#ffa726</color>
+    <color name="colorDeepOrange400">#ff7043</color>
+    <color name="colorBrown400">#8d6e63</color>
+    <color name="colorGrey400">#bdbdbd</color>
+    <color name="colorBlueGrey400">#78909c</color>
 
     <!-- Default Colors 200 -->
     <color name="colorRed200">#ef9a9a</color>
@@ -99,6 +101,26 @@
     <color name="colorDeepOrange200">#ffab91</color>
     <color name="colorBrown200">#bcaaa4</color>
     <color name="colorBlueGrey200">#b0bec5</color>
+
+    <!-- Default Colors 100 -->
+    <color name="colorRed100">#ffcdd2</color>
+    <color name="colorPink100">#f8bbd0</color>
+    <color name="colorPurple100">#ce93d8</color>
+    <color name="colorDeepPurple100">#d1c4e9</color>
+    <color name="colorIndigo100">#c5cae9</color>
+    <color name="colorBlue100">#bbdefb</color>
+    <color name="colorLightBlue100">#b3e5fc</color>
+    <color name="colorCyan100">#b2ebf2</color>
+    <color name="colorTeal100">#b2dfdb</color>
+    <color name="colorGreen100">#c8e6c9</color>
+    <color name="colorLightGreen100">#dcedc8</color>
+    <color name="colorLime100">#f0f4c3</color>
+    <color name="colorYellow100">#fff9c4</color>
+    <color name="colorAmber100">#ffecb3</color>
+    <color name="colorOrange100">#ffe0b2</color>
+    <color name="colorDeepOrange100">#ffccbc</color>
+    <color name="colorBrown100">#d7ccc8</color>
+    <color name="colorBlueGrey100">#cfd8dc</color>
 
     <!-- Default Colors 50 -->
     <color name="colorRed50">#ffebee</color>
@@ -171,51 +193,51 @@
     <color name="anniversaryColorPickerWhite">#F2F8F8FF</color> <!-- F2: 95% -->
 
     <!-- Rainbow -->
-    <color name="rainbowRed">@color/colorRed500</color>
-    <color name="rainbowOrange">@color/colorOrange500</color>
-    <color name="rainbowYellow">@color/colorYellow500</color>
-    <color name="rainbowGreen">@color/colorGreen500</color>
-    <color name="rainbowBlue">@color/colorBlue500</color>
-    <color name="rainbowIndigo">@color/colorIndigo500</color>
+    <color name="rainbowRed">@color/colorRed400</color>
+    <color name="rainbowOrange">@color/colorOrange400</color>
+    <color name="rainbowYellow">@color/colorYellow400</color>
+    <color name="rainbowGreen">@color/colorGreen400</color>
+    <color name="rainbowBlue">@color/colorBlue400</color>
+    <color name="rainbowIndigo">@color/colorIndigo400</color>
     <color name="rainbowViolet">#9F00FF</color>  <!-- Vivid Violet -->
 
     <array name="theme_colors">
         <item>@color/colorRed200</item>
-        <item>@color/colorRed500</item>
+        <item>@color/colorRed400</item>
         <item>@color/colorPink200</item>
-        <item>@color/colorPink500</item>
+        <item>@color/colorPink400</item>
         <item>@color/colorPurple200</item>
-        <item>@color/colorPurple500</item>
+        <item>@color/colorPurple400</item>
         <item>@color/colorDeepPurple200</item>
-        <item>@color/colorDeepPurple500</item>
+        <item>@color/colorDeepPurple400</item>
         <item>@color/colorIndigo200</item>
-        <item>@color/colorIndigo500</item>
+        <item>@color/colorIndigo400</item>
         <item>@color/colorBlue200</item>
-        <item>@color/colorBlue500</item>
+        <item>@color/colorBlue400</item>
         <item>@color/colorLightBlue200</item>
-        <item>@color/colorLightBlue500</item>
+        <item>@color/colorLightBlue400</item>
         <item>@color/colorCyan200</item>
-        <item>@color/colorCyan500</item>
+        <item>@color/colorCyan400</item>
         <item>@color/colorTeal200</item>
-        <item>@color/colorTeal500</item>
+        <item>@color/colorTeal400</item>
         <item>@color/colorGreen200</item>
-        <item>@color/colorGreen500</item>
+        <item>@color/colorGreen400</item>
         <item>@color/colorLightGreen200</item>
-        <item>@color/colorLightGreen500</item>
+        <item>@color/colorLightGreen400</item>
         <item>@color/colorLime200</item>
-        <item>@color/colorLime500</item>
+        <item>@color/colorLime400</item>
         <item>@color/colorYellow200</item>
-        <item>@color/colorYellow500</item>
+        <item>@color/colorYellow400</item>
         <item>@color/colorAmber200</item>
-        <item>@color/colorAmber500</item>
+        <item>@color/colorAmber400</item>
         <item>@color/colorOrange200</item>
-        <item>@color/colorOrange500</item>
+        <item>@color/colorOrange400</item>
         <item>@color/colorDeepOrange200</item>
-        <item>@color/colorDeepOrange500</item>
+        <item>@color/colorDeepOrange400</item>
         <item>@color/colorBrown200</item>
-        <item>@color/colorBrown500</item>
+        <item>@color/colorBrown400</item>
         <item>@color/colorBlueGrey200</item>
-        <item>@color/colorBlueGrey500</item>
+        <item>@color/colorBlueGrey400</item>
     </array>
 
     <!-- Ripple -->

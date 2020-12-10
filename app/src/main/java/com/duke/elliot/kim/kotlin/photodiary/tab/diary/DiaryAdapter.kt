@@ -71,6 +71,7 @@ class DiaryAdapter(private val context: Context, noInitialization: Boolean = fal
     private lateinit var viewOnClickListener: () -> Unit
     private val adapterScope = CoroutineScope(Dispatchers.Default)
     private var currentItem: DiaryModel? = null
+    var currentBackgroundColor = MainActivity.themeColorSecondary
     // TODO, load from shared pref.
     var sortingCriteria = SORT_BY_OLDEST
     var viewMode = LIST_VIEW_MODE
@@ -399,11 +400,12 @@ class DiaryAdapter(private val context: Context, noInitialization: Boolean = fal
     inner class ViewHolder constructor(val binding: ViewDataBinding):
         RecyclerView.ViewHolder(binding.root) {
 
+        /** Brief View */
         fun bind(binding: ItemDiaryBriefViewBinding, diary: DiaryModel) {
             val font = getFont(itemView.context, diary.textOptions.textFontId)
 
             // Apply theme color
-            binding.cardView.setCardBackgroundColor(MainActivity.themeColorSecondary)
+            binding.cardView.setCardBackgroundColor(currentBackgroundColor)
 
             binding.textDate.text = diary.time.toDateFormat(binding.root.context.getString(R.string.date_format_short))
             binding.textTime.text = diary.time.toDateFormat(binding.root.context.getString(R.string.time_format_short))
@@ -457,7 +459,7 @@ class DiaryAdapter(private val context: Context, noInitialization: Boolean = fal
             val font = getFont(itemView.context, diary.textOptions.textFontId)
 
             // Apply theme color
-            binding.cardView.setCardBackgroundColor(MainActivity.themeColorSecondary)
+            binding.cardView.setCardBackgroundColor(currentBackgroundColor)
 
             binding.textDate.text = diary.time.toDateFormat(binding.root.context.getString(R.string.date_format_short))
             binding.textTime.text = diary.time.toDateFormat(binding.root.context.getString(R.string.time_format_short))
@@ -580,7 +582,7 @@ class DiaryAdapter(private val context: Context, noInitialization: Boolean = fal
             val font = getFont(itemView.context, diary.textOptions.textFontId)
 
             // Apply theme color
-            binding.cardView.setCardBackgroundColor(MainActivity.themeColorSecondary)
+            binding.cardView.setCardBackgroundColor(currentBackgroundColor)
 
             binding.textDate.text = diary.time.toDateFormat(binding.root.context.getString(R.string.date_format_short))
             binding.imageWeatherIcon.setImageResource(DiaryWritingViewModel.weatherIconIds[diary.weatherIconIndex])

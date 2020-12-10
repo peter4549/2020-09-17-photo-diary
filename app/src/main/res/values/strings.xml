@@ -264,4 +264,11 @@
     <string name="data_backed_up">데이터를 백업했습니다.</string>
     <string name="backup_data_restored">백업 데이터를 복원했습니다.</string>
     <string name="data_backup_failed">데이터 백업에 실패했습니다.</string>
+
+    <!-- Reminder -->
+    <string name="reminder_settings">리마인더 설정</string>
+    <string name="set_reminder">리마인더 설정</string>
+    <string name="reminder_time">리마인더 시간</string>
+    <string name="reminder_message">리마인더 메시지</string>
+    <string name="reminder_default_message">오늘의 이야기를 들려주세요. :)</string>
 </resources>

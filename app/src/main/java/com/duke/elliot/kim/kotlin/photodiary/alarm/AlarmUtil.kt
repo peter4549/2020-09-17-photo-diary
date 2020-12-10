@@ -6,18 +6,20 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Build
 import com.duke.elliot.kim.kotlin.photodiary.R
 import java.util.*
+
 
 // USE CASE: 첫 실행, load state 함수 실행(디폴트 true) => 결과에 따라 set or pass, (cancel 시, 자동으로 false로 따로 설정할 필요 없음.)
 // 그 뒤 스위치 on/off에 따라 set/cancel 수행 후, save state 함수 수행할 것.
 
-object AlarmUtilities {
-    const val REMINDER_REQUEST_ID = 1115
-    const val REMINDER_SHARED_PREFERENCES = "reminder_shared_preferences"
-    const val KEY_REMINDER_STATE = "key_reminder_state"
-    const val KEY_REMINDER_CONTENT = "key_reminder_content"
-    const val KEY_REMINDER_TIME = "key_reminder_time"
+object AlarmUtil {
+    private const val REMINDER_REQUEST_ID = 1115
+    private const val REMINDER_SHARED_PREFERENCES = "reminder_shared_preferences"
+    private const val KEY_REMINDER_STATE = "key_reminder_state"
+    private const val KEY_REMINDER_MESSAGE = "key_reminder_message"
+    private const val KEY_REMINDER_MILLIS = "key_reminder_millis"
 
     fun cancelReminder(context: Context) {
         val alarmManager =
@@ -38,12 +40,20 @@ object AlarmUtilities {
         editor.apply()
     }
 
-    private fun saveTimeAndContent(context: Context, time: Long, content: String) {
+    private fun saveReminderMillisAndMessage(context: Context, millis: Long, message: String) {
         val sharedPreferences =
             context.getSharedPreferences(REMINDER_SHARED_PREFERENCES, Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
-        editor.putLong(KEY_REMINDER_TIME, time)
-        editor.putString(KEY_REMINDER_CONTENT, content)
+        editor.putLong(KEY_REMINDER_MILLIS, millis)
+        editor.putString(KEY_REMINDER_MESSAGE, message)
+        editor.apply()
+    }
+
+    fun saveReminderMillis(context: Context, millis: Long) {
+        val sharedPreferences =
+            context.getSharedPreferences(REMINDER_SHARED_PREFERENCES, Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.putLong(KEY_REMINDER_MILLIS, millis)
         editor.apply()
     }
 
@@ -53,54 +63,49 @@ object AlarmUtilities {
         return sharedPreferences.getBoolean(KEY_REMINDER_STATE, true)
     }
 
-    fun loadReminderTimeAndContent(context: Context): Pair<Long, String> {
+    fun loadReminderMillisAndMessage(context: Context): Pair<Long, String> {
         val calendar = Calendar.getInstance().apply {
-            timeInMillis = System.currentTimeMillis()
             set(Calendar.HOUR_OF_DAY, 22)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
         }
+
         val defaultTime = calendar.timeInMillis
 
         val sharedPreferences =
             context.getSharedPreferences(REMINDER_SHARED_PREFERENCES, Context.MODE_PRIVATE)
-        val time = sharedPreferences.getLong(KEY_REMINDER_TIME, defaultTime)
-        val content = sharedPreferences.getString(KEY_REMINDER_CONTENT, context.getString(R.string.default_notification_content))
-            ?: context.getString(R.string.default_notification_content)
+        val time = sharedPreferences.getLong(KEY_REMINDER_MILLIS, defaultTime)
+        val content = sharedPreferences.getString(
+            KEY_REMINDER_MESSAGE,
+            context.getString(R.string.reminder_default_message)
+        )
+            ?: context.getString(R.string.reminder_default_message)
 
         return Pair(time, content)
     }
 
-    fun setReminder(context: Context, time: Long, content: String) {
-        val calendar = Calendar.getInstance().apply {
-            timeInMillis = System.currentTimeMillis()
-            set(Calendar.HOUR_OF_DAY, 23)
-        }
-
+    fun setReminder(context: Context, calendar: Calendar, message: String) {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(context, AlarmReceiver::class.java).let {
             PendingIntent.getBroadcast(context, REMINDER_REQUEST_ID, it, 0)
         }
-        // Pending 인텐트 말고, 오리진 인텐트에 putInt등으로 데이터 담을 것.
 
         val packageManager = context.packageManager
         val deviceBootReceiver = ComponentName(context, DeviceBootReceiver::class.java)
 
-        /* 1회성 알람 설정 코드임. 나중에 부정확할 시 아래 코드랑 같이 참ㄴ조.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             alarmManager.setExactAndAllowWhileIdle(
                 AlarmManager.RTC_WAKEUP,
                 calendar.timeInMillis,
                 intent
             )
+        } else {
+            alarmManager.setExact(
+                AlarmManager.RTC_WAKEUP,
+                calendar.timeInMillis,
+                intent
+            )
         }
-
-         */
-
-        alarmManager.setRepeating(
-            AlarmManager.RTC_WAKEUP,
-            calendar.timeInMillis,
-            AlarmManager.INTERVAL_DAY,
-            intent
-        )
 
         packageManager.setComponentEnabledSetting(
             deviceBootReceiver,
@@ -109,6 +114,7 @@ object AlarmUtilities {
         )
 
         saveReminderState(context, true)
+        saveReminderMillisAndMessage(context, calendar.timeInMillis, message)
         // TODO: chooser 구현 후 풀 것.
         // saveTimeAndContent(time, content)
     }

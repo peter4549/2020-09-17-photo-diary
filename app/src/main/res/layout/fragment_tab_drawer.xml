@@ -53,6 +53,16 @@
                     app:drawableStartCompat="@drawable/ic_round_backup_30"
                     app:drawableTint="@color/icon_color"/>
 
+                <TextView
+                    android:id="@+id/textReminder"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="@string/reminder_settings"
+                    android:gravity="center"
+                    android:padding="16dp"
+                    app:drawableStartCompat="@drawable/ic_round_access_alarm_32"
+                    app:drawableTint="@color/icon_color"/>
+
             </LinearLayout>
         </com.google.android.material.navigation.NavigationView>
     </androidx.drawerlayout.widget.DrawerLayout>

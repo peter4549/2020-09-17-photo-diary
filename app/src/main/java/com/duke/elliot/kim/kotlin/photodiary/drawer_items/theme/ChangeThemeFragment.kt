@@ -1,4 +1,4 @@
-package com.duke.elliot.kim.kotlin.photodiary.drawer_items
+package com.duke.elliot.kim.kotlin.photodiary.drawer_items.theme
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -6,12 +6,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.databinding.DataBindingUtil
+import com.duke.elliot.kim.kotlin.photodiary.DIARIES_FRAGMENT_HANDLER_MESSAGE
 import com.duke.elliot.kim.kotlin.photodiary.MainActivity
 import com.duke.elliot.kim.kotlin.photodiary.R
 import com.duke.elliot.kim.kotlin.photodiary.base.BaseFragment
 import com.duke.elliot.kim.kotlin.photodiary.databinding.FragmentChangeThemeBinding
-import com.duke.elliot.kim.kotlin.photodiary.utility.showToast
-import kotlinx.coroutines.*
 import petrov.kristiyan.colorpicker.ColorPicker
 
 class ChangeThemeFragment: BaseFragment() {
@@ -47,6 +46,14 @@ class ChangeThemeFragment: BaseFragment() {
                     saveThemeColor(requireContext(), MainActivity.themeColorPrimary, MainActivity.themeColorSecondary)
                     binding.currentThemeColor.setCardBackgroundColor(MainActivity.themeColorPrimary)
                     applyPrimaryThemeColor(binding.toolbar)
+
+                    val diariesFragmentHandler = (requireActivity() as MainActivity).diariesFragmentHandler
+                    if (diariesFragmentHandler != null) {
+                        val message = diariesFragmentHandler.obtainMessage()
+                        message.what = DIARIES_FRAGMENT_HANDLER_MESSAGE
+                        diariesFragmentHandler.sendMessage(message)
+                    }
+
                 }
 
                 override fun onCancel() {  }

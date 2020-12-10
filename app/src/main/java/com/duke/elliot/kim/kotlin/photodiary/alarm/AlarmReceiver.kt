@@ -10,14 +10,23 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import com.duke.elliot.kim.kotlin.photodiary.MainActivity
 import com.duke.elliot.kim.kotlin.photodiary.R
+import java.util.*
 
 class AlarmReceiver: BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
+        val reminderSet = AlarmUtil.loadReminderState(context)
+        val reminderMillisAndMessage = AlarmUtil.loadReminderMillisAndMessage(context)
+        val reminderMillis = reminderMillisAndMessage.first
+        val reminderMessage = reminderMillisAndMessage.second
+
         val builder = NotificationCompat.Builder(context, CHANNEL_ID)
         val notificationManager =
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val notificationIntent = Intent(context, MainActivity::class.java)
+
+        notificationIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                Intent.FLAG_ACTIVITY_SINGLE_TOP
 
         val pendingIntent = PendingIntent.getActivity(
             context,
@@ -39,12 +48,19 @@ class AlarmReceiver: BroadcastReceiver() {
             .setDefaults(NotificationCompat.DEFAULT_ALL)
             .setWhen(System.currentTimeMillis())
             .setContentTitle(context.getString(R.string.app_name))
-            .setContentText(intent.getStringExtra("aa")
-                ?: context.getString(R.string.default_notification_content))
+            .setContentText(reminderMessage)
             .setContentIntent(pendingIntent)
         notificationManager.notify(NOTIFICATION_ID, builder.build())
 
-        // TODO: Repeat 테스트 후 부정확시 여기에 알람 등록코드 추가필요.
+        if (reminderSet) {
+            val calendar = Calendar.getInstance().apply {
+                timeInMillis = reminderMillis
+                set(Calendar.SECOND, 0)
+            }
+
+            calendar.add(Calendar.DATE, 1)
+            AlarmUtil.setReminder(context, calendar, reminderMessage)
+        }
     }
 
     companion object {

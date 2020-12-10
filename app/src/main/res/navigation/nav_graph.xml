@@ -29,6 +29,9 @@
         <action
             android:id="@+id/action_tabFragment_to_backupFragment"
             app:destination="@id/backupFragment" />
+        <action
+            android:id="@+id/action_tabFragment_to_reminderFragment"
+            app:destination="@id/reminderFragment" />
     </fragment>
     <fragment
         android:id="@+id/diaryWritingFragment"
@@ -123,10 +126,14 @@
     </fragment>
     <fragment
         android:id="@+id/changeThemeFragment"
-        android:name="com.duke.elliot.kim.kotlin.photodiary.drawer_items.ChangeThemeFragment"
+        android:name="com.duke.elliot.kim.kotlin.photodiary.drawer_items.theme.ChangeThemeFragment"
         android:label="ChangeThemeFragment" />
     <fragment
         android:id="@+id/backupFragment"
         android:name="com.duke.elliot.kim.kotlin.photodiary.drawer_items.backup.BackupFragment"
         android:label="BackupFragment" />
+    <fragment
+        android:id="@+id/reminderFragment"
+        android:name="com.duke.elliot.kim.kotlin.photodiary.drawer_items.reminder.ReminderFragment"
+        android:label="ReminderFragment" />
 </navigation>

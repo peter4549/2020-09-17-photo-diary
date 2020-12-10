@@ -7,7 +7,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.LabeledIntent
 import android.content.pm.PackageManager
-import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
@@ -18,15 +17,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import androidx.annotation.RequiresApi
-import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
-import com.duke.elliot.kim.kotlin.photodiary.MainViewModel
 import com.duke.elliot.kim.kotlin.photodiary.R
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryModel
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.media_helper.MediaHelper
 import com.duke.elliot.kim.kotlin.photodiary.utility.*
 import com.facebook.share.model.*
-import com.facebook.share.widget.MessageDialog
 import com.facebook.share.widget.ShareDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.item_select_dialog_28.view.*
@@ -401,7 +397,7 @@ object ExportUtilities {
         )
     }
 
-    fun sendDiaryToFacebook(activity: Activity, mediaUris: List<Pair<Int, Uri>>) {
+    fun sendDiaryToFacebook(activity: Activity, diary: DiaryModel, mediaUris: List<Pair<Int, Uri>>) {
         if (!::weatherWords.isInitialized)
             weatherWords = activity.resources.getStringArray(R.array.weatherWords)
 
@@ -423,7 +419,12 @@ object ExportUtilities {
         if (shareVideos.isNotEmpty())
             shareMediaContentBuilder.addMedia(shareVideos.toList())
 
-        val shareMediaContent = shareMediaContentBuilder.build()
+        val hashTag = diary.hashTags.joinToString(" ")
+        val shareMediaContent = shareMediaContentBuilder
+            .setShareHashtag(ShareHashtag.Builder()
+                .setHashtag(hashTag)
+                .build())
+            .build()
         val shareDialog = ShareDialog(activity)
         shareDialog.show(shareMediaContent, ShareDialog.Mode.AUTOMATIC)
         // shareDialog.registerCallback(callbackManager, new FacebookCallback<Sharer.Result>() { ... });
@@ -444,13 +445,14 @@ object ExportUtilities {
         stringBuilder.append(diary.content)
 
         val uri = Uri.parse("R.drawable.ic_moon_24")
+        val hashTag = diary.hashTags.joinToString(" ")
 
         val shareLinkContent = ShareLinkContent.Builder()
             .setContentUrl(uri)
             .setQuote(stringBuilder.toString())
             .setShareHashtag(
                 ShareHashtag.Builder()
-                    .setHashtag("#ConnectTheWorld #howtoconcat #hahaha")
+                    .setHashtag(hashTag)
                     .build()
             )
             .build()

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -19,7 +20,7 @@
             app:title="@string/set_lock_screen" />
 
         <TextView
-            android:id="@+id/backupInformationTitle"
+            android:id="@+id/backupInformationHeader"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -29,10 +30,24 @@
             android:padding="8dp"
             android:text="@string/backup_information"
             android:textColor="@color/colorTextAccent"
-            android:textSize="16sp"
+            android:textSize="14sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/toolbar" />
+
+        <TextView
+            android:id="@+id/backupAccountTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="32dp"
+            android:layout_marginEnd="8dp"
+            android:padding="8dp"
+            android:text="@string/backup_account"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/backupInformationHeader" />
 
         <TextView
             android:id="@+id/backupAccount"
@@ -41,15 +56,17 @@
             android:layout_weight="1"
             android:layout_marginStart="32dp"
             android:layout_marginEnd="8dp"
-            android:padding="8dp"
-            android:text="@string/backup_account"
-            android:textSize="18sp"
+            android:paddingEnd="8dp"
+            android:paddingStart="8dp"
+            android:textSize="14sp"
+            android:textColor="@color/color_text_light"
+            tools:text="peter454975@google.com"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/backupInformationTitle" />
+            app:layout_constraintTop_toBottomOf="@id/backupAccountTitle" />
 
         <TextView
-            android:id="@+id/backupInformation"
+            android:id="@+id/backupInformationTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -58,10 +75,26 @@
             android:layout_marginTop="16dp"
             android:padding="8dp"
             android:text="@string/backup_information"
-            android:textSize="18sp"
+            android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/backupAccount" />
+
+        <TextView
+            android:id="@+id/backupInformation"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="32dp"
+            android:layout_marginEnd="8dp"
+            android:textColor="@color/color_text_light"
+            android:textSize="14sp"
+            android:paddingEnd="8dp"
+            android:paddingStart="8dp"
+            tools:text="최신 백업 일자: 2020년 9월 10일 \n최신 백업 기기: Sam-sung"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/backupInformationTitle" />
 
         <TextView
             android:id="@+id/googleDriveTitle"
@@ -74,7 +107,7 @@
             android:padding="8dp"
             android:text="@string/google_drive"
             android:textColor="@color/colorTextAccent"
-            android:textSize="16sp"
+            android:textSize="14sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/backupInformation" />
@@ -87,9 +120,12 @@
             android:layout_weight="1"
             android:layout_marginStart="32dp"
             android:layout_marginEnd="8dp"
-            android:padding="8dp"
+            android:paddingBottom="16dp"
+            android:paddingEnd="8dp"
+            android:paddingStart="8dp"
+            android:paddingTop="16dp"
             android:text="@string/data_backup"
-            android:textSize="18sp"
+            android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/googleDriveTitle" />
@@ -102,10 +138,12 @@
             android:layout_weight="1"
             android:layout_marginStart="32dp"
             android:layout_marginEnd="8dp"
-            android:layout_marginTop="16dp"
-            android:padding="8dp"
+            android:paddingBottom="16dp"
+            android:paddingEnd="8dp"
+            android:paddingStart="8dp"
+            android:paddingTop="16dp"
             android:text="@string/restore_data"
-            android:textSize="18sp"
+            android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/dataBackup" />
@@ -114,7 +152,6 @@
             android:id="@+id/autoBackup"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
             android:background="?attr/selectableItemBackground"
             android:orientation="horizontal"
             android:gravity="center_vertical"
@@ -128,9 +165,12 @@
                 android:layout_weight="1"
                 android:layout_marginStart="32dp"
                 android:layout_marginEnd="8dp"
-                android:padding="8dp"
+                android:paddingBottom="16dp"
+                android:paddingEnd="8dp"
+                android:paddingStart="8dp"
+                android:paddingTop="16dp"
                 android:text="@string/auto_backup"
-                android:textSize="18sp" />
+                android:textSize="16sp" />
 
             <com.google.android.material.switchmaterial.SwitchMaterial
                 android:id="@+id/switchAutoBackup"
@@ -145,7 +185,6 @@
             android:id="@+id/backupNotification"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
             android:background="?attr/selectableItemBackground"
             android:orientation="horizontal"
             android:gravity="center_vertical"
@@ -159,9 +198,12 @@
                 android:layout_weight="1"
                 android:layout_marginStart="32dp"
                 android:layout_marginEnd="8dp"
-                android:padding="8dp"
+                android:paddingBottom="16dp"
+                android:paddingEnd="8dp"
+                android:paddingStart="8dp"
+                android:paddingTop="16dp"
                 android:text="@string/backup_notification"
-                android:textSize="18sp" />
+                android:textSize="16sp" />
 
             <com.google.android.material.switchmaterial.SwitchMaterial
                 android:id="@+id/switchBackupNotification"
@@ -183,7 +225,7 @@
             android:padding="8dp"
             android:text="@string/internal_storage"
             android:textColor="@color/colorTextAccent"
-            android:textSize="16sp"
+            android:textSize="14sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/backupNotification" />
@@ -196,9 +238,12 @@
             android:layout_weight="1"
             android:layout_marginStart="32dp"
             android:layout_marginEnd="8dp"
-            android:padding="8dp"
+            android:paddingBottom="16dp"
+            android:paddingEnd="8dp"
+            android:paddingStart="8dp"
+            android:paddingTop="16dp"
             android:text="@string/backup_to_internal_storage"
-            android:textSize="18sp"
+            android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/internalStorage" />
@@ -211,10 +256,13 @@
             android:layout_weight="1"
             android:layout_marginStart="32dp"
             android:layout_marginEnd="8dp"
-            android:layout_marginTop="16dp"
-            android:padding="8dp"
+
+            android:paddingBottom="16dp"
+            android:paddingEnd="8dp"
+            android:paddingStart="8dp"
+            android:paddingTop="16dp"
             android:text="@string/restore_from_internal_storage"
-            android:textSize="18sp"
+            android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/backupToInternalStorage" />

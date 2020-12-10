@@ -1,9 +1,6 @@
 package com.duke.elliot.kim.kotlin.photodiary.tab
 
-import android.content.Context
-import android.content.Context.MODE_PRIVATE
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -22,27 +19,19 @@ import com.duke.elliot.kim.kotlin.photodiary.MainViewModel
 import com.duke.elliot.kim.kotlin.photodiary.R
 import com.duke.elliot.kim.kotlin.photodiary.base.BaseFragment
 import com.duke.elliot.kim.kotlin.photodiary.calendar.CalendarFragment
-import com.duke.elliot.kim.kotlin.photodiary.database.DiaryDatabase
 import com.duke.elliot.kim.kotlin.photodiary.databinding.FragmentTabDrawerBinding
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.CREATE_MODE
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.DATE_OTHER_THAN_TODAY
 import com.duke.elliot.kim.kotlin.photodiary.drawer_items.lock_screen.SetLockScreenActivity
 import com.duke.elliot.kim.kotlin.photodiary.tab.diary.DiariesFragment
 import com.duke.elliot.kim.kotlin.photodiary.tab.media.PhotosFragment
-import com.duke.elliot.kim.kotlin.photodiary.utility.Operation
-import com.duke.elliot.kim.kotlin.photodiary.utility.TypefaceUtil
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
-import kotlinx.android.synthetic.main.fragment_tab_layout.*
 import kotlinx.android.synthetic.main.fragment_tab_layout.view.*
 import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.collect
 
 
-class TabFragment: BaseFragment(), Operation<String> {
+class TabFragment: BaseFragment() {
 
     // private lateinit var tabIcons: Array<Int>
     private lateinit var tabTexts: Array<String>
@@ -96,13 +85,6 @@ class TabFragment: BaseFragment(), Operation<String> {
 
         // TODO: 안쓸듯..
         binding.tabFragment.alarm_test_btn.setOnClickListener {
-            CoroutineScope(Dispatchers.IO).launch {
-                this@TabFragment.perform().collect {
-                    println("KKKKKKKKKKKKKKK $it")
-                    // 값이 존재하면, value에 존재하면, 여기로 온다.
-                }
-            }
-
             /*
             // TODO: test. 잘되면 존나 개꿀. 관건은 다이나믹하게 가능한가.. MAINACTIVITY에도 있음.
             // 설계할것..
@@ -133,6 +115,12 @@ class TabFragment: BaseFragment(), Operation<String> {
         binding.textDataBackup.setOnClickListener {
             findNavController().navigate(
                 TabFragmentDirections.actionTabFragmentToBackupFragment()
+            )
+        }
+
+        binding.textReminder.setOnClickListener {
+            findNavController().navigate(
+                TabFragmentDirections.actionTabFragmentToReminderFragment()
             )
         }
 
@@ -189,36 +177,5 @@ class TabFragment: BaseFragment(), Operation<String> {
     companion object {
         var diaryWritingMode = CREATE_MODE
         var calendarFragmentOnFabClick: (() -> Unit)? = null
-    }
-
-    // Test
-    @ExperimentalCoroutinesApi
-    suspend fun <T : Any> Operation<T>.perform(): Flow<T> =
-        callbackFlow {
-            requireContext().getExternalFilesDir(null)
-            val s = "a"
-            performAsync { value, exception ->
-                when {
-                    exception != null -> // operation had failed
-                        close(exception)
-                    value == null -> // operation had succeeded
-                        close()
-                    else -> // there is a value
-                        offer(value as T)
-                }
-            }
-
-
-
-            awaitClose { cancel() }
-        }
-
-    override fun performAsync(callback: (String?, Throwable?) -> Unit) {
-        // 값을 넘기려면 여기서..
-        println("SSSSSSS")
-        for (i in 0..3)
-            callback.invoke("HERE! $i", null)
-
-        callback.invoke("THERE! end!", null)
     }
 }

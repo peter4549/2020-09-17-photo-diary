@@ -2,6 +2,8 @@ package com.duke.elliot.kim.kotlin.photodiary.tab.diary
 
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,11 +13,14 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.SimpleItemAnimator
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.duke.elliot.kim.kotlin.photodiary.DIARIES_FRAGMENT_HANDLER_MESSAGE
+import com.duke.elliot.kim.kotlin.photodiary.MainActivity
 import com.duke.elliot.kim.kotlin.photodiary.MainViewModel
 import com.duke.elliot.kim.kotlin.photodiary.R
 import com.duke.elliot.kim.kotlin.photodiary.database.DiaryDatabase
 import com.duke.elliot.kim.kotlin.photodiary.databinding.FragmentDairiesBinding
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.CREATE_MODE
+import com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryModel
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.EDIT_MODE
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.media_helper.MediaHelper
 import com.duke.elliot.kim.kotlin.photodiary.export.ExportUtilities
@@ -53,6 +58,18 @@ class DiariesFragment: Fragment(), KakaoTalkOptionBottomSheetDialogFragment.Kaka
         viewModel = ViewModelProvider(viewModelStore, viewModelFactory)[DiariesViewModel::class.java]
 
         binding.diariesViewModel = viewModel
+
+        (requireActivity() as MainActivity).diariesFragmentHandler = Handler(Looper.getMainLooper()) {
+            when(it.what) {
+                DIARIES_FRAGMENT_HANDLER_MESSAGE -> {
+                    if (diaryAdapter.currentBackgroundColor != MainActivity.themeColorSecondary) {
+                        diaryAdapter.currentBackgroundColor = MainActivity.themeColorSecondary
+                        binding.recyclerViewDiary.adapter = diaryAdapter
+                    }
+                }
+            }
+            true
+        }
 
         mediaPicker = MediaPickerBottomSheetDialogFragment().apply {
             setMediaClickListener(this@DiariesFragment)
@@ -177,7 +194,6 @@ class DiariesFragment: Fragment(), KakaoTalkOptionBottomSheetDialogFragment.Kaka
     override fun onResume() {
         super.onResume()
         TabFragment.diaryWritingMode = CREATE_MODE
-        diaryAdapter.notifyDataSetChanged()
     }
 
     override fun onStop() {
@@ -266,7 +282,7 @@ class DiariesFragment: Fragment(), KakaoTalkOptionBottomSheetDialogFragment.Kaka
     }
 
     // Typeless Media Picker
-    override fun onClick(pickedMediaUris: List<Pair<Int, Uri>>) {
-        ExportUtilities.sendDiaryToFacebook(requireActivity(), pickedMediaUris)
+    override fun onClick(diary: DiaryModel, pickedMediaUris: List<Pair<Int, Uri>>) {
+        ExportUtilities.sendDiaryToFacebook(requireActivity(), diary, pickedMediaUris)
     }
 }

@@ -26,7 +26,7 @@ class TypelessMediaPickerBottomSheetDialogFragment: BottomSheetDialogFragment() 
     private lateinit var mediaClickListener: OnMediaClickListener
 
     interface OnMediaClickListener {
-        fun onClick(pickedMediaUris: List<Pair<Int, Uri>>)
+        fun onClick(diary: DiaryModel, pickedMediaUris: List<Pair<Int, Uri>>)
     }
 
     fun setMediaClickListener(mediaClickListener: OnMediaClickListener) {
@@ -50,7 +50,7 @@ class TypelessMediaPickerBottomSheetDialogFragment: BottomSheetDialogFragment() 
         binding.recyclerView.adapter = mediaPickerAdapter
 
         binding.ok.setOnClickListener {
-            mediaClickListener.onClick(mediaPickerAdapter.pickedMediaUris)
+            mediaClickListener.onClick(diary, mediaPickerAdapter.pickedMediaUris)
             dismiss()
         }
 

@@ -350,7 +350,7 @@ class DiaryViewPagerFragment: Fragment(),
         }
     }
 
-    override fun onClick(pickedMediaUris: List<Pair<Int, Uri>>) {
-        ExportUtilities.sendDiaryToFacebook(requireActivity(), pickedMediaUris)
+    override fun onClick(diary: DiaryModel, pickedMediaUris: List<Pair<Int, Uri>>) {
+        ExportUtilities.sendDiaryToFacebook(requireActivity(), diary, pickedMediaUris)
     }
 }

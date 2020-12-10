@@ -16,7 +16,7 @@
         android:layout_marginBottom="16dp"
         android:layout_marginEnd="2dp"
         android:layout_marginStart="2dp"
-        android:backgroundTint="@color/colorDefaultThemeSecondary"
+        app:cardBackgroundColor="@color/colorDefaultThemeSecondary"
         app:cardCornerRadius="8dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -171,8 +171,8 @@
                     app:anim_scale_factor="2"
                     app:circle_end_color="@color/colorLikeButtonEnd"
                     app:circle_start_color="@color/colorLikeButtonStart"
-                    app:dots_primary_color="@color/colorLightBlue500"
-                    app:dots_secondary_color="@color/colorBlue500"
+                    app:dots_primary_color="@color/colorLightBlue400"
+                    app:dots_secondary_color="@color/colorBlue400"
                     app:icon_size="32dp"
                     app:icon_type="Star"
                     app:is_enabled="true"

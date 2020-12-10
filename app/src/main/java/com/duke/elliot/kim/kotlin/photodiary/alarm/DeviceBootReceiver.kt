@@ -1,7 +1,5 @@
 package com.duke.elliot.kim.kotlin.photodiary.alarm
 
-import android.app.AlarmManager
-import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -11,21 +9,24 @@ class DeviceBootReceiver : BroadcastReceiver()  {
 
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action == "android.intent.action.BOOT_COMPLETED") {
-            // TODO, 인텐트로부터 컨텐트, 시간 전달받아야함.
-            // 인텐트에 시간, 메시지가 있음 그걸로 알람 재설정. 시간, 메시지 뽑아서 넘길것.
-            AlarmUtilities.setReminder(context, 0L, "abc")
+            val reminderSet = AlarmUtil.loadReminderState(context)
+            val reminderMillisAndMessage = AlarmUtil.loadReminderMillisAndMessage(context)
+            val reminderMillis = reminderMillisAndMessage.first
+            val reminderMessage = reminderMillisAndMessage.second
 
-            /*
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                manager.setExactAndAllowWhileIdle(
-                    AlarmManager.RTC_WAKEUP,
-                    calendar.timeInMillis,
-                    pendingIntent
-                )
+            if (reminderSet) {
+                val calendar = Calendar.getInstance().apply {
+                    timeInMillis = reminderMillis
+                    set(Calendar.SECOND, 0)
+                }
+
+                val calendarNow = Calendar.getInstance()
+
+                if (calendar.before(calendarNow) || calendarNow.time == calendar.time)
+                    calendar.add(Calendar.DATE, 1)
+
+                AlarmUtil.setReminder(context, calendar, reminderMessage)
             }
-
-             */
-
         }
     }
 }

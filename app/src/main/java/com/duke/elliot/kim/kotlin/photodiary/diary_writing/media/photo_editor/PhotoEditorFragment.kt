@@ -144,7 +144,6 @@ class PhotoEditorFragment: Fragment(),
                     }
                 })
                 .skipMemoryCache(false)
-                .transform(CenterCrop())
                 .into(binding.photoEditorView.source)
         }
 

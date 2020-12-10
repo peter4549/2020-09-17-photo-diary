@@ -3,43 +3,41 @@ package com.duke.elliot.kim.kotlin.photodiary
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.os.Environment
+import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import androidx.annotation.ColorInt
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
+import com.duke.elliot.kim.kotlin.photodiary.alarm.AlarmUtil
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryModel
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryWritingFragment
-import com.duke.elliot.kim.kotlin.photodiary.drawer_items.loadPrimaryThemeColor
-import com.duke.elliot.kim.kotlin.photodiary.drawer_items.loadSecondaryThemeColor
+import com.duke.elliot.kim.kotlin.photodiary.drawer_items.theme.loadPrimaryThemeColor
+import com.duke.elliot.kim.kotlin.photodiary.drawer_items.theme.loadSecondaryThemeColor
 import com.duke.elliot.kim.kotlin.photodiary.drawer_items.lock_screen.LOCK_SCREEN_TAG
 import com.duke.elliot.kim.kotlin.photodiary.drawer_items.lock_screen.LockScreenHelper
+import com.duke.elliot.kim.kotlin.photodiary.drawer_items.reminder.ReminderFragment
 import com.duke.elliot.kim.kotlin.photodiary.export.EXPORT_REQUEST_CODE
 import com.duke.elliot.kim.kotlin.photodiary.fluid_keyboard_resize.FluidContentResize
-import com.duke.elliot.kim.kotlin.photodiary.utility.Operation
 import com.duke.elliot.kim.kotlin.photodiary.utility.TypefaceUtil
 import com.duke.elliot.kim.kotlin.photodiary.utility.printHashKey
-import com.duke.elliot.kim.kotlin.photodiary.utility.showToast
 import com.facebook.internal.CallbackManagerImpl
-import kotlinx.android.synthetic.main.fragment_tab_layout.*
 import kotlinx.android.synthetic.main.item_diary.view.*
-import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.collect
 import timber.log.Timber
-import java.io.File
-import java.io.FileWriter
+import java.util.*
+import kotlin.collections.ArrayList
+
+const val DIARIES_FRAGMENT_HANDLER_MESSAGE = 527
+
+const val PREFERENCES_FIRST_LAUNCH = "zion_preferences_first_launch_2146"
 
 class MainActivity : AppCompatActivity() {
 
     // TODO must be private, provide fun as interface.
     lateinit var viewModel: MainViewModel
+    var diariesFragmentHandler: Handler? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,6 +58,11 @@ class MainActivity : AppCompatActivity() {
         themeColorPrimary = loadPrimaryThemeColor(this)
         themeColorSecondary = loadSecondaryThemeColor(this)
         // AppCompatDelegate.setDefaultNightMode(getNightMode(this))
+
+        /** First Launch */
+        if (isFirstLaunch()) {
+            turnOnReminderFirst()
+        }
 
         // TODO: Implement.
         //AlarmUtilities.setReminder(this, 0L, "")
@@ -154,6 +157,35 @@ class MainActivity : AppCompatActivity() {
         overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
     }
 
+    private fun isFirstLaunch(): Boolean {
+        val preferences = this
+            .getSharedPreferences(PREFERENCES_FIRST_LAUNCH, Context.MODE_PRIVATE)
+
+        val firstLaunch = preferences.getBoolean(KEY_FIRST_LAUNCH, true)
+
+        if (firstLaunch) {
+            val editor = preferences.edit()
+            editor.putBoolean(KEY_FIRST_LAUNCH, false)
+            editor.apply()
+        }
+
+        return firstLaunch
+    }
+
+    private fun turnOnReminderFirst() {
+        val calendar = Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, 22)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+        }
+        val calendarNow = Calendar.getInstance()
+
+        if (calendar.before(calendarNow) || calendarNow.time == calendar.time)
+            calendar.add(Calendar.DATE, 1)
+
+        AlarmUtil.setReminder(this, calendar, getString(R.string.reminder_default_message))
+    }
+
     companion object {
         const val DEFAULT_FONT_ID = R.font.cookie_run_regular
         var fontNameIdMap: MutableMap<String, Int> = mutableMapOf()
@@ -174,5 +206,7 @@ class MainActivity : AppCompatActivity() {
 
         @ColorInt
         var themeColorSecondary = 0
+
+        private const val KEY_FIRST_LAUNCH = "zion_key_first_launch"
     }
 }

@@ -14,20 +14,18 @@ import androidx.lifecycle.ViewModelProvider
 import com.duke.elliot.kim.kotlin.photodiary.MainActivity
 import com.duke.elliot.kim.kotlin.photodiary.R
 import com.duke.elliot.kim.kotlin.photodiary.base.BaseFragment
+import com.duke.elliot.kim.kotlin.photodiary.database.DIARY_DATABASE_NAME
 import com.duke.elliot.kim.kotlin.photodiary.database.DiaryDatabase
 import com.duke.elliot.kim.kotlin.photodiary.databinding.FragmentBackupBinding
-import com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryWritingViewModel
-import com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryWritingViewModelFactory
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.MediaModel
 import com.duke.elliot.kim.kotlin.photodiary.drive.DriveServiceHelper
-import com.duke.elliot.kim.kotlin.photodiary.utility.FileUtilities
 import com.duke.elliot.kim.kotlin.photodiary.utility.OkCancelDialogFragment
 import com.duke.elliot.kim.kotlin.photodiary.utility.showToast
+import com.duke.elliot.kim.kotlin.photodiary.utility.toPath
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.Scope
-import com.google.android.gms.tasks.Task
 import com.google.api.client.extensions.android.http.AndroidHttp
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
 import com.google.api.client.json.gson.GsonFactory
@@ -39,8 +37,11 @@ import com.karumi.dexter.listener.PermissionDeniedResponse
 import com.karumi.dexter.listener.PermissionGrantedResponse
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.single.PermissionListener
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.io.File
 import java.util.*
 
 private const val BACKUP_TO_INTERNAL_STORAGE = 0
@@ -66,6 +67,7 @@ class BackupFragment: BaseFragment() {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_backup, container, false)
 
         setSimpleBackButton(binding.toolbar)
+        setBackupInformationUI()
 
         val viewModelFactory = BackupViewModelFactory(requireActivity().application)
         viewModel = ViewModelProvider(viewModelStore, viewModelFactory)[BackupViewModel::class.java]
@@ -218,6 +220,7 @@ class BackupFragment: BaseFragment() {
         when (requestCode) {
             REQUEST_CODE_GOOGLE_SIGN_IN ->
                 if (resultCode == RESULT_OK && data != null) {
+                    setBackupInformationUI()
                     handleSignInResult(data)
                 }
         }
@@ -248,99 +251,49 @@ class BackupFragment: BaseFragment() {
 
                 when(mode) {
                     BACKUP_TO_GOOGLE_DRIVE -> {
-                        CoroutineScope(Dispatchers.Default).launch {
-                            showProgressBar()
-
-                            driveServiceHelper.backupDatabaseFiles(requireContext())?.let {
-
-                                val diaries = DiaryDatabase.getInstance(requireContext()).diaryDao().getAllValues()
-                                val mediaList = mutableListOf<MediaModel>()
-                                for (diary in diaries) {
-                                    mediaList += diary.mediaArray
-                                }
-                                driveServiceHelper.backupMediaFiles(mediaList).let {
-                                    if (it)
-                                        showToast(requireContext(), "데이터파일 백업 성공.")
-                                    else
-                                        showToast(requireContext(), "데이터파일 백업 실패.")
-                                }
-                            } ?: run {
-                                showToast(requireContext(), "데이터파일 백업 실패.")
-                            }
-
-                            dismissProgressBar()
-                        }
-
-                        /*
                         CoroutineScope(Dispatchers.IO).launch {
-                            driveServiceHelper.backupDatabaseFiles(requireContext())
-                        }
+                            showProgressBar()
+                            driveServiceHelper.backup(
+                                requireContext(),
+                                viewModel.getAllMedia()
+                            ) { result ->
+                                dismissProgressBar()
 
-                         */
+                                if (result) {
+                                    showToast(requireContext(), "데이터파일 백업 성공.")
+                                } else {
+                                    showToast(requireContext(), "데이터파일 백업 실패.")
+                                }
+                            }
+                        }
                     }
                     RESTORE_FROM_GOOGLE_DRIVE -> {
-                        showProgressBar()
-                        driveServiceHelper.restore(requireContext()) { result, downloadedFilePaths ->
-                            dismissProgressBar()
-
-                            if (result) { // 성공.
-                                (requireActivity() as MainActivity).recreateNoAnimation()
-                                // TODO: 현재 데이터 파일 제거. 마찬가지로 미디어 목록갖고있어야함..
-                                // TODO: origin files 경로를 갖고 있어야한다. 오리진 파일들을 제거.
-                            } else {
-                                /** 실패한 경우 */
-
-                                downloadedFilePaths?.let { viewModel.deleteFiles(it) }
-                                // origin 파일들은 건드릴 필요 없다.
-                                // db파일만 다시 붙여 넣으면 된다.
-                                restoreCurrentDatabase()
-                            }
-                        }
-
                         CoroutineScope(Dispatchers.IO).launch {
+                            val mediaList = viewModel.getAllMedia()
+                            cacheCurrentDatabase()
 
-                            /*
-                            driveServiceHelper.readFile(fileId).addOnSuccessListener { ii ->
-                                showToast(requireContext(), "SSS " + ii)
-                            }.addOnFailureListener {
-                                showToast(requireContext(), "Falss ${fileId} " + it.message.toString())
-                            }
+                            showProgressBar()
+                            driveServiceHelper.restore(requireContext()) { result, downloadedFilePaths ->
+                                dismissProgressBar()
 
-                             */
+                                if (result) {
+                                    deleteCachedDatabase()
+                                    viewModel.deleteFiles(mediaList.map { it.uriString.toPath() }
+                                        .requireNoNulls())
+                                    showToast(requireContext(), "데이터파일 복원 성공.")
+                                    (requireActivity() as MainActivity).recreateNoAnimation()
 
-                            driveServiceHelper.showAppFiles()
+                                    // driveServiceHelper.showBackedUpFiles()
 
-
-                            /*
-                            val s = driveServiceHelper.queryFiles()?.addOnSuccessListener {
-                                showToast(requireContext(), it.toString())
-                                val kk = it?.files
-                                var s = 0
-
-                                for (file in kk ?: listOf()) {
-                                    println("zzzzzzz $s: ${file.id} ${file.name}")
-                                    s += 1
-
-                                    val k = file
-
-                                    driveServiceHelper.readFile(fileId).addOnSuccessListener { ii ->
-                                        showToast(requireContext(), "SSS " + ii)
-                                    }.addOnFailureListener {
-                                        showToast(requireContext(), "Falss ${file.name} ${file.id} " + it.message.toString())
-                                    }
+                                } else {
+                                    restoreCurrentDatabase()
+                                    downloadedFilePaths?.let { viewModel.deleteFiles(it) }
+                                    showToast(requireContext(), "데이터파일 복원 실패.")
                                 }
-
-
-                            }?.addOnFailureListener {
-                                showToast(requireContext(), it.message.toString())
                             }
-
-                             */
-
                         }
                     }
                 }
-                // showToast(requireContext(), "$kk")
             }
             .addOnFailureListener { e: Exception? ->
                 Timber.e(e)
@@ -350,29 +303,51 @@ class BackupFragment: BaseFragment() {
 
     }
 
-    private fun initDriveServiceHelper(googleSignInOptions: GoogleSignInOptions) {
-        val credential = GoogleAccountCredential.usingOAuth2(
-            requireActivity(), Collections.singleton(DriveScopes.DRIVE_FILE)
-        )
-
-        credential.selectedAccount = googleSignInOptions.account
-
-        val googleDriveService = Drive.Builder(
-            AndroidHttp.newCompatibleTransport(),
-            GsonFactory(),
-            credential
-        )
-            .setApplicationName("Drive API Migration")
-            .build()
-
-        driveServiceHelper = DriveServiceHelper(googleDriveService)
-    }
-
     private fun cacheCurrentDatabase() {
+        BackupUtil.copyFile(
+            File(requireContext().getDatabasePath(DIARY_DATABASE_NAME).path),
+            File(requireContext().cacheDir.path + "/$DIARY_DATABASE_NAME")
+        )
 
+        BackupUtil.copyFile(
+            File(requireContext().getDatabasePath("$DIARY_DATABASE_NAME-shm").path),
+            File(requireContext().cacheDir.path + "/$DIARY_DATABASE_NAME-shm")
+        )
+
+        BackupUtil.copyFile(
+            File(requireContext().getDatabasePath("$DIARY_DATABASE_NAME-wal").path),
+            File(requireContext().cacheDir.path + "/$DIARY_DATABASE_NAME-wal")
+        )
     }
 
     private fun restoreCurrentDatabase() {
+        BackupUtil.copyFile(
+            File(requireContext().cacheDir.path + "/$DIARY_DATABASE_NAME"),
+            File(requireContext().getDatabasePath(DIARY_DATABASE_NAME).path)
+        )
 
+        BackupUtil.copyFile(
+            File(requireContext().cacheDir.path + "/$DIARY_DATABASE_NAME-shm"),
+            File(requireContext().getDatabasePath("$DIARY_DATABASE_NAME-shm").path)
+        )
+
+        BackupUtil.copyFile(
+            File(requireContext().cacheDir.path + "/$DIARY_DATABASE_NAME-wal"),
+            File(requireContext().getDatabasePath("$DIARY_DATABASE_NAME-wal").path)
+        )
+
+        deleteCachedDatabase()
     }
+
+    private fun deleteCachedDatabase() {
+        File(requireContext().cacheDir.path + "/$DIARY_DATABASE_NAME").delete()
+        File(requireContext().cacheDir.path + "/$DIARY_DATABASE_NAME-shm").delete()
+        File(requireContext().cacheDir.path + "/$DIARY_DATABASE_NAME-wal").delete()
+    }
+
+    private fun setBackupInformationUI() {
+        binding.backupAccount.text = getSignedInGoogleAccount() ?: ""
+    }
+
+    private fun getSignedInGoogleAccount() = GoogleSignIn.getLastSignedInAccount(activity)?.email
 }
