@@ -26,6 +26,7 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.duke.elliot.kim.kotlin.photodiary.MainActivity
 import com.duke.elliot.kim.kotlin.photodiary.R
+import com.duke.elliot.kim.kotlin.photodiary.base.BaseFragment
 import com.duke.elliot.kim.kotlin.photodiary.databinding.FragmentDiaryWritingBinding
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.MediaAdapter
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.MediaModel
@@ -33,6 +34,8 @@ import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.media_helper.Ex
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.media_helper.MediaHelper
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.media_helper.PhotoHelper
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.photo_editor.PhotoEditorFragment
+import com.duke.elliot.kim.kotlin.photodiary.folder.FolderModel
+import com.duke.elliot.kim.kotlin.photodiary.folder.SelectFolderDialogFragment
 import com.duke.elliot.kim.kotlin.photodiary.utility.*
 import com.google.android.material.chip.Chip
 import com.skydoves.colorpickerview.ColorPickerDialog
@@ -295,7 +298,6 @@ class DiaryWritingFragment: Fragment() {
         )
 
         initializeToolbar(binding.toolbar)
-        // TODO: Implement setThemeColor()...
 
         progressDialogFragment = ProgressDialogFragment.instance
 
@@ -320,6 +322,10 @@ class DiaryWritingFragment: Fragment() {
 
         binding.diaryWritingViewModel = viewModel
         binding.lifecycleOwner = viewLifecycleOwner
+
+        (requireActivity() as MainActivity).getDiaryFolders()?.observe(viewLifecycleOwner, { folders ->
+            viewModel.folders = folders
+        })
 
         viewModel.action = DiaryWritingViewModel.Action.UNINITIALIZED
         if (viewModel.mediaArrayListSize > 0)
@@ -420,6 +426,10 @@ class DiaryWritingFragment: Fragment() {
         initializeOptionItems()
         initializeTextItems()
         initializeHashTagChipGroup()
+
+        binding.imageFolder.setOnClickListener {
+
+        }
 
         setCursorColor(viewModel.textColor)
         applyTextOptions()  // TODO 여기서 bold, alignment, 색상 다시 할당할 것.
@@ -1166,7 +1176,8 @@ class DiaryWritingFragment: Fragment() {
             textOptions = createTextOptions(),
             liked = false,
             weatherIconIndex = viewModel.weatherIconIndex,
-            hashTags = viewModel.selectedHashTags.toTypedArray()
+            hashTags = viewModel.selectedHashTags.toTypedArray(),
+            folder = FolderModel(0L, "", 1)
         )
     }
 
@@ -1332,6 +1343,8 @@ class DiaryWritingFragment: Fragment() {
         val editText = EditText(requireContext())
         val id = getCurrentTime().toInt()
         editText.id = id
+        editText.onFocusChangeListener = editTextOnFocusChangeListener
+
         alertDialog.setView(editText)
 
         alertDialog.setPositiveButton(getString(R.string.ok)) { dialog, _ ->
@@ -1345,7 +1358,8 @@ class DiaryWritingFragment: Fragment() {
         }
 
         alertDialog.setNegativeButton(getString(R.string.cancel)) { dialog, _ ->
-           dialog.dismiss()
+            inputMethodManager.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0)
+            dialog.dismiss()
         }
 
         val dialog = alertDialog.show()
@@ -1414,6 +1428,13 @@ class DiaryWritingFragment: Fragment() {
             return true
 
         return false
+    }
+
+    /** Folder */
+    private fun showSelectFolderDialog() {
+        val selectFolderDialog = SelectFolderDialogFragment().apply {
+
+        }
     }
 
     companion object {

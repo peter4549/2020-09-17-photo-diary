@@ -6,17 +6,18 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/background_grey_rounded_corners">
+        android:background="@drawable/background_white_rounded_corners">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
+            <!-- android:background="@color/colorDialogBackgroundLight" -->
             <TextView
                 android:id="@+id/text_title"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:background="@color/colorDialogBackgroundLight"
+
                 android:gravity="center"
                 android:padding="16dp"
                 android:textSize="20sp"
@@ -51,7 +52,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="1dp"
                 android:layout_marginEnd="1dp"
-                android:background="@color/colorDialogBackgroundLight"
                 android:text="@string/cancel"
                 android:textSize="16sp"
                 android:textStyle="bold"
@@ -65,7 +65,6 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="1dp"
-                android:background="@color/colorDialogBackgroundLight"
                 android:backgroundTint="@color/colorBabyBlue"
                 android:text="@string/ok"
                 android:textSize="16sp"

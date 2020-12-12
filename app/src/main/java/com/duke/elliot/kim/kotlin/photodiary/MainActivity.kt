@@ -186,6 +186,8 @@ class MainActivity : AppCompatActivity() {
         AlarmUtil.setReminder(this, calendar, getString(R.string.reminder_default_message))
     }
 
+    fun getDiaryFolders() = viewModel.getDiaryFolders()
+
     companion object {
         const val DEFAULT_FONT_ID = R.font.cookie_run_regular
         var fontNameIdMap: MutableMap<String, Int> = mutableMapOf()

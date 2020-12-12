@@ -11,6 +11,7 @@ import com.duke.elliot.kim.kotlin.photodiary.MainActivity
 import com.duke.elliot.kim.kotlin.photodiary.R
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.MediaModel
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.media_helper.PhotoHelper
+import com.duke.elliot.kim.kotlin.photodiary.folder.FolderModel
 import com.duke.elliot.kim.kotlin.photodiary.utility.getCurrentTime
 import com.duke.elliot.kim.kotlin.photodiary.utility.getFont
 import kotlinx.coroutines.*
@@ -50,6 +51,8 @@ class DiaryWritingViewModel(application: Application, val originDiary: DiaryMode
         MutableLiveData(ArrayList(originDiary.mediaArray.toList()))
     else
         MutableLiveData(ArrayList())
+
+    var folders: MutableList<FolderModel>? = null
 
     private var _mediaArrayListSize = 0
 

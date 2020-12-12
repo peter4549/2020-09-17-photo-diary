@@ -6,9 +6,11 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import com.duke.elliot.kim.kotlin.photodiary.database.DiaryDao
 import com.duke.elliot.kim.kotlin.photodiary.database.DiaryDatabase
+import com.duke.elliot.kim.kotlin.photodiary.database.FolderDao
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryModel
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.media_helper.MediaHelper
 import com.duke.elliot.kim.kotlin.photodiary.drawer_items.lock_screen.LockScreenHelper
+import com.duke.elliot.kim.kotlin.photodiary.folder.FolderModel
 import com.duke.elliot.kim.kotlin.photodiary.utility.FileUtilities
 import kotlinx.coroutines.*
 import timber.log.Timber
@@ -23,11 +25,16 @@ class MainViewModel(application: Application): AndroidViewModel(application) {
     private lateinit var database: DiaryDao
     private lateinit var diaries: LiveData<MutableList<DiaryModel>>
 
+    private lateinit var folderDao: FolderDao
+    lateinit var folders: LiveData<MutableList<FolderModel>>
+
     init {
         coroutineScope.launch {
             withContext(Dispatchers.IO) {
                 database = DiaryDatabase.getInstance(application).diaryDao()
+                folderDao = DiaryDatabase.getInstance(application).folderDao()
                 diaries = database.getAll()
+                folders = folderDao.getAll()
             }
         }
     }
@@ -38,6 +45,12 @@ class MainViewModel(application: Application): AndroidViewModel(application) {
         else
             null
     }
+
+    fun getDiaryFolders() =
+        if (::folders.isInitialized)
+            folders
+        else
+            null
 
     fun insert(diary: DiaryModel) {
         coroutineScope.launch {

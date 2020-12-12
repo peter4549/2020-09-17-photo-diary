@@ -7,14 +7,16 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.duke.elliot.kim.kotlin.photodiary.calendar.AnniversaryModel
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryModel
+import com.duke.elliot.kim.kotlin.photodiary.folder.FolderModel
 
-const val DIARY_DATABASE_NAME = "diary_database_debug_14"
+const val DIARY_DATABASE_NAME = "diary_database_debug_18"
 
-@Database(entities = [DiaryModel::class, AnniversaryModel::class], version = 1, exportSchema = false)
+@Database(entities = [DiaryModel::class, AnniversaryModel::class, FolderModel::class], version = 1, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class DiaryDatabase : RoomDatabase() {
     abstract fun diaryDao(): DiaryDao
     abstract fun anniversaryDao(): AnniversaryDao
+    abstract fun folderDao(): FolderDao
 
     companion object {
         @Volatile

@@ -4,6 +4,7 @@ import android.os.Parcelable
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.MediaModel
+import com.duke.elliot.kim.kotlin.photodiary.folder.FolderModel
 import kotlinx.android.parcel.Parcelize
 import java.time.Instant
 import java.time.LocalDate
@@ -21,8 +22,8 @@ data class DiaryModel(@PrimaryKey(autoGenerate = true)
                       var liked: Boolean,
                       var weatherIconIndex: Int,
                       var hashTags: Array<String>,
-                      var backedUp: Boolean = false) : Parcelable {
-
+                      var backedUp: Boolean = false,
+                      var folder: FolderModel) : Parcelable {
 
 
     fun getLocalDate(): LocalDate {
@@ -50,6 +51,7 @@ data class DiaryModel(@PrimaryKey(autoGenerate = true)
         if (weatherIconIndex != other.weatherIconIndex) return false
         if (!hashTags.contentEquals(other.hashTags)) return false
         if (backedUp != other.backedUp) return false
+        if (folder != other.folder) return false
 
         return true
     }
@@ -65,6 +67,9 @@ data class DiaryModel(@PrimaryKey(autoGenerate = true)
         result = 31 * result + weatherIconIndex
         result = 31 * result + hashTags.contentHashCode()
         result = 31 * result + backedUp.hashCode()
+        result = 31 * result + folder.hashCode()
         return result
     }
+
+
 }

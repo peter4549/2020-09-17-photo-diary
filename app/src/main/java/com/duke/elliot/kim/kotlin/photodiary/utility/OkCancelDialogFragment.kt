@@ -12,7 +12,6 @@ import androidx.fragment.app.DialogFragment
 import com.duke.elliot.kim.kotlin.photodiary.R
 import com.duke.elliot.kim.kotlin.photodiary.databinding.FragmentOkCancelDialogBinding
 
-
 class OkCancelDialogFragment: DialogFragment() {
 
     private lateinit var binding: FragmentOkCancelDialogBinding
@@ -81,10 +80,8 @@ class OkCancelDialogFragment: DialogFragment() {
             binding.buttonOk.text = it
         }
 
-        if (dialog != null && dialog?.window != null) {
-            dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-            dialog?.window?.requestFeature(Window.FEATURE_NO_TITLE)
-        }
+        dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog?.window?.requestFeature(Window.FEATURE_NO_TITLE)
 
         return binding.root
     }

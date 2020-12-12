@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:app="http://schemas.android.com/apk/res-auto"
+<layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <androidx.drawerlayout.widget.DrawerLayout
@@ -63,6 +64,67 @@
                     app:drawableStartCompat="@drawable/ic_round_access_alarm_32"
                     app:drawableTint="@color/icon_color"/>
 
+                <LinearLayout
+                    android:id="@+id/folderContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:id="@+id/folderHeaderContainer"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/textFolder"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:text="@string/folder"
+                            android:gravity="center"
+                            android:padding="16dp"
+                            app:drawableStartCompat="@drawable/ic_round_folder_32"
+                            app:drawableTint="@color/icon_color"/>
+
+                        <ImageView
+                            android:id="@+id/showFolders"
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            app:srcCompat="@drawable/ic_sharp_arrow_drop_down_28"
+                            app:tint="@color/icon_color"
+                            tools:ignore="ContentDescription" />
+
+                        <ImageView
+                            android:id="@+id/addFolder"
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            app:srcCompat="@drawable/ic_sharp_add_24"
+                            app:tint="@color/icon_color"
+                            tools:ignore="ContentDescription" />
+
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/testView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:text="TEST"
+                        android:gravity="center"
+                        android:padding="16dp"
+                        android:visibility="gone"
+                        app:drawableStartCompat="@drawable/ic_round_folder_32"
+                        app:drawableTint="@color/icon_color"/>
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/testView2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="TEST22"
+                    android:gravity="center"
+                    android:padding="16dp"
+                    app:drawableStartCompat="@drawable/ic_round_folder_32"
+                    app:drawableTint="@color/icon_color"/>
             </LinearLayout>
         </com.google.android.material.navigation.NavigationView>
     </androidx.drawerlayout.widget.DrawerLayout>
