@@ -11,6 +11,7 @@ import com.duke.elliot.kim.kotlin.photodiary.MainActivity
 import com.duke.elliot.kim.kotlin.photodiary.R
 import com.duke.elliot.kim.kotlin.photodiary.base.BaseFragment
 import com.duke.elliot.kim.kotlin.photodiary.databinding.FragmentChangeThemeBinding
+import com.duke.elliot.kim.kotlin.photodiary.utility.toHexColor
 import petrov.kristiyan.colorpicker.ColorPicker
 
 class ChangeThemeFragment: BaseFragment() {
@@ -33,7 +34,7 @@ class ChangeThemeFragment: BaseFragment() {
         setSimpleBackButton(binding.toolbar)
 
         val themeColors = requireContext().resources.getIntArray(R.array.theme_colors).toList()
-        val hexColors = themeColors.map { String.format("#%06X", 0xFFFFFF and it) } as ArrayList
+        val hexColors = themeColors.map { it.toHexColor() } as ArrayList
 
         binding.currentThemeColor.setCardBackgroundColor(MainActivity.themeColorPrimary)
         binding.changeThemeColor.setOnClickListener {

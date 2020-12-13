@@ -23,7 +23,7 @@ data class DiaryModel(@PrimaryKey(autoGenerate = true)
                       var weatherIconIndex: Int,
                       var hashTags: Array<String>,
                       var backedUp: Boolean = false,
-                      var folder: FolderModel) : Parcelable {
+                      var folderId: Long) : Parcelable {
 
 
     fun getLocalDate(): LocalDate {
@@ -51,7 +51,7 @@ data class DiaryModel(@PrimaryKey(autoGenerate = true)
         if (weatherIconIndex != other.weatherIconIndex) return false
         if (!hashTags.contentEquals(other.hashTags)) return false
         if (backedUp != other.backedUp) return false
-        if (folder != other.folder) return false
+        if (folderId != other.folderId) return false
 
         return true
     }
@@ -67,7 +67,7 @@ data class DiaryModel(@PrimaryKey(autoGenerate = true)
         result = 31 * result + weatherIconIndex
         result = 31 * result + hashTags.contentHashCode()
         result = 31 * result + backedUp.hashCode()
-        result = 31 * result + folder.hashCode()
+        result = 31 * result + folderId.hashCode()
         return result
     }
 

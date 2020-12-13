@@ -187,6 +187,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun getDiaryFolders() = viewModel.getDiaryFolders()
+    fun getFolderDao() = viewModel.folderDao
+
+    fun setFolderId(folderId: Long) {
+        viewModel.selectedFolderId.value = folderId
+    }
+
+    fun getSelectedFolderId() = viewModel.selectedFolderId
 
     companion object {
         const val DEFAULT_FONT_ID = R.font.cookie_run_regular

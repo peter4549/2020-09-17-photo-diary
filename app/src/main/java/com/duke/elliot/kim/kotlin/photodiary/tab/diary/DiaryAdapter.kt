@@ -27,6 +27,7 @@ import com.duke.elliot.kim.kotlin.photodiary.databinding.ViewModeSortBarBinding
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryModel
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryWritingViewModel
 import com.duke.elliot.kim.kotlin.photodiary.export.ExportUtilities
+import com.duke.elliot.kim.kotlin.photodiary.folder.DEFAULT_FOLDER_ID
 import com.duke.elliot.kim.kotlin.photodiary.utility.*
 import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder

@@ -26,6 +26,7 @@ import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.media_helper.Me
 import com.duke.elliot.kim.kotlin.photodiary.export.ExportUtilities
 import com.duke.elliot.kim.kotlin.photodiary.export.FacebookOptionBottomSheetDialogFragment
 import com.duke.elliot.kim.kotlin.photodiary.export.KakaoTalkOptionBottomSheetDialogFragment
+import com.duke.elliot.kim.kotlin.photodiary.folder.DEFAULT_FOLDER_ID
 import com.duke.elliot.kim.kotlin.photodiary.picker.MediaPickerBottomSheetDialogFragment
 import com.duke.elliot.kim.kotlin.photodiary.picker.TypelessMediaPickerBottomSheetDialogFragment
 import com.duke.elliot.kim.kotlin.photodiary.tab.TabFragment
@@ -33,6 +34,7 @@ import com.duke.elliot.kim.kotlin.photodiary.tab.TabFragmentDirections
 import com.duke.elliot.kim.kotlin.photodiary.utility.showToast
 import kotlinx.coroutines.*
 import timber.log.Timber
+import java.util.ArrayList
 
 class DiariesFragment: Fragment(), KakaoTalkOptionBottomSheetDialogFragment.KakaoTalkOptionClickListener,
     MediaPickerBottomSheetDialogFragment.OnMediaClickListener,
@@ -69,6 +71,23 @@ class DiariesFragment: Fragment(), KakaoTalkOptionBottomSheetDialogFragment.Kaka
                 }
             }
             true
+        }
+
+        /** Folder */
+        (requireActivity() as MainActivity).getSelectedFolderId().observe(viewLifecycleOwner) { folderId ->
+            viewModel.folderId = folderId
+            val filteredDiaries = mutableListOf<DiaryModel>()
+
+            if (viewModel.folderId != DEFAULT_FOLDER_ID) {
+                viewModel.originalDiaries?.let { diaries ->
+                    for (diary in diaries) {
+                        if (diary.folderId == viewModel.folderId)
+                            filteredDiaries.add(diary)
+                    }
+
+                    diaryAdapter.addHeaderAndSubmitList(filteredDiaries)
+                }
+            }
         }
 
         mediaPicker = MediaPickerBottomSheetDialogFragment().apply {
@@ -163,8 +182,23 @@ class DiariesFragment: Fragment(), KakaoTalkOptionBottomSheetDialogFragment.Kaka
         )
         binding.recyclerViewDiary.adapter = diaryAdapter
 
+        /**  Diaries */
         viewModel.diaries.observe(requireActivity()) { diaries ->
-            diaryAdapter.addHeaderAndSubmitList(diaries, false)
+            val filteredDiaries = mutableListOf<DiaryModel>()
+
+            if (viewModel.folderId != DEFAULT_FOLDER_ID) {
+                viewModel.originalDiaries?.let { it ->
+                    for (diary in it) {
+                        if (diary.folderId == viewModel.folderId)
+                            filteredDiaries.add(diary)
+                    }
+                }
+
+                diaryAdapter.addHeaderAndSubmitList(filteredDiaries, false)
+            } else
+                diaryAdapter.addHeaderAndSubmitList(diaries, false)
+
+            viewModel.originalDiaries = diaries.toMutableList()
 
             if (viewModel.status == DiariesViewModel.UNINITIALIZED) {
                 binding.recyclerViewDiary.scrollToPosition(0)

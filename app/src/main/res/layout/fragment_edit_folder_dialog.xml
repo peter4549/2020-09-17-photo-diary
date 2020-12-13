@@ -88,7 +88,7 @@
                     android:layout_weight="1"
                     android:orientation="vertical"
                     android:layout_marginEnd="8dp"
-                    android:layout_marginStart="16dp">
+                    android:layout_marginStart="24dp">
 
                     <TextView
                         android:layout_width="match_parent"
@@ -113,7 +113,7 @@
                     android:id="@+id/folderColor"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
-                    android:layout_marginEnd="48dp"
+                    android:layout_marginEnd="24dp"
                     app:cardCornerRadius="8dp" />
             </LinearLayout>
 
@@ -121,12 +121,13 @@
                 android:id="@+id/okButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="32dp"
+                android:layout_marginTop="24dp"
                 android:layout_marginEnd="24dp"
-                android:layout_marginBottom="24dp"
+                android:layout_marginBottom="16dp"
                 android:text="@string/ok"
                 android:textColor="@color/colorTextAccent"
-                android:textSize="16sp"
+                android:textSize="18sp"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/selectFolderColorContainer" />
@@ -136,9 +137,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="24dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:text="@string/cancel"
-                android:textColor="@color/colorTextAccent"
-                android:textSize="16sp"
+                android:textColor="@color/color_text_light"
+                android:textSize="18sp"
                 app:layout_constraintEnd_toStartOf="@+id/okButton"
                 app:layout_constraintTop_toTopOf="@+id/okButton" />
 

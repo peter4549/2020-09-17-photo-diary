@@ -1,6 +1,5 @@
 package com.duke.elliot.kim.kotlin.photodiary.folder
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,10 +11,22 @@ import androidx.recyclerview.widget.RecyclerView
 import com.duke.elliot.kim.kotlin.photodiary.R
 import com.duke.elliot.kim.kotlin.photodiary.database.FolderDao
 import com.duke.elliot.kim.kotlin.photodiary.databinding.ItemFolderBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 
-class FolderAdapter(private val context: Context, private val folderDao: FolderDao, private val onFolderClickListener: (FolderModel) -> Unit): ListAdapter<FolderModel, RecyclerView.ViewHolder>(FolderDiffCallback()) {
+const val DEFAULT_FOLDER_ID = -1L
+
+class FolderAdapter(private val folderDao: FolderDao, private val onFolderClickListener: (FolderModel) -> Unit):
+    ListAdapter<FolderModel, RecyclerView.ViewHolder>(FolderDiffCallback()) {
+
+    private val job = Job()
+    private val coroutineScope = CoroutineScope(Dispatchers.Default + job)
+
     inner class ViewHolder constructor(val binding: ViewDataBinding): RecyclerView.ViewHolder(binding.root) {
         fun bind(binding: ItemFolderBinding, folder: FolderModel) {
+            binding.folderColor.setBackgroundColor(folder.color)
             binding.folderName.text = folder.name
             binding.editFolder.setOnClickListener {
                 showPopupMenu(it, folder)
@@ -47,11 +58,11 @@ class FolderAdapter(private val context: Context, private val folderDao: FolderD
         popupMenu.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.edit -> {
-
+                    // TODO. change and update folder.
                     true
                 }
                 R.id.delete -> {
-
+                    deleteFolder(folder)
                     true
                 }
                 else -> false
@@ -59,6 +70,12 @@ class FolderAdapter(private val context: Context, private val folderDao: FolderD
         }
 
         popupMenu.show()
+    }
+
+    private fun deleteFolder(folder: FolderModel) {
+        coroutineScope.launch {
+            folderDao.delete(folder)
+        }
     }
 }
 

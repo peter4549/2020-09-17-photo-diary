@@ -43,6 +43,23 @@ fun View.crossFadeIn(duration: Number) {
     }
 }
 
+fun View.crossFadeOut(duration: Number) {
+    this.apply {
+        alpha = 1F
+        visibility = View.VISIBLE
+
+        animate()
+            .alpha(0F)
+            .setDuration(duration.toLong())
+            .setListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator?) {
+                    this@crossFadeOut.visibility = View.GONE
+                    super.onAnimationEnd(animation)
+                }
+            })
+    }
+}
+
 fun View.hideDown(duration: Number) {
     this.apply {
         translationY = 0F

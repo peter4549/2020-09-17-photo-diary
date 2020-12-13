@@ -26,7 +26,6 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.duke.elliot.kim.kotlin.photodiary.MainActivity
 import com.duke.elliot.kim.kotlin.photodiary.R
-import com.duke.elliot.kim.kotlin.photodiary.base.BaseFragment
 import com.duke.elliot.kim.kotlin.photodiary.databinding.FragmentDiaryWritingBinding
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.MediaAdapter
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.MediaModel
@@ -425,10 +424,30 @@ class DiaryWritingFragment: Fragment() {
         initializeSpinners()
         initializeOptionItems()
         initializeTextItems()
-        initializeHashTagChipGroup()
+        initChipGroup()
 
         binding.imageFolder.setOnClickListener {
+            if (layoutOptionItemsIsShown) {
+                binding.layoutOptionItems
+                    .hideDownWithFading(
+                        shortAnimationDuration,
+                        layoutOptionItemsHeight
+                    )
+                binding.optionItemsBackground
+                    .hideDown(shortAnimationDuration, layoutOptionItemsHeight)
+                binding.layoutOptionsContainer
+                    .translateDown(shortAnimationDuration, layoutOptionItemsHeight)
+                layoutOptionItemsIsShown = false
+            }
 
+            val selectFolderDialog = SelectFolderDialogFragment().apply {
+                setOnFolderClickListener {
+                    addFolderChip(it)
+                    dismiss()
+                }
+            }
+
+            selectFolderDialog.show(requireActivity().supportFragmentManager, selectFolderDialog.tag)
         }
 
         setCursorColor(viewModel.textColor)
@@ -573,9 +592,21 @@ class DiaryWritingFragment: Fragment() {
         binding.imageAudioLibraryItem.setOnClickListener(optionItemsOnClickListener)
     }
 
-    private fun initializeHashTagChipGroup() {
+    private fun initChipGroup() {
         binding.chipGroup.removeAllViews()
 
+        /** Folder */
+        viewModel.folder?.let { folder ->
+            val chip = Chip(requireContext())
+            chip.text = folder.name
+            chip.setTextAppearanceResource(R.style.ChipFontStyle)
+            chip.setOnCloseIconClickListener {
+                binding.chipGroup.removeView(it)
+                viewModel.originDiary?.folderId = -1
+            }
+        }
+
+        /** Hash Tag */
         for (hashTag in viewModel.selectedHashTags) {
             val chip = Chip(requireContext())
             chip.text = hashTag
@@ -1177,7 +1208,7 @@ class DiaryWritingFragment: Fragment() {
             liked = false,
             weatherIconIndex = viewModel.weatherIconIndex,
             hashTags = viewModel.selectedHashTags.toTypedArray(),
-            folder = FolderModel(0L, "", 1)
+            folderId = viewModel.folder?.id ?: -1L
         )
     }
 
@@ -1400,6 +1431,28 @@ class DiaryWritingFragment: Fragment() {
         }
     }
 
+    private fun addFolderChip(folder: FolderModel) {
+        viewModel.folder?.let {
+            val chip = binding.chipGroup.getChildAt(0) as? Chip
+            chip?.text = folder.name
+            chip?.invalidate()
+        } ?: run {
+            val chip = Chip(requireContext())
+            chip.text = folder.name
+            chip.chipIcon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_round_folder_32)
+            chip.setChipIconTintResource(R.color.icon_color)
+            chip.setTextAppearanceResource(R.style.ChipFontStyle)
+            chip.setOnCloseIconClickListener {
+                binding.chipGroup.removeView(it)
+                viewModel.folder = null
+            }
+
+            binding.chipGroup.addView(chip, 0)
+        }
+
+        viewModel.folder = folder
+    }
+
     private fun showConfirmDateDialog(time: Long) {
         val title = getString(R.string.confirm_date_title)
         val message = getString(R.string.confirm_date_message)
@@ -1428,13 +1481,6 @@ class DiaryWritingFragment: Fragment() {
             return true
 
         return false
-    }
-
-    /** Folder */
-    private fun showSelectFolderDialog() {
-        val selectFolderDialog = SelectFolderDialogFragment().apply {
-
-        }
     }
 
     companion object {

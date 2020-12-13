@@ -8,6 +8,6 @@ import kotlinx.android.parcel.Parcelize
 @Entity(tableName = "folder")
 @Parcelize
 data class FolderModel(@PrimaryKey(autoGenerate = true)
-                       val id: Long,
+                       val id: Long = 0L,
                        var name: String,
                        var color: Int) : Parcelable

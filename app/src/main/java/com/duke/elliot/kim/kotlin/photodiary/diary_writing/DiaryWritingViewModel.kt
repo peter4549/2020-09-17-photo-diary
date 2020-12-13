@@ -53,6 +53,7 @@ class DiaryWritingViewModel(application: Application, val originDiary: DiaryMode
         MutableLiveData(ArrayList())
 
     var folders: MutableList<FolderModel>? = null
+    var folder: FolderModel? = null
 
     private var _mediaArrayListSize = 0
 

@@ -261,3 +261,5 @@ object ColorUtilities {
         return color
     }
 }
+
+fun Int.toHexColor() = String.format("#%06X", 0xFFFFFF and this)

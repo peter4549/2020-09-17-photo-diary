@@ -4,29 +4,32 @@ import android.app.Application
 import androidx.core.net.toUri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.duke.elliot.kim.kotlin.photodiary.database.DiaryDao
 import com.duke.elliot.kim.kotlin.photodiary.database.DiaryDatabase
 import com.duke.elliot.kim.kotlin.photodiary.database.FolderDao
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryModel
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.media_helper.MediaHelper
-import com.duke.elliot.kim.kotlin.photodiary.drawer_items.lock_screen.LockScreenHelper
+import com.duke.elliot.kim.kotlin.photodiary.folder.DEFAULT_FOLDER_ID
 import com.duke.elliot.kim.kotlin.photodiary.folder.FolderModel
 import com.duke.elliot.kim.kotlin.photodiary.utility.FileUtilities
 import kotlinx.coroutines.*
 import timber.log.Timber
-import java.time.LocalDate
 
 class MainViewModel(application: Application): AndroidViewModel(application) {
     private val job = Job()
     private val coroutineScope = CoroutineScope(Dispatchers.Main + job)
     private val fileUtilities = FileUtilities.getInstance(application)
-    // var diariesFragmentAction = Action.UNINITIALIZED
     var photosFragmentAction = Action.UNINITIALIZED
     private lateinit var database: DiaryDao
     private lateinit var diaries: LiveData<MutableList<DiaryModel>>
 
-    private lateinit var folderDao: FolderDao
+    lateinit var folderDao: FolderDao
     lateinit var folders: LiveData<MutableList<FolderModel>>
+
+    var selectedFolderId = MutableLiveData<Long>().apply {
+        value = DEFAULT_FOLDER_ID
+    }
 
     init {
         coroutineScope.launch {
