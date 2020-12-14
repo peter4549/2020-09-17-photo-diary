@@ -25,22 +25,42 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
+            <View
+                android:id="@+id/topBorder"
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:background="@color/icon_color"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/title"/>
+
             <TextView
                 android:id="@+id/addFolder"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/add_folder"
                 android:textSize="16sp"
+                android:background="?attr/selectableItemBackground"
                 android:paddingBottom="8dp"
                 android:paddingEnd="16dp"
                 android:paddingStart="16dp"
                 android:paddingTop="8dp"
-                android:drawablePadding="16dp"
+                android:gravity="center_vertical"
+                android:drawablePadding="24dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/title"
+                app:layout_constraintTop_toBottomOf="@id/topBorder"
                 app:drawableStartCompat="@drawable/ic_round_create_new_folder_24"
                 app:drawableTint="@color/icon_color" />
+
+            <View
+                android:id="@+id/bottomBorder"
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:background="@color/icon_color"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/addFolder"/>
 
             <TextView
                 android:id="@+id/emptyMessage"
@@ -51,20 +71,22 @@
                 android:padding="8dp"
                 android:text="@string/no_folder"
                 android:textColor="@color/color_text_light"
+                android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/addFolder" />
+                app:layout_constraintTop_toBottomOf="@id/bottomBorder" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/folderRecyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
+                android:layoutAnimation="@anim/layout_animation_slide_down"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/addFolder" />
+                app:layout_constraintTop_toBottomOf="@+id/bottomBorder" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </RelativeLayout>

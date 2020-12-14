@@ -138,7 +138,7 @@
                             android:background="?attr/selectableItemBackgroundBorderless"
                             android:layout_width="24dp"
                             android:layout_height="24dp"
-                            android:layout_marginEnd="24dp"
+                            android:layout_marginEnd="16dp"
                             app:srcCompat="@drawable/ic_sharp_add_24"
                             app:tint="@color/icon_color"
                             tools:ignore="ContentDescription" />
@@ -161,6 +161,28 @@
                         android:visibility="gone"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" />
+
+                    <FrameLayout
+                        android:id="@+id/showAllContainer"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/colorItemBackground"
+                        android:foreground="?attr/selectableItemBackground">
+
+                        <TextView
+                            android:id="@+id/showAll"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="8dp"
+                            android:layout_gravity="center"
+                            android:gravity="center"
+                            android:padding="8dp"
+                            android:visibility="gone"
+                            android:text="@string/show_all"
+                            android:drawablePadding="8dp"
+                            app:drawableStartCompat="@drawable/ic_round_folder_open_24"
+                            app:drawableTint="@color/icon_color"/>
+                    </FrameLayout>
                 </LinearLayout>
 
             </LinearLayout>

@@ -29,6 +29,8 @@
     </style>
 
     <style name="Widget.App.Chip" parent="Widget.MaterialComponents.Chip.Entry">
+        <item name="chipCornerRadius">10dp</item>
+        <item name="iconStartPadding">2dp</item>
         <item name="checkedIconEnabled">false</item>
         <item name="checkedIconVisible">false</item>
         <item name="chipBackgroundColor">@color/colorFragmentBackgroundLight</item>

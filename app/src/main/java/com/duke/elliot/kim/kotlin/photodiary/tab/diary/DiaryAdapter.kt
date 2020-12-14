@@ -12,6 +12,7 @@ import android.view.animation.AnimationUtils
 import android.widget.ArrayAdapter
 import android.widget.PopupMenu
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -20,6 +21,7 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.duke.elliot.kim.kotlin.photodiary.MainActivity
 import com.duke.elliot.kim.kotlin.photodiary.MainViewModel
 import com.duke.elliot.kim.kotlin.photodiary.R
+import com.duke.elliot.kim.kotlin.photodiary.database.DiaryDatabase
 import com.duke.elliot.kim.kotlin.photodiary.databinding.ItemDiaryBinding
 import com.duke.elliot.kim.kotlin.photodiary.databinding.ItemDiaryBriefViewBinding
 import com.duke.elliot.kim.kotlin.photodiary.databinding.ItemDiaryFrameViewBinding
@@ -70,7 +72,8 @@ class DiaryAdapter(private val context: Context, noInitialization: Boolean = fal
     private lateinit var sendDiaryToKakaoTalkClickListener: () -> Unit
     private lateinit var sendDiaryToFacebookClickListener: () -> Unit
     private lateinit var viewOnClickListener: () -> Unit
-    private val adapterScope = CoroutineScope(Dispatchers.Default)
+    private val job = Job()
+    private val adapterScope = CoroutineScope(Dispatchers.Default + job)
     private var currentItem: DiaryModel? = null
     var currentBackgroundColor = MainActivity.themeColorSecondary
     // TODO, load from shared pref.
@@ -484,6 +487,23 @@ class DiaryAdapter(private val context: Context, noInitialization: Boolean = fal
             else if (diary.textOptions.textStyleItalic)
                 binding.textContent.setTypeface(font, Typeface.ITALIC)
 
+            /** Chip */
+            binding.chipGroup.removeAllViews()
+            adapterScope.launch {
+                DiaryDatabase.getInstance(context).folderDao().getFolderById(diary.folderId)?.let { folder ->
+                    val chip = Chip(context)
+                    chip.text = folder.name
+                    chip.chipIcon = ContextCompat.getDrawable(context, R.drawable.ic_round_folder_16)
+                    chip.chipIconSize = convertDpToPx(context, 20F)
+                    chip.isCloseIconVisible = false
+                    chip.setChipIconTintResource(R.color.icon_color)
+                    chip.setTextAppearanceResource(R.style.ChipFontStyle)
+
+                    withContext(Dispatchers.Main) {
+                        binding.chipGroup.addView(chip, 0)
+                    }
+                }
+            }
             for (hashTag in diary.hashTags) {
                 val chip = Chip(binding.chipGroup.context)
                 chip.text = hashTag
@@ -663,9 +683,11 @@ class DiaryAdapter(private val context: Context, noInitialization: Boolean = fal
                     if (::updateListener.isInitialized)
                         updateListener.invoke()
 
-                    CoroutineScope(Dispatchers.Main).launch {
-                        delay(200)
-                        binding.buttonStar.isEnabled = true
+                    adapterScope.launch {
+                        withContext(Dispatchers.Main) {
+                            delay(200)
+                            binding.buttonStar.isEnabled = true
+                        }
                     }
                 }
 
@@ -679,9 +701,11 @@ class DiaryAdapter(private val context: Context, noInitialization: Boolean = fal
                         updateListener.invoke()
                     }
 
-                    CoroutineScope(Dispatchers.Main).launch {
-                        delay(200)
-                        binding.buttonStar.isEnabled = true
+                    adapterScope.launch {
+                        withContext(Dispatchers.Main) {
+                            delay(200)
+                            binding.buttonStar.isEnabled = true
+                        }
                     }
                 }
             })

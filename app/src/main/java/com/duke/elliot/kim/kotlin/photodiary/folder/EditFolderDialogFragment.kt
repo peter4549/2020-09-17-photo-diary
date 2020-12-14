@@ -1,21 +1,19 @@
 package com.duke.elliot.kim.kotlin.photodiary.folder
 
+import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
-import com.duke.elliot.kim.kotlin.photodiary.DIARIES_FRAGMENT_HANDLER_MESSAGE
-import com.duke.elliot.kim.kotlin.photodiary.MainActivity
 import com.duke.elliot.kim.kotlin.photodiary.R
 import com.duke.elliot.kim.kotlin.photodiary.database.FolderDao
 import com.duke.elliot.kim.kotlin.photodiary.databinding.FragmentEditFolderDialogBinding
-import com.duke.elliot.kim.kotlin.photodiary.drawer_items.theme.getSecondaryThemeColor
-import com.duke.elliot.kim.kotlin.photodiary.drawer_items.theme.saveThemeColor
 import com.duke.elliot.kim.kotlin.photodiary.utility.toHexColor
 import kotlinx.android.synthetic.main.fragment_edit_folder_dialog.*
 import kotlinx.coroutines.*
@@ -31,6 +29,11 @@ class EditFolderDialogFragment: DialogFragment() {
 
     private val job = Job()
     private val coroutineScope = CoroutineScope(Dispatchers.Main + job)
+
+    private lateinit var callbackAfterEditing: (FolderModel) -> Unit
+    fun setCallbackAfterEditing(callbackAfterEditing: (FolderModel) -> Unit) {
+        this.callbackAfterEditing = callbackAfterEditing
+    }
 
     fun setMode(mode: Int) {
         this.mode = mode
@@ -50,20 +53,43 @@ class EditFolderDialogFragment: DialogFragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_edit_folder_dialog, container, false)
-
+        val inputMethodManager = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         folderColor = ContextCompat.getColor(requireContext(), R.color.colorRed200)  // Default color
 
         binding.title.text = when(mode) {
             ADD_MODE -> getString(R.string.add_folder)
-            else -> ""
+            else -> getString(R.string.edit_folder)
         }
+
+        if (mode == EDIT_MODE)
+            binding.folderName.setText(folder.name)
 
         binding.folderColor.setCardBackgroundColor(folderColor)
         binding.okButton.setOnClickListener {
             when(mode) {
-                ADD_MODE -> createFolder()?.let { insertFolder(it) } ?: run {
+                ADD_MODE -> createFolder()?.let {
+                    insertFolder(it)
+                    inputMethodManager.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0)
+                } ?: run {
                     folderNameContainer.isErrorEnabled = true
                     folderNameContainer.error = getString(R.string.enter_the_folder_name)
+                }
+                EDIT_MODE -> {
+                    if (binding.folderName.text.toString().isNotBlank()) {
+                        folder.let {
+                            it.name = binding.folderName.text.toString()
+                            it.color = folderColor
+
+                            updateFolder(it)
+                            callbackAfterEditing.invoke(it)
+                        }
+
+
+                        inputMethodManager.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0)
+                    } else {
+                        folderNameContainer.isErrorEnabled = true
+                        folderNameContainer.error = getString(R.string.enter_the_folder_name)
+                    }
                 }
             }
         }
@@ -102,6 +128,16 @@ class EditFolderDialogFragment: DialogFragment() {
         coroutineScope.launch {
             withContext(Dispatchers.IO) {
                 folderDao.insert(folder)
+            }
+
+            dismiss()
+        }
+    }
+
+    private fun updateFolder(folder: FolderModel) {
+        coroutineScope.launch {
+            withContext(Dispatchers.IO) {
+                folderDao.update(folder)
             }
 
             dismiss()

@@ -116,7 +116,6 @@
                 android:id="@+id/text_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
                 android:layout_marginEnd="8dp"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="4dp"
@@ -159,9 +158,10 @@
                     android:id="@+id/view_pager"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:layout_marginBottom="4dp"
                     android:layout_marginEnd="8dp"
                     android:layout_marginStart="8dp"
-                    android:layout_marginTop="8dp"/>
+                    android:layout_marginTop="4dp"/>
 
                 <com.rd.PageIndicatorView
                     android:id="@+id/page_indicator_view"
@@ -181,7 +181,10 @@
                 android:id="@+id/text_content"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="8dp"
+                android:layout_marginBottom="4dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="4dp"
                 android:background="@drawable/background_white_rounded_corners"
                 android:maxHeight="160dp"
                 android:minHeight="80dp"
@@ -195,7 +198,10 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="8dp"
+                android:layout_marginBottom="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="4dp"
                 android:orientation="horizontal"
                 android:background="@drawable/background_white_rounded_corners"
                 android:gravity="center_vertical"

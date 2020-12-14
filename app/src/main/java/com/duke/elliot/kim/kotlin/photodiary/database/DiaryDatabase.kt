@@ -9,7 +9,7 @@ import com.duke.elliot.kim.kotlin.photodiary.calendar.AnniversaryModel
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryModel
 import com.duke.elliot.kim.kotlin.photodiary.folder.FolderModel
 
-const val DIARY_DATABASE_NAME = "diary_database_debug_19"
+const val DIARY_DATABASE_NAME = "diary_database_debug_23"
 
 @Database(entities = [DiaryModel::class, AnniversaryModel::class, FolderModel::class], version = 1, exportSchema = false)
 @TypeConverters(Converters::class)

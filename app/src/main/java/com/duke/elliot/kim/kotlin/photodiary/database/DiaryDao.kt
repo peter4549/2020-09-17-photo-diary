@@ -3,6 +3,8 @@ package com.duke.elliot.kim.kotlin.photodiary.database
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryModel
+import com.duke.elliot.kim.kotlin.photodiary.folder.DEFAULT_FOLDER_ID
+import com.duke.elliot.kim.kotlin.photodiary.folder.FolderModel
 
 @Dao
 interface DiaryDao {
@@ -17,7 +19,7 @@ interface DiaryDao {
     fun getSelectedDateDiaries(today: Long, tomorrow: Long): LiveData<MutableList<DiaryModel>>
 
     @Insert
-    fun insert(dairy: DiaryModel)
+    fun insert(dairy: DiaryModel): Long
 
     @Delete
     fun delete(diary: DiaryModel)
@@ -27,4 +29,7 @@ interface DiaryDao {
 
     @Update
     fun update(diary: DiaryModel)
+
+    @Query("UPDATE diary SET folderId = :newId WHERE id = :oldId")
+    fun updateFolderId(oldId: Long, newId: Long = DEFAULT_FOLDER_ID)
 }

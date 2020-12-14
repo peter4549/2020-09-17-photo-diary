@@ -22,6 +22,7 @@ class DiariesViewModel(val database: DiaryDao, application: Application): Androi
     var originalDiaries: MutableList<DiaryModel>? = null
     var folderId = DEFAULT_FOLDER_ID
 
+    /*
     fun delete(diary: DiaryModel) {
         coroutineScope.launch {
             withContext(Dispatchers.IO) {
@@ -36,6 +37,7 @@ class DiariesViewModel(val database: DiaryDao, application: Application): Androi
             }
         }
     }
+     */
 
     fun update(diary: DiaryModel) {
         coroutineScope.launch {

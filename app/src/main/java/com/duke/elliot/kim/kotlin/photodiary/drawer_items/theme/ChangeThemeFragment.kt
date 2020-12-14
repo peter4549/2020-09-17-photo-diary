@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.databinding.DataBindingUtil
-import com.duke.elliot.kim.kotlin.photodiary.DIARIES_FRAGMENT_HANDLER_MESSAGE
+import com.duke.elliot.kim.kotlin.photodiary.DIARIES_FRAGMENT_HANDLER_COLOR_CHANGED_MESSAGE
 import com.duke.elliot.kim.kotlin.photodiary.MainActivity
 import com.duke.elliot.kim.kotlin.photodiary.R
 import com.duke.elliot.kim.kotlin.photodiary.base.BaseFragment
@@ -48,10 +48,11 @@ class ChangeThemeFragment: BaseFragment() {
                     binding.currentThemeColor.setCardBackgroundColor(MainActivity.themeColorPrimary)
                     applyPrimaryThemeColor(binding.toolbar)
 
+                    /** Handler */
                     val diariesFragmentHandler = (requireActivity() as MainActivity).diariesFragmentHandler
                     if (diariesFragmentHandler != null) {
                         val message = diariesFragmentHandler.obtainMessage()
-                        message.what = DIARIES_FRAGMENT_HANDLER_MESSAGE
+                        message.what = DIARIES_FRAGMENT_HANDLER_COLOR_CHANGED_MESSAGE
                         diariesFragmentHandler.sendMessage(message)
                     }
 

@@ -9,6 +9,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.duke.elliot.kim.kotlin.photodiary.MainActivity
 import com.duke.elliot.kim.kotlin.photodiary.R
+import com.duke.elliot.kim.kotlin.photodiary.database.DiaryDatabase
+import com.duke.elliot.kim.kotlin.photodiary.database.FolderDao
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.MediaModel
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.media_helper.PhotoHelper
 import com.duke.elliot.kim.kotlin.photodiary.folder.FolderModel
@@ -52,8 +54,18 @@ class DiaryWritingViewModel(application: Application, val originDiary: DiaryMode
     else
         MutableLiveData(ArrayList())
 
+    /** Folder */
+    lateinit var folderDao: FolderDao
     var folders: MutableList<FolderModel>? = null
     var folder: FolderModel? = null
+
+    init {
+        coroutineScope.launch {
+            withContext(Dispatchers.Default) {
+                folderDao = DiaryDatabase.getInstance(application).folderDao()
+            }
+        }
+    }
 
     private var _mediaArrayListSize = 0
 

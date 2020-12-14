@@ -21,7 +21,7 @@ class MainViewModel(application: Application): AndroidViewModel(application) {
     private val coroutineScope = CoroutineScope(Dispatchers.Main + job)
     private val fileUtilities = FileUtilities.getInstance(application)
     var photosFragmentAction = Action.UNINITIALIZED
-    private lateinit var database: DiaryDao
+    lateinit var database: DiaryDao
     private lateinit var diaries: LiveData<MutableList<DiaryModel>>
 
     lateinit var folderDao: FolderDao
@@ -55,20 +55,33 @@ class MainViewModel(application: Application): AndroidViewModel(application) {
         else
             null
 
-    fun insert(diary: DiaryModel) {
+    fun insert(diary: DiaryModel, folder: FolderModel?) {
         coroutineScope.launch {
             withContext(Dispatchers.IO) {
                 inserted = true
-                database.insert(diary)
+                val diaryId = database.insert(diary)
+
+                folder?.let {
+                    val diaryIds = it.diaryIds.toMutableList()
+                    if (!diaryIds.contains(diaryId)) {
+                        diaryIds.add(diaryId)
+                        it.diaryIds = diaryIds.toTypedArray()
+                        folderDao.update(it)
+                    }
+                }
             }
         }
     }
 
-    fun update(diary: DiaryModel) {
+    fun update(diary: DiaryModel, folder: FolderModel?) {
         coroutineScope.launch {
             withContext(Dispatchers.IO) {
                 updated = true
                 database.update(diary)
+
+                folder?.let {
+                    insertDiaryToFolder(diary.id, it)
+                }
             }
         }
     }
@@ -76,6 +89,12 @@ class MainViewModel(application: Application): AndroidViewModel(application) {
     fun delete(diary: DiaryModel) {
         coroutineScope.launch {
             withContext(Dispatchers.IO) {
+                folderDao.getFolderById(diary.folderId)?.let {
+                    removeDiaryFromFolder(diary.id, it)
+                } ?: run {
+                    Timber.d("Folder not found.")
+                }
+
                 database.delete(diary)
 
                 for (media in diary.mediaArray) {
@@ -85,6 +104,24 @@ class MainViewModel(application: Application): AndroidViewModel(application) {
                     }
                 }
             }
+        }
+    }
+
+    fun removeDiaryFromFolder(diaryId: Long, folder: FolderModel) {
+        val diaryIds = folder.diaryIds.toMutableList()
+        diaryIds.remove(diaryId)
+        folder.diaryIds = diaryIds.toTypedArray()
+        println("AAAAAAAA ${folder.diaryIds.toList()}")
+        folderDao.update(folder)
+    }
+
+    private fun insertDiaryToFolder(diaryId: Long, folder: FolderModel) {
+        val diaryIds = folder.diaryIds.toMutableList()
+
+        if (!diaryIds.contains(diaryId)) {
+            diaryIds.add(diaryId)
+            folder.diaryIds = diaryIds.toTypedArray()
+            folderDao.update(folder)
         }
     }
 

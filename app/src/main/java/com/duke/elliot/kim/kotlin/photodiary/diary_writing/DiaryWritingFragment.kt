@@ -9,6 +9,8 @@ import android.graphics.PorterDuff
 import android.graphics.Typeface
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.TypedValue
 import android.view.*
 import android.view.inputmethod.InputMethodManager
@@ -24,8 +26,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.duke.elliot.kim.kotlin.photodiary.MainActivity
-import com.duke.elliot.kim.kotlin.photodiary.R
+import com.duke.elliot.kim.kotlin.photodiary.*
+import com.duke.elliot.kim.kotlin.photodiary.database.DiaryDatabase
 import com.duke.elliot.kim.kotlin.photodiary.databinding.FragmentDiaryWritingBinding
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.MediaAdapter
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.MediaModel
@@ -33,17 +35,17 @@ import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.media_helper.Ex
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.media_helper.MediaHelper
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.media_helper.PhotoHelper
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.photo_editor.PhotoEditorFragment
+import com.duke.elliot.kim.kotlin.photodiary.folder.DEFAULT_FOLDER_ID
 import com.duke.elliot.kim.kotlin.photodiary.folder.FolderModel
 import com.duke.elliot.kim.kotlin.photodiary.folder.SelectFolderDialogFragment
 import com.duke.elliot.kim.kotlin.photodiary.utility.*
 import com.google.android.material.chip.Chip
 import com.skydoves.colorpickerview.ColorPickerDialog
 import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent.setEventListener
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener
+import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -72,6 +74,9 @@ class DiaryWritingFragment: Fragment() {
     private var selectedTime = -1L
     private var shortAnimationDuration = 0
     private var showOptionItemsScheduled = false
+
+    private val job = Job()
+    private val coroutineScope = CoroutineScope(Dispatchers.Main + job)
 
     private val optionsOnClickListener = View.OnClickListener { view ->
         when (view.id) {
@@ -322,6 +327,7 @@ class DiaryWritingFragment: Fragment() {
         binding.diaryWritingViewModel = viewModel
         binding.lifecycleOwner = viewLifecycleOwner
 
+        /** Folders Observe */
         (requireActivity() as MainActivity).getDiaryFolders()?.observe(viewLifecycleOwner, { folders ->
             viewModel.folders = folders
         })
@@ -511,6 +517,21 @@ class DiaryWritingFragment: Fragment() {
             onBackPressedCallback
         )
 
+        /** Handler */
+        (requireActivity() as MainActivity).diaryWritingFragmentHandler = Handler(Looper.getMainLooper()) {
+            when(it.what) {
+                DIARY_WRITING_HANDLER_FOLDER_CHANGED_MESSAGE -> {
+                    viewModel.folder?.let { folder ->
+                        if (folder.id == (it.obj as FolderModel).id) {
+                            viewModel.folder = it.obj as FolderModel
+                            viewModel.folder?.let { newFolder -> addFolderChip(newFolder) }
+                        }
+                    }
+                }
+            }
+            true
+        }
+
         return binding.root
     }
 
@@ -596,13 +617,16 @@ class DiaryWritingFragment: Fragment() {
         binding.chipGroup.removeAllViews()
 
         /** Folder */
-        viewModel.folder?.let { folder ->
-            val chip = Chip(requireContext())
-            chip.text = folder.name
-            chip.setTextAppearanceResource(R.style.ChipFontStyle)
-            chip.setOnCloseIconClickListener {
-                binding.chipGroup.removeView(it)
-                viewModel.originDiary?.folderId = -1
+        coroutineScope.launch(Dispatchers.Default) {
+            DiaryDatabase.getInstance(requireContext()).folderDao().let { folderDao ->
+                viewModel.originDiary?.let {
+                    viewModel.folder = folderDao.getFolderById(it.folderId)
+                    viewModel.folder?.let { folder ->
+                        withContext(Dispatchers.Main) {
+                            addFolderChip(folder)
+                        }
+                    }
+                }
             }
         }
 
@@ -891,9 +915,9 @@ class DiaryWritingFragment: Fragment() {
                     progressDialogFragment.show(requireActivity().supportFragmentManager, tag)
                     @Suppress("SpellCheckingInspection")
                     viewModel.getCurrentImageUri()?.let { uri ->
-                        CoroutineScope(Dispatchers.Main).launch {
+                        coroutineScope.launch {
                             fileUtilities.copyFileToInternalStorage(uri)?.let { copiedUri ->
-                                println("FILE COPIED!!!!, $copiedUri")
+                                Timber.d("File copied: $copiedUri")
                                 progressDialogFragment.dismiss()
                                 addMedia(MediaModel(MediaModel.Type.PHOTO, copiedUri.toString()))
                             } ?: run {
@@ -921,7 +945,7 @@ class DiaryWritingFragment: Fragment() {
                         var itemCount = 0
                         for (i in 0 until totalItemCount) {
                             data.clipData?.getItemAt(i)?.uri?.let { uri ->
-                                CoroutineScope(Dispatchers.Main).launch {
+                                coroutineScope.launch {
                                     fileUtilities.copyFileToInternalStorage(
                                         uri,
                                         suffix = "_${timestamp}"
@@ -951,7 +975,7 @@ class DiaryWritingFragment: Fragment() {
                     } else if (data?.data != null) {
                         progressDialogFragment.show(requireActivity().supportFragmentManager, tag)
                         data.data?.let { uri ->
-                            CoroutineScope(Dispatchers.Main).launch {
+                            coroutineScope.launch {
                                 fileUtilities.copyFileToInternalStorage(uri)?.let { copiedUri ->
                                     println("FILE COPIED!!!!, $copiedUri")
                                     progressDialogFragment.dismiss()
@@ -984,7 +1008,7 @@ class DiaryWritingFragment: Fragment() {
                         var itemCount = 0
                         for (i in 0 until totalItemCount) {
                             data.clipData?.getItemAt(i)?.uri?.let { videoUri ->
-                                CoroutineScope(Dispatchers.Main).launch {
+                                coroutineScope.launch {
                                     fileUtilities.copyFileToInternalStorage(videoUri)
                                         ?.let { copiedUri ->
                                             itemCount += 1
@@ -1021,7 +1045,7 @@ class DiaryWritingFragment: Fragment() {
                                 requireActivity().supportFragmentManager,
                                 tag
                             )
-                            CoroutineScope(Dispatchers.Main).launch {
+                            coroutineScope.launch {
                                 fileUtilities.copyFileToInternalStorage(videoUri)
                                     ?.let { copiedUri ->
                                         progressDialogFragment.dismiss()
@@ -1056,7 +1080,7 @@ class DiaryWritingFragment: Fragment() {
                         var itemCount = 0
                         for (i in 0 until totalItemCount) {
                             data.clipData?.getItemAt(i)?.uri?.let { uri ->
-                                CoroutineScope(Dispatchers.Main).launch {
+                                coroutineScope.launch {
                                     fileUtilities.copyFileToInternalStorage(
                                         uri,
                                         suffix = "_${timestamp}"
@@ -1086,7 +1110,7 @@ class DiaryWritingFragment: Fragment() {
                     } else if (data?.data != null) {
                         progressDialogFragment.show(requireActivity().supportFragmentManager, tag)
                         data.data?.let { uri ->
-                            CoroutineScope(Dispatchers.Main).launch {
+                            coroutineScope.launch {
                                 fileUtilities.copyFileToInternalStorage(uri)?.let { copiedUri ->
                                     progressDialogFragment.dismiss()
                                     addMedia(
@@ -1144,12 +1168,29 @@ class DiaryWritingFragment: Fragment() {
     private fun saveDiary(diary: DiaryModel) {
         if (keyboardShown)
             hideKeyboard(binding.root, inputMethodManager)
-        (requireActivity() as MainActivity).saveDiary(diary)
+        (requireActivity() as MainActivity).saveDiary(diary, viewModel.folder)
         findNavController().popBackStack()
     }
 
     private fun updateDiary() {
         if (isChanged()) {
+            if (viewModel.originDiary?.folderId != viewModel.folder?.id) {
+                // The diary is added to the new folder in the update function,
+                // so here you just need to delete it from the existing folder.
+                viewModel.originDiary?.let { diary ->
+                    val originFolderId = diary.folderId
+                    coroutineScope.launch {
+                        withContext(Dispatchers.Default) {
+                            val originFolder = viewModel.folderDao.getFolderById(originFolderId)
+                            originFolder?.let { folder ->
+                                (requireActivity() as MainActivity).viewModel
+                                    .removeDiaryFromFolder(diary.id, folder)
+                            }
+                        }
+                    }
+                }
+            }
+
             viewModel.originDiary?.let { diary ->
                 diary.title = binding.editTextTitle.text.toString()
                 diary.content = binding.editTextContent.text.toString()
@@ -1157,12 +1198,13 @@ class DiaryWritingFragment: Fragment() {
                 diary.mediaArray = mediaAdapter.getMediaArray()
                 diary.weatherIconIndex = viewModel.weatherIconIndex
                 diary.hashTags = viewModel.selectedHashTags.toTypedArray()
+                diary.folderId = viewModel.folder?.id ?: DEFAULT_FOLDER_ID
             } ?: run {
                 showToast(requireContext(), "원본 다이어리가 손상되었습니다.") // TODO change to resource
                 saveDiary(createDiary())
             }
 
-            (requireActivity() as MainActivity).updateDiary(viewModel.originDiary!!)
+            (requireActivity() as MainActivity).updateDiary(viewModel.originDiary!!, viewModel.folder)
         }
 
         findNavController().popBackStack()
@@ -1193,6 +1235,9 @@ class DiaryWritingFragment: Fragment() {
             if (!originDiary.hashTags.contentEquals(viewModel.selectedHashTags.toTypedArray()))
                 return true
 
+            if (originDiary.folderId != viewModel.folder?.id)
+                return true
+
             return false
         }
     }
@@ -1200,6 +1245,7 @@ class DiaryWritingFragment: Fragment() {
     private fun createDiary(): DiaryModel {
         val title = binding.editTextTitle.text.toString()
         val content = binding.editTextContent.text.toString()
+
         return DiaryModel(
             title = title, content = content,
             time = viewModel.time,
@@ -1208,7 +1254,7 @@ class DiaryWritingFragment: Fragment() {
             liked = false,
             weatherIconIndex = viewModel.weatherIconIndex,
             hashTags = viewModel.selectedHashTags.toTypedArray(),
-            folderId = viewModel.folder?.id ?: -1L
+            folderId = viewModel.folder?.id ?: DEFAULT_FOLDER_ID
         )
     }
 
@@ -1439,7 +1485,9 @@ class DiaryWritingFragment: Fragment() {
         } ?: run {
             val chip = Chip(requireContext())
             chip.text = folder.name
-            chip.chipIcon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_round_folder_32)
+            chip.chipIcon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_round_folder_16)
+            chip.chipIconSize = convertDpToPx(requireContext(), 20F)
+
             chip.setChipIconTintResource(R.color.icon_color)
             chip.setTextAppearanceResource(R.style.ChipFontStyle)
             chip.setOnCloseIconClickListener {

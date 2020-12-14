@@ -13,10 +13,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.SimpleItemAnimator
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.duke.elliot.kim.kotlin.photodiary.DIARIES_FRAGMENT_HANDLER_MESSAGE
-import com.duke.elliot.kim.kotlin.photodiary.MainActivity
-import com.duke.elliot.kim.kotlin.photodiary.MainViewModel
-import com.duke.elliot.kim.kotlin.photodiary.R
+import com.duke.elliot.kim.kotlin.photodiary.*
 import com.duke.elliot.kim.kotlin.photodiary.database.DiaryDatabase
 import com.duke.elliot.kim.kotlin.photodiary.databinding.FragmentDairiesBinding
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.CREATE_MODE
@@ -34,7 +31,6 @@ import com.duke.elliot.kim.kotlin.photodiary.tab.TabFragmentDirections
 import com.duke.elliot.kim.kotlin.photodiary.utility.showToast
 import kotlinx.coroutines.*
 import timber.log.Timber
-import java.util.ArrayList
 
 class DiariesFragment: Fragment(), KakaoTalkOptionBottomSheetDialogFragment.KakaoTalkOptionClickListener,
     MediaPickerBottomSheetDialogFragment.OnMediaClickListener,
@@ -61,13 +57,17 @@ class DiariesFragment: Fragment(), KakaoTalkOptionBottomSheetDialogFragment.Kaka
 
         binding.diariesViewModel = viewModel
 
+        /** Handler */
         (requireActivity() as MainActivity).diariesFragmentHandler = Handler(Looper.getMainLooper()) {
             when(it.what) {
-                DIARIES_FRAGMENT_HANDLER_MESSAGE -> {
+                DIARIES_FRAGMENT_HANDLER_COLOR_CHANGED_MESSAGE -> {
                     if (diaryAdapter.currentBackgroundColor != MainActivity.themeColorSecondary) {
                         diaryAdapter.currentBackgroundColor = MainActivity.themeColorSecondary
                         binding.recyclerViewDiary.adapter = diaryAdapter
                     }
+                }
+                DIARIES_FRAGMENT_HANDLER_FOLDER_CHANGED_MESSAGE -> {
+                    diaryAdapter.notifyDataSetChanged()
                 }
             }
             true
@@ -86,6 +86,10 @@ class DiariesFragment: Fragment(), KakaoTalkOptionBottomSheetDialogFragment.Kaka
                     }
 
                     diaryAdapter.addHeaderAndSubmitList(filteredDiaries)
+                }
+            } else {
+                viewModel.originalDiaries?.let {
+                    diaryAdapter.addHeaderAndSubmitList(it, false)
                 }
             }
         }
@@ -134,7 +138,7 @@ class DiariesFragment: Fragment(), KakaoTalkOptionBottomSheetDialogFragment.Kaka
 
             setDeleteOnClickListener {
                 getCurrentDiary()?.let {
-                    viewModel.delete(it)
+                    (requireActivity() as MainActivity).viewModel.delete(it)
                 }
             }
 
@@ -171,7 +175,7 @@ class DiariesFragment: Fragment(), KakaoTalkOptionBottomSheetDialogFragment.Kaka
                 getCurrentDiary()?.let {
                     (binding.recyclerViewDiary.itemAnimator as SimpleItemAnimator)
                         .supportsChangeAnimations = false
-                    viewModel.update(it)
+                    (requireActivity() as MainActivity).updateDiary(it, null)
                 }
             }
         }
@@ -187,7 +191,7 @@ class DiariesFragment: Fragment(), KakaoTalkOptionBottomSheetDialogFragment.Kaka
             val filteredDiaries = mutableListOf<DiaryModel>()
 
             if (viewModel.folderId != DEFAULT_FOLDER_ID) {
-                viewModel.originalDiaries?.let { it ->
+                diaries?.let { it ->
                     for (diary in it) {
                         if (diary.folderId == viewModel.folderId)
                             filteredDiaries.add(diary)

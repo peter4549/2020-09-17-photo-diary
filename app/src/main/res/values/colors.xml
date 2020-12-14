@@ -4,6 +4,8 @@
     <color name="colorPrimaryDark">@color/colorSilver</color>
     <color name="colorAccent">@color/colorSilver</color>
 
+    <color name="colorItemBackground">@color/colorSnowWhite</color>
+
     <color name="colorControlHighlight">@color/colorAluminum</color>
 
     <color name="colorTextAccent">@color/colorBabyBlue</color>

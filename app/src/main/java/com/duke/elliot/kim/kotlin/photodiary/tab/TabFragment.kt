@@ -1,7 +1,6 @@
 package com.duke.elliot.kim.kotlin.photodiary.tab
 
 import android.content.Intent
-import android.opengl.Visibility
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -15,6 +14,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
+import com.duke.elliot.kim.kotlin.photodiary.DIARIES_FRAGMENT_HANDLER_FOLDER_CHANGED_MESSAGE
 import com.duke.elliot.kim.kotlin.photodiary.MainActivity
 import com.duke.elliot.kim.kotlin.photodiary.MainViewModel
 import com.duke.elliot.kim.kotlin.photodiary.R
@@ -26,6 +26,7 @@ import com.duke.elliot.kim.kotlin.photodiary.databinding.FragmentTabDrawerBindin
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.CREATE_MODE
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.DATE_OTHER_THAN_TODAY
 import com.duke.elliot.kim.kotlin.photodiary.drawer_items.lock_screen.SetLockScreenActivity
+import com.duke.elliot.kim.kotlin.photodiary.folder.DEFAULT_FOLDER_ID
 import com.duke.elliot.kim.kotlin.photodiary.folder.EditFolderDialogFragment
 import com.duke.elliot.kim.kotlin.photodiary.folder.FolderAdapter
 import com.duke.elliot.kim.kotlin.photodiary.tab.diary.DiariesFragment
@@ -141,11 +142,28 @@ class TabFragment: BaseFragment() {
             withContext(Dispatchers.Main) {
                 folderDao.getAll().observe(viewLifecycleOwner) { folders ->
                     if (!foldersInitialized) {
+                        val mainActivity = requireActivity() as MainActivity
                         folderAdapter =
-                            FolderAdapter((requireActivity() as MainActivity).getFolderDao()) {
+                            FolderAdapter(mainActivity.getFolderDao(), mainActivity.getDiaryDao()) {
                                 (requireActivity() as MainActivity).setFolderId(it.id)
                             }.apply {
-                                submitList(folders)
+                                setOnEditFolderClickListener {
+                                    val editFolderDialog = EditFolderDialogFragment().apply {
+                                        setMode(EditFolderDialogFragment.EDIT_MODE)
+                                        setFolderDao(folderDao)
+                                        setFolder(it)
+                                        setCallbackAfterEditing {
+                                            val diariesFragmentHandler = (requireActivity() as MainActivity).diariesFragmentHandler
+                                            if (diariesFragmentHandler != null) {
+                                                val message = diariesFragmentHandler.obtainMessage()
+                                                message.what = DIARIES_FRAGMENT_HANDLER_FOLDER_CHANGED_MESSAGE
+                                                diariesFragmentHandler.sendMessage(message)
+                                            }
+                                        }
+                                    }
+
+                                    editFolderDialog.show(requireActivity().supportFragmentManager, editFolderDialog.tag)
+                                }
                             }
 
                         binding.folderRecyclerView.layoutManager =
@@ -153,9 +171,10 @@ class TabFragment: BaseFragment() {
                         binding.folderRecyclerView.adapter = folderAdapter
 
                         foldersInitialized = true
-                    } else
-                        folderAdapter.submitList(folders)
+                    }
 
+                    folderAdapter.submitList(folders)
+                    folderAdapter.notifyDataSetChanged()
                 }
             }
         }
@@ -175,6 +194,7 @@ class TabFragment: BaseFragment() {
                 }
 
                 binding.showFolders.rotate(180F, 200)
+                binding.showAll.crossFadeOut(200)
             } else {
                 if (itemCount == 0) {
                     binding.foldersEmptyMessage.crossFadeIn(200)
@@ -185,6 +205,8 @@ class TabFragment: BaseFragment() {
                     binding.folderRecyclerView.crossFadeIn(200)
                     binding.showFolders.rotate(0F, 200)
                 }
+
+                binding.showAll.crossFadeIn(200)
             }
         }
 
@@ -195,6 +217,10 @@ class TabFragment: BaseFragment() {
             }
 
             editFolderDialog.show(requireActivity().supportFragmentManager, editFolderDialog.tag)
+        }
+
+        binding.showAllContainer.setOnClickListener {
+            (requireActivity() as MainActivity).setFolderId(DEFAULT_FOLDER_ID)
         }
 
         return binding.root

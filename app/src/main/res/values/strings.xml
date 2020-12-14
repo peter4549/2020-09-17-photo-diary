@@ -280,4 +280,6 @@
     <string name="select_folder_color_message">폴더 색상을 선택하세요.</string>
     <string name="folder_name">폴더 이름</string>
     <string name="enter_the_folder_name">폴더 이름을 입력하세요.</string>
+    <string name="show_all">모두 보기</string>
+    <string name="edit_folder">폴더 수정</string>
 </resources>

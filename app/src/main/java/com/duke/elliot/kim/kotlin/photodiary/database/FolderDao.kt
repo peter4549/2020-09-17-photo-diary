@@ -6,10 +6,10 @@ import com.duke.elliot.kim.kotlin.photodiary.folder.FolderModel
 
 @Dao
 interface FolderDao {
-    @Query("SELECT * FROM folder ORDER BY name DESC")
+    @Query("SELECT * FROM folder ORDER BY name ASC")
     fun getAll(): LiveData<MutableList<FolderModel>>
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(folder: FolderModel)
 
     @Delete
@@ -17,4 +17,7 @@ interface FolderDao {
 
     @Update
     fun update(folder: FolderModel)
+
+    @Query("SELECT * FROM folder WHERE id = :id LIMIT 1")
+    fun getFolderById(id: Long): FolderModel?
 }

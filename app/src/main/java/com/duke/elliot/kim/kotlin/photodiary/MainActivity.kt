@@ -21,6 +21,7 @@ import com.duke.elliot.kim.kotlin.photodiary.drawer_items.lock_screen.LockScreen
 import com.duke.elliot.kim.kotlin.photodiary.drawer_items.reminder.ReminderFragment
 import com.duke.elliot.kim.kotlin.photodiary.export.EXPORT_REQUEST_CODE
 import com.duke.elliot.kim.kotlin.photodiary.fluid_keyboard_resize.FluidContentResize
+import com.duke.elliot.kim.kotlin.photodiary.folder.FolderModel
 import com.duke.elliot.kim.kotlin.photodiary.utility.TypefaceUtil
 import com.duke.elliot.kim.kotlin.photodiary.utility.printHashKey
 import com.facebook.internal.CallbackManagerImpl
@@ -29,7 +30,9 @@ import timber.log.Timber
 import java.util.*
 import kotlin.collections.ArrayList
 
-const val DIARIES_FRAGMENT_HANDLER_MESSAGE = 527
+const val DIARIES_FRAGMENT_HANDLER_COLOR_CHANGED_MESSAGE = 527
+const val DIARIES_FRAGMENT_HANDLER_FOLDER_CHANGED_MESSAGE = 528
+const val DIARY_WRITING_HANDLER_FOLDER_CHANGED_MESSAGE = 1126
 
 const val PREFERENCES_FIRST_LAUNCH = "zion_preferences_first_launch_2146"
 
@@ -38,6 +41,7 @@ class MainActivity : AppCompatActivity() {
     // TODO must be private, provide fun as interface.
     lateinit var viewModel: MainViewModel
     var diariesFragmentHandler: Handler? = null
+    var diaryWritingFragmentHandler: Handler? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -141,12 +145,12 @@ class MainActivity : AppCompatActivity() {
 
     fun getDiaries() = viewModel.getDiaries()
 
-    fun saveDiary(diary: DiaryModel) {
-        viewModel.insert(diary)
+    fun saveDiary(diary: DiaryModel, folder: FolderModel?) {
+        viewModel.insert(diary, folder)
     }
 
-    fun updateDiary(diary: DiaryModel) {
-        viewModel.update(diary)
+    fun updateDiary(diary: DiaryModel, folder: FolderModel?) {
+        viewModel.update(diary, folder)
     }
 
     fun recreateNoAnimation() {
@@ -188,6 +192,7 @@ class MainActivity : AppCompatActivity() {
 
     fun getDiaryFolders() = viewModel.getDiaryFolders()
     fun getFolderDao() = viewModel.folderDao
+    fun getDiaryDao() = viewModel.database
 
     fun setFolderId(folderId: Long) {
         viewModel.selectedFolderId.value = folderId

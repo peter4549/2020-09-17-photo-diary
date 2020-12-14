@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.duke.elliot.kim.kotlin.photodiary.R
+import com.duke.elliot.kim.kotlin.photodiary.database.DiaryDao
 import com.duke.elliot.kim.kotlin.photodiary.database.FolderDao
 import com.duke.elliot.kim.kotlin.photodiary.databinding.ItemFolderBinding
 import kotlinx.coroutines.CoroutineScope
@@ -18,16 +19,23 @@ import kotlinx.coroutines.launch
 
 const val DEFAULT_FOLDER_ID = -1L
 
-class FolderAdapter(private val folderDao: FolderDao, private val onFolderClickListener: (FolderModel) -> Unit):
+class FolderAdapter(private val folderDao: FolderDao, private val diaryDao: DiaryDao, private val onFolderClickListener: (FolderModel) -> Unit):
     ListAdapter<FolderModel, RecyclerView.ViewHolder>(FolderDiffCallback()) {
 
     private val job = Job()
     private val coroutineScope = CoroutineScope(Dispatchers.Default + job)
 
+    private lateinit var onEditClickListener: (FolderModel) -> Unit
+
+    fun setOnEditFolderClickListener(onEditClickListener: (FolderModel) -> Unit) {
+        this.onEditClickListener = onEditClickListener
+    }
+
     inner class ViewHolder constructor(val binding: ViewDataBinding): RecyclerView.ViewHolder(binding.root) {
         fun bind(binding: ItemFolderBinding, folder: FolderModel) {
             binding.folderColor.setBackgroundColor(folder.color)
             binding.folderName.text = folder.name
+            binding.itemCount.text = folder.diaryIds.count().toString()
             binding.editFolder.setOnClickListener {
                 showPopupMenu(it, folder)
             }
@@ -58,7 +66,7 @@ class FolderAdapter(private val folderDao: FolderDao, private val onFolderClickL
         popupMenu.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.edit -> {
-                    // TODO. change and update folder.
+                    onEditClickListener.invoke(folder)
                     true
                 }
                 R.id.delete -> {
@@ -74,6 +82,7 @@ class FolderAdapter(private val folderDao: FolderDao, private val onFolderClickL
 
     private fun deleteFolder(folder: FolderModel) {
         coroutineScope.launch {
+            diaryDao.updateFolderId(folder.id)
             folderDao.delete(folder)
         }
     }
