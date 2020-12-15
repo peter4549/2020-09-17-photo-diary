@@ -16,6 +16,9 @@ import com.duke.elliot.kim.kotlin.photodiary.utility.FileUtilities
 import kotlinx.coroutines.*
 import timber.log.Timber
 
+const val SHOW_FAVORITES = -2213L
+// DEFAULT_FOLDER_ID is -1L.
+
 class MainViewModel(application: Application): AndroidViewModel(application) {
     private val job = Job()
     private val coroutineScope = CoroutineScope(Dispatchers.Main + job)
@@ -111,7 +114,6 @@ class MainViewModel(application: Application): AndroidViewModel(application) {
         val diaryIds = folder.diaryIds.toMutableList()
         diaryIds.remove(diaryId)
         folder.diaryIds = diaryIds.toTypedArray()
-        println("AAAAAAAA ${folder.diaryIds.toList()}")
         folderDao.update(folder)
     }
 

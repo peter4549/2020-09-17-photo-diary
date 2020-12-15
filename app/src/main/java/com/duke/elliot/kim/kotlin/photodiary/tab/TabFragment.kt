@@ -14,10 +14,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
-import com.duke.elliot.kim.kotlin.photodiary.DIARIES_FRAGMENT_HANDLER_FOLDER_CHANGED_MESSAGE
-import com.duke.elliot.kim.kotlin.photodiary.MainActivity
-import com.duke.elliot.kim.kotlin.photodiary.MainViewModel
-import com.duke.elliot.kim.kotlin.photodiary.R
+import com.duke.elliot.kim.kotlin.photodiary.*
 import com.duke.elliot.kim.kotlin.photodiary.base.BaseFragment
 import com.duke.elliot.kim.kotlin.photodiary.calendar.CalendarFragment
 import com.duke.elliot.kim.kotlin.photodiary.database.DiaryDatabase
@@ -107,6 +104,11 @@ class TabFragment: BaseFragment() {
             //binding.tabFragment.invalidate() // 리사이클러뷰를 노티해줘야함.
             */
 
+        }
+
+        /** Favorites */
+        binding.showFavorites.setOnClickListener {
+            (requireActivity() as MainActivity).setFolderId(SHOW_FAVORITES)
         }
 
         binding.textChangeTheme.setOnClickListener {

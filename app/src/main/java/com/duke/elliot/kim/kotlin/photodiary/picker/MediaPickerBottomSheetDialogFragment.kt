@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.duke.elliot.kim.kotlin.photodiary.R
 import com.duke.elliot.kim.kotlin.photodiary.databinding.BottomSheetFragmentMediaPickerBinding
@@ -21,7 +22,7 @@ import kotlinx.android.synthetic.main.item_media_picker.view.*
 
 class MediaPickerBottomSheetDialogFragment: BottomSheetDialogFragment() {
 
-    private lateinit var mediaClickListener: OnMediaClickListener
+    private lateinit var onMediaClickListener: OnMediaClickListener
 
     interface OnMediaClickListener {
         fun photoOnClick(pickedPhotoUris: List<String>)
@@ -30,7 +31,7 @@ class MediaPickerBottomSheetDialogFragment: BottomSheetDialogFragment() {
     }
 
     fun setMediaClickListener(mediaClickListener: OnMediaClickListener) {
-        this.mediaClickListener = mediaClickListener
+        this.onMediaClickListener = mediaClickListener
     }
 
     private lateinit var binding: BottomSheetFragmentMediaPickerBinding
@@ -90,7 +91,9 @@ class MediaPickerBottomSheetDialogFragment: BottomSheetDialogFragment() {
                     dismiss()
                 }
             }
-            else -> showToast(requireContext(), getString(R.string.media_not_found))
+            else -> {
+                dismiss()
+            }
         }
 
         return binding.root
@@ -103,7 +106,8 @@ class MediaPickerBottomSheetDialogFragment: BottomSheetDialogFragment() {
                 binding.textButtonContainer.visibility = View.VISIBLE
                 binding.ok.setOnClickListener {
                     if (mediaPickerAdapter.pickedPhotoUris.isNotEmpty()) {
-                        mediaClickListener.photoOnClick(mediaPickerAdapter.pickedPhotoUris)
+                        if (::onMediaClickListener.isInitialized)
+                            onMediaClickListener.photoOnClick(mediaPickerAdapter.pickedPhotoUris)
                         dismiss()
                     } else
                         showToast(requireContext(), getString(R.string.no_picture_is_selected))
@@ -129,9 +133,11 @@ class MediaPickerBottomSheetDialogFragment: BottomSheetDialogFragment() {
         val pickedPhotoUris = mutableListOf<String>()
 
         fun selectAllPhotos() {
-            for (media in mediaList) {
-                if (!pickedPhotoUris.contains(media.uriString))
-                    pickedPhotoUris.add(media.uriString)
+            if (pickedPhotoUris.count() != mediaList.count()) {
+                for (media in mediaList) {
+                    if (!pickedPhotoUris.contains(media.uriString))
+                        pickedPhotoUris.add(media.uriString)
+                }
             }
 
             notifyDataSetChanged()
@@ -179,7 +185,8 @@ class MediaPickerBottomSheetDialogFragment: BottomSheetDialogFragment() {
 
                         setImage(view.imageContent, media.uriString)
                         view.setOnClickListener {
-                            mediaClickListener.videoOnClick(media.uriString)
+                            if (::onMediaClickListener.isInitialized)
+                                onMediaClickListener.videoOnClick(media.uriString)
                             dismiss()
                         }
                     }
@@ -191,7 +198,8 @@ class MediaPickerBottomSheetDialogFragment: BottomSheetDialogFragment() {
                         albumArt?.let {
                             setImage(view.imageContent, it)
                             view.setOnClickListener {
-                                mediaClickListener.audioOnClick(media.uriString)
+                                if (::onMediaClickListener.isInitialized)
+                                    onMediaClickListener.audioOnClick(media.uriString)
                                 dismiss()
                             }
                         } ?: run {

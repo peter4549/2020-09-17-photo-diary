@@ -587,6 +587,9 @@ class DiaryWritingFragment: Fragment() {
         super.onStop()
         viewModel.title = binding.editTextTitle.text.toString()
         viewModel.content = binding.editTextContent.text.toString()
+
+        viewModel.updateHashTagsToPreferences()
+        PhotoHelper.deleteTempJpegFiles(requireContext())
     }
 
     private fun initializeToolbar(toolbar: Toolbar) {
@@ -1028,6 +1031,7 @@ class DiaryWritingFragment: Fragment() {
                                             requireContext(),
                                             getString(R.string.failed_to_load_video)
                                         )
+                                        Timber.e("File copy failed.")
                                     }
                                 }
                             } ?: run {
@@ -1037,6 +1041,7 @@ class DiaryWritingFragment: Fragment() {
                                     requireContext(),
                                     getString(R.string.failed_to_load_video)
                                 )
+                                Timber.e("Uri is null.")
                             }
                         }
                     } else if (data?.data != null) {
@@ -1061,6 +1066,7 @@ class DiaryWritingFragment: Fragment() {
                                         requireContext(),
                                         getString(R.string.failed_to_load_video)
                                     )
+                                    Timber.e("File copy failed.")
                                 }
                             }
                         }
@@ -1266,12 +1272,6 @@ class DiaryWritingFragment: Fragment() {
         textStyleBold = viewModel.textStyleBold,
         textStyleItalic = viewModel.textStyleItalic
     )
-
-    override fun onDestroy() {
-        super.onDestroy()
-        viewModel.updateHashTagsToPreferences()
-        PhotoHelper.deleteTempJpegFiles(requireContext())
-    }
 
     private fun showOptionItems(view: View) {
         binding.layoutPhotoOptionItems.visibility = View.GONE

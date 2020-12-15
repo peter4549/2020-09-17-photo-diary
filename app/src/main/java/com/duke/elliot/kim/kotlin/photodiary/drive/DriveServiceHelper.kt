@@ -125,11 +125,14 @@ class DriveServiceHelper(private val drive: Drive) {
         }
 
         val existingBackedUpMediaFileIds = future.get() ?: listOf()
-        val backedUpFileIds = futures.map { it?.get() }.requireNoNulls()
+        val backedUpFileIds = futures.map { it?.get() }
+
+        if (backedUpFileIds.contains(null))
+            executeFailed = true
 
         if (executeFailed) {
             completeListener?.invoke(false)
-            deleteGoogleDriveFiles(backedUpFileIds)
+            deleteGoogleDriveFiles(backedUpFileIds.requireNoNulls())
         } else {
             completeListener?.invoke(true)
             deleteGoogleDriveFiles(existingBackedUpMediaFileIds)
@@ -214,5 +217,13 @@ class DriveServiceHelper(private val drive: Drive) {
             e.printStackTrace()
             false
         }
+    }
+
+    private fun createMetadata() {
+
+    }
+
+    private fun getMetadata() {
+
     }
 }

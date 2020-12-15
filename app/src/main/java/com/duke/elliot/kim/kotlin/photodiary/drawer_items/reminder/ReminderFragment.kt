@@ -1,13 +1,10 @@
 package com.duke.elliot.kim.kotlin.photodiary.drawer_items.reminder
 
-import android.app.DatePickerDialog
 import android.app.TimePickerDialog
-import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TimePicker
 import androidx.databinding.DataBindingUtil
 import com.duke.elliot.kim.kotlin.photodiary.MainActivity
 import com.duke.elliot.kim.kotlin.photodiary.R
@@ -106,8 +103,13 @@ class ReminderFragment: BaseFragment() {
         }
 
         reminderMillis = calendar.timeInMillis
-
         binding.reminderTimeContent.text = reminderMillis.toDateFormat("a h:mm")
-        AlarmUtil.saveReminderMillis(requireContext(), reminderMillis)
+
+
+        if (AlarmUtil.loadReminderState(requireContext())) {
+            AlarmUtil.cancelReminder(requireContext())
+            AlarmUtil.setReminder(requireContext(), calendar, reminderMessage)
+        } else
+            AlarmUtil.saveReminderMillis(requireContext(), reminderMillis)
     }
 }

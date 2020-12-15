@@ -37,9 +37,10 @@ class DiariesFragment: Fragment(), KakaoTalkOptionBottomSheetDialogFragment.Kaka
     FacebookOptionBottomSheetDialogFragment.OnFacebookOptionClickListener,
     TypelessMediaPickerBottomSheetDialogFragment.OnMediaClickListener {
 
-    private lateinit var diaryAdapter: DiaryAdapter
     private lateinit var binding: FragmentDairiesBinding
     private lateinit var viewModel: DiariesViewModel
+
+    private lateinit var diaryAdapter: DiaryAdapter
     private lateinit var mediaPicker: MediaPickerBottomSheetDialogFragment
     private lateinit var typelessMediaPicker: TypelessMediaPickerBottomSheetDialogFragment
 
@@ -78,27 +79,36 @@ class DiariesFragment: Fragment(), KakaoTalkOptionBottomSheetDialogFragment.Kaka
             viewModel.folderId = folderId
             val filteredDiaries = mutableListOf<DiaryModel>()
 
-            if (viewModel.folderId != DEFAULT_FOLDER_ID) {
+            if (viewModel.folderId == SHOW_FAVORITES) {
+                /** Favorites */
                 viewModel.originalDiaries?.let { diaries ->
                     for (diary in diaries) {
-                        if (diary.folderId == viewModel.folderId)
+                        if (diary.liked)
                             filteredDiaries.add(diary)
                     }
 
                     diaryAdapter.addHeaderAndSubmitList(filteredDiaries)
                 }
             } else {
-                viewModel.originalDiaries?.let {
-                    diaryAdapter.addHeaderAndSubmitList(it, false)
+                /** Folder */
+                if (viewModel.folderId != DEFAULT_FOLDER_ID) {
+                    viewModel.originalDiaries?.let { diaries ->
+                        for (diary in diaries) {
+                            if (diary.folderId == viewModel.folderId)
+                                filteredDiaries.add(diary)
+                        }
+
+                        diaryAdapter.addHeaderAndSubmitList(filteredDiaries)
+                    }
+                } else {
+                    viewModel.originalDiaries?.let {
+                        diaryAdapter.addHeaderAndSubmitList(it, false)
+                    }
                 }
             }
         }
 
         mediaPicker = MediaPickerBottomSheetDialogFragment().apply {
-            setMediaClickListener(this@DiariesFragment)
-        }
-
-        typelessMediaPicker = TypelessMediaPickerBottomSheetDialogFragment().apply {
             setMediaClickListener(this@DiariesFragment)
         }
 
@@ -305,6 +315,10 @@ class DiariesFragment: Fragment(), KakaoTalkOptionBottomSheetDialogFragment.Kaka
     /** Facebook */
     override fun onSendMediaClick() {
         diaryAdapter.getCurrentDiary()?.let {
+            typelessMediaPicker = TypelessMediaPickerBottomSheetDialogFragment().apply {
+                setMediaClickListener(this@DiariesFragment)
+            }
+
             typelessMediaPicker.setDiary(it)
             typelessMediaPicker.show(requireActivity().supportFragmentManager, typelessMediaPicker.tag)
         }

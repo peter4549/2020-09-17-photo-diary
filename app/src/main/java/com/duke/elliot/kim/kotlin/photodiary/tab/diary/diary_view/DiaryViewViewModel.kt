@@ -12,4 +12,6 @@ class DiaryViewViewModel: ViewModel() {
     }
 
     fun getDiary() = this.diary
+
+    fun getMediaList() = diary.mediaArray.toList()
 }

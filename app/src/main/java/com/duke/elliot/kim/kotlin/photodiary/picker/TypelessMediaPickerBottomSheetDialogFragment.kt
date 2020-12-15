@@ -15,6 +15,7 @@ import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.media_helper.Me
 import com.duke.elliot.kim.kotlin.photodiary.utility.GridLayoutManagerWrapper
 import com.duke.elliot.kim.kotlin.photodiary.utility.scaleUp
 import com.duke.elliot.kim.kotlin.photodiary.utility.setImage
+import com.duke.elliot.kim.kotlin.photodiary.utility.showToast
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.android.synthetic.main.item_media_picker.view.*
 
@@ -23,14 +24,14 @@ class TypelessMediaPickerBottomSheetDialogFragment: BottomSheetDialogFragment() 
     private lateinit var binding: BottomSheetFragmentTypelessMediaPickerBinding
     private lateinit var diary: DiaryModel
     private lateinit var mediaPickerAdapter: MediaPickerAdapter
-    private lateinit var mediaClickListener: OnMediaClickListener
+    private lateinit var onMediaClickListener: OnMediaClickListener
 
     interface OnMediaClickListener {
         fun onClick(diary: DiaryModel, pickedMediaUris: List<Pair<Int, Uri>>)
     }
 
     fun setMediaClickListener(mediaClickListener: OnMediaClickListener) {
-        this.mediaClickListener = mediaClickListener
+        this.onMediaClickListener = mediaClickListener
     }
 
     fun setDiary(diary: DiaryModel) {
@@ -45,14 +46,18 @@ class TypelessMediaPickerBottomSheetDialogFragment: BottomSheetDialogFragment() 
         binding = DataBindingUtil.inflate(inflater, R.layout.bottom_sheet_fragment_typeless_media_picker, container, false)
         binding.recyclerView.layoutManager = GridLayoutManagerWrapper(requireContext(), 3)
 
+
         val imageVideoArray = diary.mediaArray.filter { it.type != MediaHelper.MediaType.AUDIO }
         mediaPickerAdapter = MediaPickerAdapter(imageVideoArray)
         binding.recyclerView.adapter = mediaPickerAdapter
 
         binding.ok.setOnClickListener {
-            mediaClickListener.onClick(diary, mediaPickerAdapter.pickedMediaUris)
+            if (::onMediaClickListener.isInitialized)
+                onMediaClickListener.onClick(diary, mediaPickerAdapter.pickedMediaUris)
             dismiss()
         }
+
+        binding.pickedItemCount.text = "0/6"
 
         return binding.root
     }
@@ -84,14 +89,25 @@ class TypelessMediaPickerBottomSheetDialogFragment: BottomSheetDialogFragment() 
                             view.imagePicker.setBackgroundResource(R.drawable.circle_border)
                             view.imagePicker.setImageResource(android.R.color.transparent)
                             view.imagePicker.scaleUp(1F, 100L)
+                            val pickedItemCount = pickedMediaUris.count()
+                            val text = "$pickedItemCount/6"
+                            binding.pickedItemCount.text = text
                         }
                     } else {
+                        if (pickedMediaUris.count() >= 6) {
+                            showToast(view.context, view.context.getString(R.string.you_can_select_up_to_six))
+                            return@setOnClickListener
+                        }
+
                         pickedMediaUris.add(pickedUri)
 
                         view.imagePicker.scaleUp(0.8F, 100L) {
                             view.imagePicker.setBackgroundResource(R.drawable.circle_transparent_background)
                             view.imagePicker.setImageResource(R.drawable.ic_sharp_check_circle_24)
                             view.imagePicker.scaleUp(1F, 100L)
+                            val pickedItemCount = pickedMediaUris.count()
+                            val text = "$pickedItemCount/6"
+                            binding.pickedItemCount.text = text
                         }
                     }
                 }

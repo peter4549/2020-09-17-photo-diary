@@ -52,7 +52,7 @@ class DiaryViewFragment: Fragment() {
 
         mediaPagerAdapter = MediaPagerAdapter().apply {
             setContext(requireContext())
-            setMediaList(diary.mediaArray.toList())
+            setMediaList(viewModel.getMediaList())
         }
 
         return binding.root

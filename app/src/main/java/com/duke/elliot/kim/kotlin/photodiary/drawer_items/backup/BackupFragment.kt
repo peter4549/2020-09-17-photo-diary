@@ -17,7 +17,6 @@ import com.duke.elliot.kim.kotlin.photodiary.base.BaseFragment
 import com.duke.elliot.kim.kotlin.photodiary.database.DIARY_DATABASE_NAME
 import com.duke.elliot.kim.kotlin.photodiary.database.DiaryDatabase
 import com.duke.elliot.kim.kotlin.photodiary.databinding.FragmentBackupBinding
-import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.MediaModel
 import com.duke.elliot.kim.kotlin.photodiary.drive.DriveServiceHelper
 import com.duke.elliot.kim.kotlin.photodiary.utility.OkCancelDialogFragment
 import com.duke.elliot.kim.kotlin.photodiary.utility.showToast
@@ -57,7 +56,6 @@ class BackupFragment: BaseFragment() {
     private lateinit var driveServiceHelper: DriveServiceHelper
     private lateinit var viewModel: BackupViewModel
     private var mode = -1
-    private var fileId = ""
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -169,10 +167,11 @@ class BackupFragment: BaseFragment() {
                         BACKUP_FILE_NAME
                     )
                 }
+
             if (result)
-                showToast(requireContext(), "true")
+                showToast(requireContext(), getString(R.string.data_backup))
             else
-                showToast(requireContext(), "false")
+                showToast(requireContext(), getString(R.string.data_backup_failed))
 
             dismissProgressBar()
         }
@@ -195,9 +194,9 @@ class BackupFragment: BaseFragment() {
                     )
 
             if (result)
-                showToast(requireContext(), "true")
+                showToast(requireContext(), getString(R.string.data_backup))
             else
-                showToast(requireContext(), "false")
+                showToast(requireContext(), getString(R.string.data_backup_failed))
 
             dismissProgressBar()
             (requireActivity() as MainActivity).recreateNoAnimation()
@@ -260,9 +259,9 @@ class BackupFragment: BaseFragment() {
                                 dismissProgressBar()
 
                                 if (result) {
-                                    showToast(requireContext(), "데이터파일 백업 성공.")
+                                    showToast(requireContext(), getString(R.string.data_backed_up))
                                 } else {
-                                    showToast(requireContext(), "데이터파일 백업 실패.")
+                                    showToast(requireContext(), getString(R.string.data_backup_failed))
                                 }
                             }
                         }
@@ -280,15 +279,14 @@ class BackupFragment: BaseFragment() {
                                     deleteCachedDatabase()
                                     viewModel.deleteFiles(mediaList.map { it.uriString.toPath() }
                                         .requireNoNulls())
-                                    showToast(requireContext(), "데이터파일 복원 성공.")
+                                    showToast(requireContext(), getString(R.string.data_restored))
                                     (requireActivity() as MainActivity).recreateNoAnimation()
 
                                     // driveServiceHelper.showBackedUpFiles()
-
                                 } else {
                                     restoreCurrentDatabase()
                                     downloadedFilePaths?.let { viewModel.deleteFiles(it) }
-                                    showToast(requireContext(), "데이터파일 복원 실패.")
+                                    showToast(requireContext(), getString(R.string.data_restore_failed))
                                 }
                             }
                         }
@@ -297,10 +295,8 @@ class BackupFragment: BaseFragment() {
             }
             .addOnFailureListener { e: Exception? ->
                 Timber.e(e)
-                showToast(requireContext(), "실패.")
+                showToast(requireContext(), getString(R.string.google_sign_in_failed))
             }
-
-
     }
 
     private fun cacheCurrentDatabase() {

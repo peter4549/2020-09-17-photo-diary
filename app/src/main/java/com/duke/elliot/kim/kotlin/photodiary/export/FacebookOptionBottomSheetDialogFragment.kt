@@ -13,6 +13,14 @@ class FacebookOptionBottomSheetDialogFragment: BottomSheetDialogFragment() {
 
     private lateinit var binding: FragmentFacebookOptionBottomSheetDialogBinding
     private lateinit var onFacebookOptionClickListener: OnFacebookOptionClickListener
+    // private lateinit var onClickListenerWrapper: OnClickListenerWrapper
+
+    /*
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putSerializable(KEY_ON_CLICK_LISTENER_WRAPPER, onClickListenerWrapper)
+    }
+     */
 
     interface OnFacebookOptionClickListener {
         fun onSendMediaClick()
@@ -30,16 +38,33 @@ class FacebookOptionBottomSheetDialogFragment: BottomSheetDialogFragment() {
     ): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_facebook_option_bottom_sheet_dialog, container, false)
 
+        /*
+        onClickListenerWrapper = if (savedInstanceState != null) {
+            savedInstanceState.getSerializable(KEY_ON_CLICK_LISTENER_WRAPPER) as OnClickListenerWrapper
+        } else
+            OnClickListenerWrapper(onFacebookOptionClickListener)
+         */
+
         binding.sendMedia.setOnClickListener {
-            onFacebookOptionClickListener.onSendMediaClick()
+            if (::onFacebookOptionClickListener.isInitialized)
+                onFacebookOptionClickListener.onSendMediaClick()
             dismiss()
         }
 
         binding.sendText.setOnClickListener {
-            onFacebookOptionClickListener.onSendOnlyTextClick()
+            if (::onFacebookOptionClickListener.isInitialized)
+                onFacebookOptionClickListener.onSendOnlyTextClick()
             dismiss()
         }
 
         return binding.root
     }
+
+    /*
+    inner class OnClickListenerWrapper(val onClickListener: OnFacebookOptionClickListener) : Serializable
+
+    companion object {
+        private const val KEY_ON_CLICK_LISTENER_WRAPPER = "elliot_on_click_listener_wrapper_1850"
+    }
+     */
 }

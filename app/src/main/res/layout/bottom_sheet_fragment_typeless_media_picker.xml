@@ -38,7 +38,7 @@
                 android:gravity="bottom|end">
 
                 <TextView
-                    android:id="@+id/selectAll"
+                    android:id="@+id/pickedItemCount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="?attr/selectableItemBackgroundBorderless"
@@ -51,7 +51,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="16dp"
                     android:layout_marginStart="32dp"
-                    android:layout_toEndOf="@id/selectAll"
+                    android:layout_toEndOf="@id/pickedItemCount"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:text="@string/ok"
                     android:textColor="@color/colorWhite" />

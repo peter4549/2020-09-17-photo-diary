@@ -25,6 +25,22 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/showFavorites"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="?attr/selectableItemBackground"
+                    android:text="@string/favorites"
+                    android:textSize="14sp"
+                    android:drawablePadding="24dp"
+                    android:paddingBottom="8dp"
+                    android:paddingEnd="16dp"
+                    android:paddingStart="16dp"
+                    android:paddingTop="8dp"
+                    android:gravity="center_vertical"
+                    app:drawableStartCompat="@drawable/ic_round_star_liked_24"
+                    app:drawableTint="@color/icon_color"/>
+
+                <TextView
                     android:id="@+id/textChangeTheme"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"

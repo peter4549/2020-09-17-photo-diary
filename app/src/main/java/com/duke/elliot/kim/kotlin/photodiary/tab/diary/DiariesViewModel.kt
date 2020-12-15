@@ -8,6 +8,8 @@ import com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryModel
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.media_helper.MediaHelper
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.media_helper.PhotoHelper
 import com.duke.elliot.kim.kotlin.photodiary.folder.DEFAULT_FOLDER_ID
+import com.duke.elliot.kim.kotlin.photodiary.picker.MediaPickerBottomSheetDialogFragment
+import com.duke.elliot.kim.kotlin.photodiary.picker.TypelessMediaPickerBottomSheetDialogFragment
 import com.duke.elliot.kim.kotlin.photodiary.utility.FileUtilities
 import kotlinx.coroutines.*
 import timber.log.Timber
@@ -21,6 +23,8 @@ class DiariesViewModel(val database: DiaryDao, application: Application): Androi
     var status = UNINITIALIZED
     var originalDiaries: MutableList<DiaryModel>? = null
     var folderId = DEFAULT_FOLDER_ID
+
+    lateinit var diaryAdapter: DiaryAdapter
 
     /*
     fun delete(diary: DiaryModel) {

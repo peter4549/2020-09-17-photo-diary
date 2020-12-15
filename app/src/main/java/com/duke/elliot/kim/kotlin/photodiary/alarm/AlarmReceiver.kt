@@ -15,7 +15,7 @@ import java.util.*
 class AlarmReceiver: BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
-        val reminderSet = AlarmUtil.loadReminderState(context)
+        // val reminderSet = AlarmUtil.loadReminderState(context)
         val reminderMillisAndMessage = AlarmUtil.loadReminderMillisAndMessage(context)
         val reminderMillis = reminderMillisAndMessage.first
         val reminderMessage = reminderMillisAndMessage.second
@@ -35,6 +35,8 @@ class AlarmReceiver: BroadcastReceiver() {
             0
         )
 
+        // TODO: 이미 지난 시간이라면, 무시하고 date + 1
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val importance = NotificationManager.IMPORTANCE_HIGH
             val channel = NotificationChannel(CHANNEL_ID, CHANNEL_NAME, importance)
@@ -52,15 +54,13 @@ class AlarmReceiver: BroadcastReceiver() {
             .setContentIntent(pendingIntent)
         notificationManager.notify(NOTIFICATION_ID, builder.build())
 
-        if (reminderSet) {
-            val calendar = Calendar.getInstance().apply {
-                timeInMillis = reminderMillis
-                set(Calendar.SECOND, 0)
-            }
-
-            calendar.add(Calendar.DATE, 1)
-            AlarmUtil.setReminder(context, calendar, reminderMessage)
+        val calendar = Calendar.getInstance().apply {
+            timeInMillis = reminderMillis
+            set(Calendar.SECOND, 0)
         }
+
+        calendar.add(Calendar.DATE, 1)
+        AlarmUtil.setReminder(context, calendar, reminderMessage)
     }
 
     companion object {

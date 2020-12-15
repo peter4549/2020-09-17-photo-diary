@@ -115,11 +115,5 @@ object AlarmUtil {
 
         saveReminderState(context, true)
         saveReminderMillisAndMessage(context, calendar.timeInMillis, message)
-        // TODO: chooser 구현 후 풀 것.
-        // saveTimeAndContent(time, content)
     }
-
-    // TODO setRepeat 부정확할 시, 아래 코드 참고할 것.
-    // fun setAlarm(hour: Int, context: Context) { val calendar = Calendar.getInstance() calendar.set(Calendar.HOUR_OF_DAY, hour) calendar.set(Calendar.MINUTE, 0) calendar.set(Calendar.SECOND, 0) var nowCalendar = Calendar.getInstance() if (calendar.before(nowCalendar) || nowCalendar.time == calendar.time) { //이미 지난 시간 일 경우 calendar.add(Calendar.DATE, 1) } var intent = Intent(context, MealsAlarmReceiver::class.java) var pendingIntent = PendingIntent.getBroadcast(context, REQ_MEAL_ALARM, intent, PendingIntent.FLAG_UPDATE_CURRENT) val alarmManaer = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager when { Build.VERSION.SDK_INT >= Build.VERSION_CODES.M -> alarmManaer.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent) Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT -> alarmManaer.setExact(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent) else -> alarmManaer.set(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent) } }
-
 }
