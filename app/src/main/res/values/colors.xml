@@ -13,6 +13,9 @@
     <color name="colorTextCalendar">@color/colorJet</color>
     <color name="colorTextSpinnerItem">@color/colorDavyGrey</color>
 
+    <color name="colorNegativeButton">@color/colorSilver</color>
+    <color name="colorPositiveButton">@color/colorBabyBlue</color>
+
     <color name="colorDefaultThemePrimary">#B39DDB</color>
     <color name="colorDefaultThemeSecondary">#EDE7F6</color>
     <color name="colorTextDisabledDark">@color/colorSilver</color>
@@ -52,9 +55,9 @@
     <color name="colorDarkGreyTransparent">#809E9E9E</color>
     <color name="colorJet">#343434</color>
     <color name="colorDavyGrey">#555555</color>
-    <color name="colorSilver">#BABACA</color>  <!-- customize #C0C0C0 to #BCBCCF -->
+    <color name="colorSilver">#BABACA</color>  <!-- Customize #C0C0C0 to #BCBCCF -->
     <color name="colorWhite">#FEFEFE</color>
-    <color name="colorSnowWhite">#FFFAFA</color>
+    <color name="colorSnowWhite">#FAFAFF</color>  <!-- Customized #FFFAFA => #FAFAFF -->
 
     <!-- PhotoEditor -->
     <color name="colorSemiBlackTransparent">#99000000</color>

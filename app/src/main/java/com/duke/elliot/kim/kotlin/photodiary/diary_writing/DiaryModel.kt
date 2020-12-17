@@ -5,6 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.MediaModel
 import com.duke.elliot.kim.kotlin.photodiary.folder.FolderModel
+import com.duke.elliot.kim.kotlin.photodiary.google_map.PlaceModel
 import kotlinx.android.parcel.Parcelize
 import java.time.Instant
 import java.time.LocalDate
@@ -23,8 +24,9 @@ data class DiaryModel(@PrimaryKey(autoGenerate = true)
                       var weatherIconIndex: Int,
                       var hashTags: Array<String>,
                       var backedUp: Boolean = false,
-                      var folderId: Long) : Parcelable {
-
+                      var folderId: Long,
+                      var place: PlaceModel
+) : Parcelable {
 
     fun getLocalDate(): LocalDate {
         return Instant.ofEpochMilli(this.time)

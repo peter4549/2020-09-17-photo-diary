@@ -7,6 +7,7 @@ import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -24,10 +25,13 @@ import com.duke.elliot.kim.kotlin.photodiary.export.ExportUtilities
 import com.duke.elliot.kim.kotlin.photodiary.export.FacebookOptionBottomSheetDialogFragment
 import com.duke.elliot.kim.kotlin.photodiary.export.KakaoTalkOptionBottomSheetDialogFragment
 import com.duke.elliot.kim.kotlin.photodiary.folder.DEFAULT_FOLDER_ID
+import com.duke.elliot.kim.kotlin.photodiary.hashtag.HASHTAG_SELECTED
 import com.duke.elliot.kim.kotlin.photodiary.picker.MediaPickerBottomSheetDialogFragment
 import com.duke.elliot.kim.kotlin.photodiary.picker.TypelessMediaPickerBottomSheetDialogFragment
 import com.duke.elliot.kim.kotlin.photodiary.tab.TabFragment
 import com.duke.elliot.kim.kotlin.photodiary.tab.TabFragmentDirections
+import com.duke.elliot.kim.kotlin.photodiary.utility.leftDrawable
+import com.duke.elliot.kim.kotlin.photodiary.utility.setDrawableTint
 import com.duke.elliot.kim.kotlin.photodiary.utility.showToast
 import kotlinx.coroutines.*
 import timber.log.Timber
@@ -43,6 +47,9 @@ class DiariesFragment: Fragment(), KakaoTalkOptionBottomSheetDialogFragment.Kaka
     private lateinit var diaryAdapter: DiaryAdapter
     private lateinit var mediaPicker: MediaPickerBottomSheetDialogFragment
     private lateinit var typelessMediaPicker: TypelessMediaPickerBottomSheetDialogFragment
+
+    private val job = Job()
+    private val coroutineScope = CoroutineScope(Dispatchers.Main + job)
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -89,7 +96,28 @@ class DiariesFragment: Fragment(), KakaoTalkOptionBottomSheetDialogFragment.Kaka
 
                     diaryAdapter.addHeaderAndSubmitList(filteredDiaries)
                 }
-            } else {
+
+                binding.currentFolder.text = getString(R.string.favorites)
+                binding.currentFolder.leftDrawable(R.drawable.ic_round_star_liked_24, R.dimen.dimen_24dp)
+                binding.currentFolder.setDrawableTint(MainActivity.themeColorSecondary)
+                binding.currentFolder.setTextColor(ContextCompat.getColor(requireContext(), R.color.color_text_dark))
+            } else if (viewModel.folderId == HASHTAG_SELECTED) {
+                /** Hash Tags */
+                val hashTag = (requireActivity() as MainActivity).viewModel.selectedHashTag
+                viewModel.originalDiaries?.let { diaries ->
+                    for (diary in diaries) {
+                        if (diary.hashTags.contains(hashTag))
+                            filteredDiaries.add(diary)
+                    }
+
+                    diaryAdapter.addHeaderAndSubmitList(filteredDiaries)
+                }
+
+                binding.currentFolder.text = hashTag
+                binding.currentFolder.setTextColor(ContextCompat.getColor(requireContext(), R.color.colorTextAccent))
+                binding.currentFolder.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
+            }
+            else {
                 /** Folder */
                 if (viewModel.folderId != DEFAULT_FOLDER_ID) {
                     viewModel.originalDiaries?.let { diaries ->
@@ -100,10 +128,30 @@ class DiariesFragment: Fragment(), KakaoTalkOptionBottomSheetDialogFragment.Kaka
 
                         diaryAdapter.addHeaderAndSubmitList(filteredDiaries)
                     }
+
+                    coroutineScope.launch {
+                        var name: String? = null
+                        launch (Dispatchers.Default) {
+                            name = viewModel.folderDao.getFolderById(viewModel.folderId)?.name
+                        }.join()
+
+                        launch {
+                            name?.let { binding.currentFolder.text = name }
+                            binding.currentFolder.leftDrawable(R.drawable.ic_round_folder_24, R.dimen.dimen_24dp)
+                            binding.currentFolder.setDrawableTint(MainActivity.themeColorSecondary)
+                            binding.currentFolder.setTextColor(ContextCompat.getColor(requireContext(), R.color.color_text_dark))
+                        }
+                    }
                 } else {
+                    // Show all
                     viewModel.originalDiaries?.let {
                         diaryAdapter.addHeaderAndSubmitList(it, false)
                     }
+
+                    binding.currentFolder.text = getString(R.string.show_all)
+                    binding.currentFolder.leftDrawable(R.drawable.ic_round_folder_open_24, R.dimen.dimen_24dp)
+                    binding.currentFolder.setDrawableTint(MainActivity.themeColorSecondary)
+                    binding.currentFolder.setTextColor(ContextCompat.getColor(requireContext(), R.color.color_text_dark))
                 }
             }
         }
@@ -201,10 +249,22 @@ class DiariesFragment: Fragment(), KakaoTalkOptionBottomSheetDialogFragment.Kaka
             val filteredDiaries = mutableListOf<DiaryModel>()
 
             if (viewModel.folderId != DEFAULT_FOLDER_ID) {
-                diaries?.let { it ->
-                    for (diary in it) {
-                        if (diary.folderId == viewModel.folderId)
-                            filteredDiaries.add(diary)
+                /** Hashtag selected */
+                if (viewModel.folderId == HASHTAG_SELECTED) {
+                    diaries?.let { it ->
+                        for (diary in it) {
+                            if (diary.hashTags.contains((requireActivity() as MainActivity)
+                                    .viewModel.selectedHashTag))
+                                filteredDiaries.add(diary)
+                        }
+                    }
+                } else {
+                    /** Folder selected */
+                    diaries?.let { it ->
+                        for (diary in it) {
+                            if (diary.folderId == viewModel.folderId)
+                                filteredDiaries.add(diary)
+                        }
                     }
                 }
 

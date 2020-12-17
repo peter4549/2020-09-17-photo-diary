@@ -17,12 +17,6 @@
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
-            <View
-                android:id="@+id/folderColor"
-                android:layout_width="5dp"
-                android:layout_height="match_parent"
-                tools:background="@color/colorRed200"/>
-
             <TextView
                 android:id="@+id/folderName"
                 android:layout_width="0dp"
@@ -36,7 +30,7 @@
                 android:maxLines="1"
                 android:ellipsize="end"
                 android:gravity="center_vertical"
-                tools:text="폴더 이름"/>
+                tools:text="#해시태그"/>
 
             <TextView
                 android:id="@+id/itemCount"
@@ -45,16 +39,8 @@
                 android:gravity="center"
                 android:padding="8dp"
                 android:textSize="12sp"
+                android:layout_marginEnd="16dp"
                 tools:text="999+"/>
-
-            <ImageView
-                android:id="@+id/editFolder"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginEnd="8dp"
-                app:srcCompat="@drawable/ic_round_more_vert_36"
-                app:tint="@color/icon_color"
-                tools:ignore="ContentDescription" />
 
         </LinearLayout>
     </androidx.cardview.widget.CardView>

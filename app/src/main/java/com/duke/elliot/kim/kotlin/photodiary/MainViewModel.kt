@@ -18,6 +18,7 @@ import timber.log.Timber
 
 const val SHOW_FAVORITES = -2213L
 // DEFAULT_FOLDER_ID is -1L.
+// HASHTAG_SELECTED is -825L.
 
 class MainViewModel(application: Application): AndroidViewModel(application) {
     private val job = Job()
@@ -29,6 +30,8 @@ class MainViewModel(application: Application): AndroidViewModel(application) {
 
     lateinit var folderDao: FolderDao
     lateinit var folders: LiveData<MutableList<FolderModel>>
+
+    lateinit var selectedHashTag: String
 
     var selectedFolderId = MutableLiveData<Long>().apply {
         value = DEFAULT_FOLDER_ID

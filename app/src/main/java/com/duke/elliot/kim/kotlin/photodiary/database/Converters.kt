@@ -4,6 +4,7 @@ import androidx.room.TypeConverter
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.TextOptionsModel
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.MediaModel
 import com.duke.elliot.kim.kotlin.photodiary.folder.FolderModel
+import com.duke.elliot.kim.kotlin.photodiary.google_map.PlaceModel
 import com.google.gson.Gson
 
 class Converters {
@@ -44,4 +45,10 @@ class Converters {
 
     @TypeConverter
     fun jsonToLongArray(value: String): Array<Long> = Gson().fromJson(value, Array<Long>::class.java)
+
+    @TypeConverter
+    fun placeToJson(value: PlaceModel): String = Gson().toJson(value)
+
+    @TypeConverter
+    fun jsonToPlace(value: String): PlaceModel = Gson().fromJson(value, PlaceModel::class.java)
 }

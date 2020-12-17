@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.core.net.toUri
 import androidx.lifecycle.AndroidViewModel
 import com.duke.elliot.kim.kotlin.photodiary.database.DiaryDao
+import com.duke.elliot.kim.kotlin.photodiary.database.DiaryDatabase
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryModel
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.media_helper.MediaHelper
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.media_helper.PhotoHelper
@@ -15,7 +16,7 @@ import kotlinx.coroutines.*
 import timber.log.Timber
 
 class DiariesViewModel(val database: DiaryDao, application: Application): AndroidViewModel(application) {
-    private val fileUtilities = FileUtilities.getInstance(application)
+    // private val fileUtilities = FileUtilities.getInstance(application)
     private val job = Job()
     private val coroutineScope = CoroutineScope(Dispatchers.Main + job)
 
@@ -25,6 +26,8 @@ class DiariesViewModel(val database: DiaryDao, application: Application): Androi
     var folderId = DEFAULT_FOLDER_ID
 
     lateinit var diaryAdapter: DiaryAdapter
+
+    val folderDao = DiaryDatabase.getInstance(application).folderDao()
 
     /*
     fun delete(diary: DiaryModel) {

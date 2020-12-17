@@ -16,8 +16,8 @@ class BackupViewModel(application: Application): ViewModel() {
     private val job = Job()
     private val coroutineScope = CoroutineScope(Dispatchers.IO + job)
     private var fileUtil: FileUtilities = FileUtilities.getInstance(application)
-    private val diaryDao = DiaryDatabase.getInstance(application).diaryDao()
-    private lateinit var diaries: List<DiaryModel>
+    val diaryDao = DiaryDatabase.getInstance(application).diaryDao()
+    lateinit var diaries: List<DiaryModel>
 
     init {
         coroutineScope.launch {

@@ -1,5 +1,6 @@
 package com.duke.elliot.kim.kotlin.photodiary.utility
 
+import android.content.DialogInterface
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -7,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
+import android.widget.AutoCompleteTextView
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
 import com.duke.elliot.kim.kotlin.photodiary.R
@@ -17,6 +19,7 @@ class OkCancelDialogFragment: DialogFragment() {
     private lateinit var binding: FragmentOkCancelDialogBinding
     private lateinit var cancelButtonOnClick: () -> Unit
     private lateinit var okButtonOnClick: () -> Unit
+    private lateinit var onDismissListener: () -> Unit
     private lateinit var title: String
     private lateinit var message: String
 
@@ -31,6 +34,16 @@ class OkCancelDialogFragment: DialogFragment() {
 
     fun setCancelClickEvent(onClick: () -> Unit) {
         this.cancelButtonOnClick = onClick
+    }
+
+    fun setOnDismissListener(onDismissListener: () -> Unit) {
+        this.onDismissListener = onDismissListener
+    }
+
+    override fun onDismiss(dialog: DialogInterface) {
+        if (::onDismissListener.isInitialized)
+            onDismissListener.invoke()
+        super.onDismiss(dialog)
     }
 
     fun setButtonTexts(okButtonText: String?, cancelButtonText: String?) {

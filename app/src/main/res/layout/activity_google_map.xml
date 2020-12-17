@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/dimen_toolbar_height"
+            android:background="@color/colorToolbarBackground"
+            android:elevation="2dp"
+            android:theme="@style/ToolbarTheme"
+            app:title="@string/todays_place"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/locationNameContainer"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:gravity="center_vertical"
+            app:boxBackgroundColor="@color/colorFragmentBackgroundLight"
+            app:boxStrokeColor="@color/icon_color"
+            app:boxStrokeErrorColor="@color/colorError"
+            app:boxStrokeWidth="2dp"
+            app:boxCornerRadiusBottomEnd="8dp"
+            app:boxCornerRadiusBottomStart="8dp"
+            app:boxCornerRadiusTopEnd="8dp"
+            app:boxCornerRadiusTopStart="8dp"
+            app:endIconMode="clear_text"
+            app:endIconTint="@color/icon_color"
+            app:errorEnabled="true"
+            app:errorIconTint="@color/colorError"
+            app:errorTextAppearance="@style/CookieRunFontFamilyStyle"
+            app:errorTextColor="@color/colorError"
+            app:helperTextEnabled="false"
+            app:helperTextTextAppearance="@style/CookieRunFontFamilyStyle"
+            app:hintTextColor="@color/icon_color"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/toolbar">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/locationName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/place_name"
+                android:fontFamily="@font/cookie_run_regular"
+                android:gravity="center_vertical"
+                android:inputType="textPersonName"
+                android:paddingBottom="8dp"
+                android:paddingEnd="16dp"
+                android:paddingStart="16dp"
+                android:paddingTop="8dp"
+                android:textColor="@color/color_text_dark"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintStart_toStartOf="parent" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/placeSearchContainer"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="68dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:gravity="center_vertical"
+            app:boxBackgroundColor="@color/colorFragmentBackgroundLight"
+            app:boxCornerRadiusBottomEnd="8dp"
+            app:boxCornerRadiusBottomStart="8dp"
+            app:boxCornerRadiusTopEnd="8dp"
+            app:boxCornerRadiusTopStart="8dp"
+            app:boxStrokeColor="@color/icon_color"
+            app:boxStrokeErrorColor="@color/colorError"
+            app:boxStrokeWidth="2dp"
+            app:endIconMode="clear_text"
+            app:endIconTint="@color/icon_color"
+            app:errorEnabled="true"
+            app:errorIconTint="@color/colorError"
+            app:errorTextAppearance="@style/CookieRunFontFamilyStyle"
+            app:errorTextColor="@color/colorError"
+            app:helperTextEnabled="false"
+            app:helperTextTextAppearance="@style/CookieRunFontFamilyStyle"
+            app:hintTextColor="@color/icon_color"
+            app:layout_constraintEnd_toStartOf="@+id/myLocation"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/locationNameContainer"
+            app:startIconDrawable="@drawable/ic_round_search_24"
+            app:startIconTint="@color/icon_color">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/placeSearch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/cookie_run_regular"
+                android:gravity="center_vertical"
+                android:hint="@string/place_search"
+                android:inputType="textPersonName"
+                android:paddingStart="16dp"
+                android:paddingTop="8dp"
+                android:paddingEnd="16dp"
+                android:paddingBottom="8dp"
+                android:textColor="@color/color_text_dark"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintStart_toStartOf="parent" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <ImageView
+            android:id="@+id/myLocation"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/placeSearchContainer"
+            app:srcCompat="@drawable/ic_round_my_location_24"
+            app:tint="@color/icon_color"
+            tools:ignore="ContentDescription" />
+
+        <fragment
+            android:id="@+id/googleMap"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/placeSearchContainer"
+            tools:context=".MapsActivity"
+            tools:ignore="FragmentTagUsage" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

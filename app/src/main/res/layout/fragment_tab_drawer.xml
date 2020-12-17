@@ -101,6 +101,7 @@
                     app:drawableStartCompat="@drawable/ic_round_access_alarm_24"
                     app:drawableTint="@color/icon_color"/>
 
+                <!-- Folder -->
                 <LinearLayout
                     android:id="@+id/folderContainer"
                     android:layout_width="match_parent"
@@ -182,6 +183,7 @@
                         android:id="@+id/showAllContainer"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:elevation="2dp"
                         android:background="@color/colorItemBackground"
                         android:foreground="?attr/selectableItemBackground">
 
@@ -191,6 +193,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginEnd="8dp"
                             android:layout_gravity="center"
+                            android:elevation="2dp"
                             android:gravity="center"
                             android:padding="8dp"
                             android:visibility="gone"
@@ -200,6 +203,112 @@
                             app:drawableTint="@color/icon_color"/>
                     </FrameLayout>
                 </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0.5dp"
+                    android:background="@color/icon_color"/>
+                <!-- End of Folder -->
+
+                <!-- Hash Tags -->
+                <LinearLayout
+                    android:id="@+id/hashTagsContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:id="@+id/hashTagsHeader"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="?attr/selectableItemBackground"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_marginEnd="2dp"
+                            android:layout_marginStart="18dp"
+                            android:clickable="false"
+                            android:focusable="false"
+                            app:srcCompat="@drawable/ic_hashtag_21_24"
+                            app:tint="@color/icon_color"
+                            tools:ignore="ContentDescription" />
+
+                        <ImageView
+                            android:id="@+id/showHashTags"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_marginStart="8dp"
+                            android:clickable="false"
+                            android:focusable="false"
+                            app:srcCompat="@drawable/ic_sharp_arrow_drop_down_28"
+                            app:tint="@color/icon_color"
+                            tools:ignore="ContentDescription" />
+
+                        <TextView
+                            android:id="@+id/textHashTags"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/hashtag"
+                            android:drawablePadding="24dp"
+                            android:paddingBottom="8dp"
+                            android:paddingEnd="16dp"
+                            android:paddingStart="8dp"
+                            android:paddingTop="8dp"
+                            android:gravity="center_vertical" />
+
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/hashTagsEmptyMessage"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:gravity="center"
+                        android:padding="8dp"
+                        android:visibility="gone"
+                        android:text="@string/no_folder"
+                        android:textColor="@color/color_text_light" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/hashTagRecyclerView"
+                        android:visibility="gone"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+                    <FrameLayout
+                        android:id="@+id/showAllContainerHashTag"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:elevation="2dp"
+                        android:background="@color/colorItemBackground"
+                        android:foreground="?attr/selectableItemBackground">
+
+                        <TextView
+                            android:id="@+id/showAllHashTag"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="8dp"
+                            android:layout_gravity="center"
+                            android:gravity="center"
+                            android:elevation="2dp"
+                            android:padding="8dp"
+                            android:visibility="gone"
+                            android:text="@string/show_all"
+                            android:drawablePadding="8dp"
+                            app:drawableStartCompat="@drawable/ic_hashtag_21_24"
+                            app:drawableTint="@color/icon_color"/>
+                    </FrameLayout>
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0.5dp"
+                    android:background="@color/icon_color"/>
+                <!-- End of Hash Tag -->
 
             </LinearLayout>
         </com.google.android.material.navigation.NavigationView>

@@ -11,4 +11,7 @@
     <dimen name="dimen_editing_tool_icon_width">32dp</dimen>
 
     <dimen name="spacing_large">16dp</dimen>
+
+    <dimen name="dimen_16dp">16dp</dimen>
+    <dimen name="dimen_24dp">24dp</dimen>
 </resources>

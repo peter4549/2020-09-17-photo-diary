@@ -1,6 +1,7 @@
 package com.duke.elliot.kim.kotlin.photodiary.tab
 
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -26,6 +27,8 @@ import com.duke.elliot.kim.kotlin.photodiary.drawer_items.lock_screen.SetLockScr
 import com.duke.elliot.kim.kotlin.photodiary.folder.DEFAULT_FOLDER_ID
 import com.duke.elliot.kim.kotlin.photodiary.folder.EditFolderDialogFragment
 import com.duke.elliot.kim.kotlin.photodiary.folder.FolderAdapter
+import com.duke.elliot.kim.kotlin.photodiary.hashtag.HASHTAG_SELECTED
+import com.duke.elliot.kim.kotlin.photodiary.hashtag.HashTagAdapter
 import com.duke.elliot.kim.kotlin.photodiary.tab.diary.DiariesFragment
 import com.duke.elliot.kim.kotlin.photodiary.tab.media.PhotosFragment
 import com.duke.elliot.kim.kotlin.photodiary.utility.*
@@ -33,7 +36,7 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_tab_layout.view.*
 import kotlinx.coroutines.*
-
+import java.util.*
 
 class TabFragment: BaseFragment() {
 
@@ -42,6 +45,10 @@ class TabFragment: BaseFragment() {
     private lateinit var binding: FragmentTabDrawerBinding
     private lateinit var folderAdapter: FolderAdapter
     private lateinit var folderDao: FolderDao
+    private lateinit var hashTagAdapter: HashTagAdapter
+
+    private val job = Job()
+    private val coroutineScope = CoroutineScope(Dispatchers.Default + job)
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -89,6 +96,7 @@ class TabFragment: BaseFragment() {
             onBackPressedCallback
         )
 
+        /*
         // TODO: 안쓸듯..
         binding.tabFragment.alarm_test_btn.setOnClickListener {
             /*
@@ -105,6 +113,8 @@ class TabFragment: BaseFragment() {
             */
 
         }
+
+         */
 
         /** Favorites */
         binding.showFavorites.setOnClickListener {
@@ -173,6 +183,18 @@ class TabFragment: BaseFragment() {
                         binding.folderRecyclerView.adapter = folderAdapter
 
                         foldersInitialized = true
+                    } else {
+                        if (folders.isNotEmpty()) {
+                            if (binding.folderRecyclerView.visibility == View.GONE)
+                                binding.folderRecyclerView.crossFadeIn(200)
+
+                            binding.foldersEmptyMessage.visibility = View.GONE
+                        } else {
+                            if (binding.foldersEmptyMessage.visibility == View.GONE)
+                                binding.foldersEmptyMessage.crossFadeIn(200)
+
+                            binding.folderRecyclerView.visibility = View.GONE
+                        }
                     }
 
                     folderAdapter.submitList(folders)
@@ -183,12 +205,14 @@ class TabFragment: BaseFragment() {
 
         binding.showFolders.rotate(180F, 0)
         binding.folderHeaderContainer.setOnClickListener {
-            val isVisible = binding.folderRecyclerView.visibility == View.VISIBLE
+            val isVisible = binding.folderRecyclerView.visibility == View.VISIBLE ||
+                    binding.foldersEmptyMessage.visibility == View.VISIBLE
             val itemCount = folderAdapter.itemCount
 
             if (isVisible) {
                 if (itemCount == 0) {
-                    binding.foldersEmptyMessage.crossFadeOut(200)
+                    if (binding.foldersEmptyMessage.visibility == View.VISIBLE)
+                        binding.foldersEmptyMessage.crossFadeOut(200)
                     binding.folderRecyclerView.visibility = View.GONE
                 } else {
                     binding.foldersEmptyMessage.visibility = View.GONE
@@ -201,13 +225,12 @@ class TabFragment: BaseFragment() {
                 if (itemCount == 0) {
                     binding.foldersEmptyMessage.crossFadeIn(200)
                     binding.folderRecyclerView.visibility = View.GONE
-                    binding.showFolders.rotate(180F, 200)
                 } else {
                     binding.foldersEmptyMessage.visibility = View.GONE
                     binding.folderRecyclerView.crossFadeIn(200)
-                    binding.showFolders.rotate(0F, 200)
                 }
 
+                binding.showFolders.rotate(0F, 200)
                 binding.showAll.crossFadeIn(200)
             }
         }
@@ -225,13 +248,77 @@ class TabFragment: BaseFragment() {
             (requireActivity() as MainActivity).setFolderId(DEFAULT_FOLDER_ID)
         }
 
+        /** Hash Tags */
+        var hashTagsInitialized = false
+
+        DiaryDatabase.getInstance(requireContext()).diaryDao().getAll().observe(viewLifecycleOwner) { diaries ->
+            val hashTags = diaries.map { it.hashTags }.flatMap { it.toList() }
+            val hashTagMap = mutableMapOf<String, Int>()
+
+            for (hashTag in hashTags) {
+                if (!hashTagMap.keys.contains(hashTag))
+                    hashTagMap[hashTag] = Collections.frequency(hashTags, hashTag)
+            }
+
+            if (!hashTagsInitialized) {
+                hashTagAdapter = HashTagAdapter { hashTag ->
+                    (requireActivity() as MainActivity).viewModel.selectedHashTag = hashTag
+                    (requireActivity() as MainActivity).setFolderId(HASHTAG_SELECTED)
+                }
+                binding.hashTagRecyclerView.layoutManager =
+                    GridLayoutManagerWrapper(requireContext(), 1)
+                binding.hashTagRecyclerView.adapter = hashTagAdapter
+                hashTagAdapter.submitList(hashTagMap.toList())
+
+                hashTagsInitialized = true
+            } else
+                hashTagAdapter.submitList(hashTagMap.toList())
+        }
+
+        /** Hash Tag Views */
+        binding.showHashTags.rotate(180F, 0)
+        binding.hashTagsHeader.setOnClickListener {
+            val isVisible = binding.hashTagRecyclerView.visibility == View.VISIBLE ||
+                    binding.hashTagsEmptyMessage.visibility == View.VISIBLE
+            val itemCount = hashTagAdapter.itemCount
+
+            if (isVisible) {
+                if (itemCount == 0) {
+                    if (binding.hashTagsEmptyMessage.visibility == View.VISIBLE)
+                        binding.hashTagsEmptyMessage.crossFadeOut(200)
+                    binding.hashTagRecyclerView.visibility = View.GONE
+                } else {
+                    binding.hashTagsEmptyMessage.visibility = View.GONE
+                    binding.hashTagRecyclerView.crossFadeOut(200)
+                }
+
+                binding.showHashTags.rotate(180F, 200)
+                binding.showAllHashTag.crossFadeOut(200)
+            } else {
+                if (itemCount == 0) {
+                    binding.hashTagsEmptyMessage.crossFadeIn(200)
+                    binding.hashTagRecyclerView.visibility = View.GONE
+                } else {
+                    binding.hashTagsEmptyMessage.visibility = View.GONE
+                    binding.hashTagRecyclerView.crossFadeIn(200)
+                }
+
+                binding.showHashTags.rotate(0F, 200)
+                binding.showAllHashTag.crossFadeIn(200)
+            }
+        }
+
+        binding.showAllContainerHashTag.setOnClickListener {
+            (requireActivity() as MainActivity).setFolderId(DEFAULT_FOLDER_ID)
+        }
+
         return binding.root
     }
 
     override fun onResume() {
         super.onResume()
         applyPrimaryThemeColor(binding.tabFragment.toolbar)
-        binding.tabFragment.fab_write_diary.setBackgroundColor(MainActivity.themeColorPrimary)
+        binding.tabFragment.fab_write_diary.backgroundTintList = ColorStateList.valueOf(MainActivity.themeColorPrimary)
     }
 
     private fun initializeNavigationDrawer() {

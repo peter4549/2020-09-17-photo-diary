@@ -2,9 +2,15 @@ package com.duke.elliot.kim.kotlin.photodiary.drive
 
 import android.content.Context
 import android.net.Uri
+import com.duke.elliot.kim.kotlin.photodiary.R
 import com.duke.elliot.kim.kotlin.photodiary.database.DIARY_DATABASE_NAME
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.MediaModel
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.media_helper.MediaHelper
+import com.duke.elliot.kim.kotlin.photodiary.utility.getCurrentTime
+import com.duke.elliot.kim.kotlin.photodiary.utility.toDateFormat
+import com.google.android.gms.tasks.Task
+import com.google.android.gms.tasks.Tasks
+import com.google.api.client.http.ByteArrayContent
 import com.google.api.client.http.FileContent
 import com.google.api.services.drive.Drive
 import com.google.api.services.drive.model.File
@@ -16,13 +22,20 @@ import java.util.concurrent.Executors
 import java.util.concurrent.Future
 import java.util.concurrent.TimeUnit
 
+private const val BACKUP_METADATA_FILE_NAME = "backup_metadata.txt"
+
 class DriveServiceHelper(private val drive: Drive) {
 
-    private val executor = Executors.newSingleThreadExecutor()
+    private val executor = Executors.newFixedThreadPool(10)
+    private val metadataExecutor = Executors.newSingleThreadExecutor()
 
-    fun restore(context: Context, completeListener: ((result: Boolean, downloadedFilePaths: List<String>?) -> Unit)?) {
+    fun restore(
+        context: Context,
+        completeListener: ((result: Boolean, downloadedFilePaths: List<String>?) -> Unit)?
+    ) {
         var executeFailed = false
         val files = drive.files().list()
+            .setQ("name != '${BACKUP_METADATA_FILE_NAME}'")
             .setSpaces("appDataFolder")
             .execute().files
 
@@ -65,7 +78,7 @@ class DriveServiceHelper(private val drive: Drive) {
 
         executor.shutdown()
 
-        if(executor.awaitTermination(120, TimeUnit.MINUTES)) {
+        if (executor.awaitTermination(120, TimeUnit.MINUTES)) {
             Timber.d("Backup success.")
         } else {
             Timber.d("Backup failure.")
@@ -87,55 +100,67 @@ class DriveServiceHelper(private val drive: Drive) {
         }
     }
 
-    fun backup(context: Context, mediaList: List<MediaModel>,
-               completeListener: ((result: Boolean) -> Unit)?) {
+    fun backup(
+        context: Context, mediaList: List<MediaModel>,
+        completeListener: ((result: Boolean, errorMessage: String?) -> Unit)?
+    ) {
         var executeFailed = false
         val futures = mutableListOf<Future<String?>?>()
-        val databaseFilePaths = arrayOf(DIARY_DATABASE_NAME, "$DIARY_DATABASE_NAME-shm", "$DIARY_DATABASE_NAME-wal")
+        val databaseFilePaths = arrayOf(
+            DIARY_DATABASE_NAME,
+            "$DIARY_DATABASE_NAME-shm",
+            "$DIARY_DATABASE_NAME-wal"
+        )
 
-        val future = executor.submit<List<String>> {
-            drive.files().list()
-                .setSpaces("appDataFolder")
-                .execute().files.map { it.id }
-        }
+        try {
+            val future = executor.submit<List<String>> {
+                drive.files().list()
+                    .setSpaces("appDataFolder")
+                    .execute().files.map { it.id }
+            }
 
-        /** Database */
-        for (databaseFilePath in databaseFilePaths) {
-            futures.add(executor.submit<String> {
-                backupDatabaseFile(
-                    context.getDatabasePath(databaseFilePath), databaseFilePath)
-            })
-        }
+            /** Database */
+            for (databaseFilePath in databaseFilePaths) {
+                futures.add(executor.submit<String> {
+                    backupDatabaseFile(
+                        context.getDatabasePath(databaseFilePath), databaseFilePath
+                    )
+                })
+            }
 
-        /** Media */
-        for (media in mediaList) {
-            futures.add(executor.submit<String> {
-                backupMediaFile(media)
-            })
-        }
+            /** Media */
+            for (media in mediaList) {
+                futures.add(executor.submit<String> {
+                    backupMediaFile(media)
+                })
+            }
 
-        executor.shutdown()
+            executor.shutdown()
 
-        if(executor.awaitTermination(120, TimeUnit.MINUTES)) {
-            Timber.d("Backup success.")
-        } else {
-            Timber.d("Backup failure.")
-            executeFailed = true
-            executor.shutdownNow()
-        }
+            if (executor.awaitTermination(120, TimeUnit.MINUTES)) {
+                Timber.d("Backup success.")
+            } else {
+                Timber.d("Backup failure.")
+                executeFailed = true
+                executor.shutdownNow()
+            }
 
-        val existingBackedUpMediaFileIds = future.get() ?: listOf()
-        val backedUpFileIds = futures.map { it?.get() }
+            val existingBackedUpMediaFileIds = future.get() ?: listOf()
+            val backedUpFileIds = futures.map { it?.get() }
 
-        if (backedUpFileIds.contains(null))
-            executeFailed = true
+            if (backedUpFileIds.contains(null))
+                executeFailed = true
 
-        if (executeFailed) {
-            completeListener?.invoke(false)
-            deleteGoogleDriveFiles(backedUpFileIds.requireNoNulls())
-        } else {
-            completeListener?.invoke(true)
-            deleteGoogleDriveFiles(existingBackedUpMediaFileIds)
+            if (executeFailed) { // Failure
+                completeListener?.invoke(false, null)
+                deleteGoogleDriveFiles(backedUpFileIds.requireNoNulls())
+            } else { // Success
+                completeListener?.invoke(true, null)
+                deleteGoogleDriveFiles(existingBackedUpMediaFileIds)
+            }
+        } catch (e: Exception) {
+            Timber.e(e)
+            completeListener?.invoke(false, e.message)
         }
     }
 
@@ -151,19 +176,19 @@ class DriveServiceHelper(private val drive: Drive) {
      * https://developers.google.com/drive/api/v3/mime-types
      */
     private fun backupDatabaseFile(backupDatabaseFile: java.io.File, name: String): String? {
-            val metadata = File()
-                .setParents(Collections.singletonList("appDataFolder"))
-                .setMimeType("application/x-sqlite3")
-                .setName(name)
+        val metadata = File()
+            .setParents(Collections.singletonList("appDataFolder"))
+            .setMimeType("application/x-sqlite3")
+            .setName(name)
 
-            val fileContent = FileContent("application/x-sqlite3", backupDatabaseFile)
+        val fileContent = FileContent("application/x-sqlite3", backupDatabaseFile)
 
-            val file = drive.files().create(metadata, fileContent)
-                .setFields("id")
-                .execute()
-                ?: throw IOException("Null result when requesting file creation.")
+        val file = drive.files().create(metadata, fileContent)
+            .setFields("id")
+            .execute()
+            ?: throw IOException("Null result when requesting file creation.")
 
-            return file.id
+        return file.id
     }
 
     private fun backupMediaFile(media: MediaModel): String? {
@@ -219,11 +244,60 @@ class DriveServiceHelper(private val drive: Drive) {
         }
     }
 
-    private fun createMetadata() {
+    fun createMetadata(context: Context, diaryCount: Long): Task<String> =
+        Tasks.call(metadataExecutor, {
+            val metadataFiles = drive.files().list()
+                .setSpaces("appDataFolder")
+                .setQ("name = '$BACKUP_METADATA_FILE_NAME'")
+                .execute().files
 
+            for (metadataFile in metadataFiles) {
+                drive.files().delete(metadataFile.id)
+            }
+
+            val fileMetadata = File()
+            fileMetadata.parents = Collections.singletonList("appDataFolder")
+            fileMetadata.name = BACKUP_METADATA_FILE_NAME
+            fileMetadata.mimeType = "text/plain"
+
+            val stringBuilder = StringBuilder()
+            stringBuilder.append(
+                "${context.getString(R.string.last_backup_date)}: ${
+                    getCurrentTime().toDateFormat(
+                        "yyyy.M.d  aa h:m"
+                    )
+                }_"
+            )
+            stringBuilder.append("${context.getString(R.string.last_backup_device)}: ${android.os.Build.MODEL}_")
+            stringBuilder.append("${context.getString(R.string.backed_up_diary_count)}: $diaryCount")
+
+            val contentStream = ByteArrayContent.fromString ("text/plain", stringBuilder.toString())
+
+            drive.files().create(fileMetadata, contentStream).execute().id
+        })
+
+    fun readMetadata(): Task<String?>? {
+        return Tasks.call(metadataExecutor, {
+
+            val metadataFiles = drive.files().list()
+                .setSpaces("appDataFolder")
+                .setQ("name = '$BACKUP_METADATA_FILE_NAME'")
+                .execute().files
+
+            val metadataFileId = metadataFiles[0].id ?: return@call null
+
+            drive.files().get(metadataFileId).executeMediaAsInputStream().use { inputStream ->
+                BufferedReader(InputStreamReader(inputStream)).use { reader ->
+                    val stringBuilder = StringBuilder()
+                    var line: String?
+                    while (reader.readLine().also { line = it } != null) {
+                        stringBuilder.append(line)
+                    }
+
+                    return@call stringBuilder.toString().replace("_", "\n")
+                }
+            }
+        })
     }
 
-    private fun getMetadata() {
-
-    }
 }

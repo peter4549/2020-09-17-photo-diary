@@ -152,4 +152,8 @@ dependencies {
 
     implementation group: 'com.google.api-client', name: 'google-api-client', version: '1.26.0'
     implementation group: 'com.google.api-client', name: 'google-api-client-android', version: '1.26.0'
+
+    // Google Map
+    implementation 'com.google.android.gms:play-services-location:17.1.0'
+    implementation 'com.google.android.gms:play-services-maps:17.0.0'
 }

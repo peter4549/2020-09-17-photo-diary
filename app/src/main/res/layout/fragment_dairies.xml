@@ -14,6 +14,26 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <TextView
+            android:id="@+id/currentFolder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorItemBackground"
+            android:gravity="center_vertical"
+            android:paddingBottom="8dp"
+            android:paddingEnd="16dp"
+            android:paddingStart="16dp"
+            android:paddingTop="8dp"
+            android:drawablePadding="16dp"
+            tools:text="모두 보기"
+            android:textSize="16sp"
+            android:elevation="2dp"
+            app:drawableStartCompat="@drawable/ic_round_folder_open_24"
+            app:drawableTint="@color/colorDefaultThemePrimary"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_view_diary"
             android:layout_width="0dp"
@@ -23,7 +43,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@id/currentFolder" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

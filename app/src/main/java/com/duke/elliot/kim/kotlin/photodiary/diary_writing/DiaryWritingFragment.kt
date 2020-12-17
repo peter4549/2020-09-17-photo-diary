@@ -907,6 +907,10 @@ class DiaryWritingFragment: Fragment() {
                     EDIT_MODE -> updateDiary()
                 }
             }
+            R.id.location -> {
+                val intent = Intent()
+                intent.putExtra("a", viewModel.originDiary!!)
+            }
         }
         return super.onOptionsItemSelected(item)
     }
@@ -1227,6 +1231,7 @@ class DiaryWritingFragment: Fragment() {
             return false
         } else {
             val originDiary = viewModel.originDiary!!
+
             if (originDiary.title != binding.editTextTitle.text.toString() ||
                     originDiary.content != binding.editTextContent.text.toString() ||
                     originDiary.weatherIconIndex != viewModel.weatherIconIndex)
@@ -1241,7 +1246,8 @@ class DiaryWritingFragment: Fragment() {
             if (!originDiary.hashTags.contentEquals(viewModel.selectedHashTags.toTypedArray()))
                 return true
 
-            if (originDiary.folderId != viewModel.folder?.id)
+            val currentFolderId = viewModel.folder?.id ?: DEFAULT_FOLDER_ID
+            if (originDiary.folderId != currentFolderId)
                 return true
 
             return false

@@ -200,6 +200,8 @@ class MainActivity : AppCompatActivity() {
 
     fun getSelectedFolderId() = viewModel.selectedFolderId
 
+    fun getContext() = this
+
     companion object {
         const val DEFAULT_FONT_ID = R.font.cookie_run_regular
         var fontNameIdMap: MutableMap<String, Int> = mutableMapOf()

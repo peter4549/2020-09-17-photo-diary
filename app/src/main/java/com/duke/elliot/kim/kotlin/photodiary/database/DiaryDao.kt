@@ -32,4 +32,7 @@ interface DiaryDao {
 
     @Query("UPDATE diary SET folderId = :newId WHERE id = :oldId")
     fun updateFolderId(oldId: Long, newId: Long = DEFAULT_FOLDER_ID)
+
+    @Query("SELECT COUNT(id) FROM diary")
+    fun getDiaryCount(): Long
 }

@@ -3,19 +3,21 @@ package com.duke.elliot.kim.kotlin.photodiary.drawer_items.backup
 import android.Manifest
 import android.app.Activity.RESULT_OK
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
+import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import com.duke.elliot.kim.kotlin.photodiary.MainActivity
 import com.duke.elliot.kim.kotlin.photodiary.R
 import com.duke.elliot.kim.kotlin.photodiary.base.BaseFragment
 import com.duke.elliot.kim.kotlin.photodiary.database.DIARY_DATABASE_NAME
-import com.duke.elliot.kim.kotlin.photodiary.database.DiaryDatabase
 import com.duke.elliot.kim.kotlin.photodiary.databinding.FragmentBackupBinding
 import com.duke.elliot.kim.kotlin.photodiary.drive.DriveServiceHelper
 import com.duke.elliot.kim.kotlin.photodiary.utility.OkCancelDialogFragment
@@ -25,6 +27,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.Scope
+import com.google.android.material.snackbar.Snackbar
 import com.google.api.client.extensions.android.http.AndroidHttp
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
 import com.google.api.client.json.gson.GsonFactory
@@ -71,21 +74,53 @@ class BackupFragment: BaseFragment() {
         viewModel = ViewModelProvider(viewModelStore, viewModelFactory)[BackupViewModel::class.java]
 
         binding.dataBackup.setOnClickListener {
-            mode = BACKUP_TO_GOOGLE_DRIVE
-            createPermissionListener(BACKUP_TO_GOOGLE_DRIVE)
+            val title = getString(R.string.data_backup)
+            val message = getString(R.string.data_backup_message)
+            val confirmDialog = OkCancelDialogFragment().apply {
+                setDialogParameters(title, message) {
+                    mode = BACKUP_TO_GOOGLE_DRIVE
+                    createPermissionListener(BACKUP_TO_GOOGLE_DRIVE)
+                }
+            }
+
+            confirmDialog.show(requireActivity().supportFragmentManager, confirmDialog.tag)
         }
 
         binding.restoreData.setOnClickListener {
-            mode = RESTORE_FROM_GOOGLE_DRIVE
-            createPermissionListener(RESTORE_FROM_GOOGLE_DRIVE)
+            val title = getString(R.string.restore_data)
+            val message = getString(R.string.data_restore_message)
+            val confirmDialog = OkCancelDialogFragment().apply {
+                setDialogParameters(title, message) {
+                    mode = RESTORE_FROM_GOOGLE_DRIVE
+                    createPermissionListener(RESTORE_FROM_GOOGLE_DRIVE)
+                }
+            }
+
+            confirmDialog.show(requireActivity().supportFragmentManager, confirmDialog.tag)
         }
 
         binding.backupToInternalStorage.setOnClickListener {
-            createPermissionListener(BACKUP_TO_INTERNAL_STORAGE)
+            val title = getString(R.string.data_backup)
+            val message = getString(R.string.data_backup_message)
+            val confirmDialog = OkCancelDialogFragment().apply {
+                setDialogParameters(title, message) {
+                    createPermissionListener(BACKUP_TO_INTERNAL_STORAGE)
+                }
+            }
+
+            confirmDialog.show(requireActivity().supportFragmentManager, confirmDialog.tag)
         }
 
         binding.restoreFromInternalStorage.setOnClickListener {
-            createPermissionListener(RESTORE_FROM_INTERNAL_STORAGE)
+            val title = getString(R.string.restore_data)
+            val message = getString(R.string.data_restore_message)
+            val confirmDialog = OkCancelDialogFragment().apply {
+                setDialogParameters(title, message) {
+                    createPermissionListener(RESTORE_FROM_INTERNAL_STORAGE)
+                }
+            }
+
+            confirmDialog.show(requireActivity().supportFragmentManager, confirmDialog.tag)
         }
 
         return binding.root
@@ -97,15 +132,33 @@ class BackupFragment: BaseFragment() {
                 when(mode) {
                     BACKUP_TO_GOOGLE_DRIVE -> requestGoogleSignIn()
                     RESTORE_FROM_GOOGLE_DRIVE -> requestGoogleSignIn()
-                    BACKUP_TO_INTERNAL_STORAGE -> backup()
-                    RESTORE_FROM_INTERNAL_STORAGE -> restore()
+                    BACKUP_TO_INTERNAL_STORAGE -> {
+                        val title = getString(R.string.data_backup)
+                        val message = getString(R.string.data_backup_message)
+                        val backupConfirmDialog = OkCancelDialogFragment().apply {
+                            setDialogParameters(title, message) {
+                                backup()
+                            }
+                        }
+
+                        backupConfirmDialog.show(requireActivity().supportFragmentManager, backupConfirmDialog.tag)
+                    }
+                    RESTORE_FROM_INTERNAL_STORAGE -> {
+                        val title = getString(R.string.restore_data)
+                        val message = getString(R.string.data_restore_message)
+                        val restoreConfirmDialog = OkCancelDialogFragment().apply {
+                            setDialogParameters(title, message) {
+                                restore()
+                            }
+                        }
+
+                        restoreConfirmDialog.show(requireActivity().supportFragmentManager, restoreConfirmDialog.tag)
+                    }
                 }
             }
 
             override fun onPermissionDenied(response: PermissionDeniedResponse) {
-                showToast(requireContext(), "DDDD")
-                // TODO make ok dialog.
-
+               showSnackbarOnDenied()
             }
 
             override fun onPermissionRationaleShouldBeShown(
@@ -134,6 +187,10 @@ class BackupFragment: BaseFragment() {
             setCancelClickEvent {
                 token.cancelPermissionRequest()
             }
+
+            setOnDismissListener {
+                token.cancelPermissionRequest()
+            }
         }
 
         requestPermissionDialog.show(
@@ -147,7 +204,7 @@ class BackupFragment: BaseFragment() {
         CoroutineScope(Dispatchers.Default).launch {
             showProgressBar()
 
-            val diaries = DiaryDatabase.getInstance(requireContext()).diaryDao().getAllValues()
+            val diaries = viewModel.diaries
             val mediaAbsolutePaths = mutableListOf<String>()
             for (diary in diaries) {
                 mediaAbsolutePaths += diary.getAllMediaAbsolutePaths()
@@ -218,13 +275,12 @@ class BackupFragment: BaseFragment() {
 
         when (requestCode) {
             REQUEST_CODE_GOOGLE_SIGN_IN ->
-                if (resultCode == RESULT_OK && data != null) {
-                    setBackupInformationUI()
+                if (resultCode == RESULT_OK && data != null)
                     handleSignInResult(data)
-                }
         }
     }
 
+    /** Google Drive Backup */
     private fun handleSignInResult(data: Intent) {
         GoogleSignIn.getSignedInAccountFromIntent(data)
             .addOnSuccessListener { googleAccount: GoogleSignInAccount ->
@@ -246,22 +302,37 @@ class BackupFragment: BaseFragment() {
                 // Its instantiation is required before handling any onClick actions.
                 driveServiceHelper = DriveServiceHelper(googleDriveService)
 
-               // val kk =
+                setBackupInformationUI()
 
                 when(mode) {
                     BACKUP_TO_GOOGLE_DRIVE -> {
                         CoroutineScope(Dispatchers.IO).launch {
                             showProgressBar()
                             driveServiceHelper.backup(
-                                requireContext(),
+                                this@BackupFragment.requireContext(),
                                 viewModel.getAllMedia()
-                            ) { result ->
+                            ) { result, errorMessage ->
                                 dismissProgressBar()
 
                                 if (result) {
-                                    showToast(requireContext(), getString(R.string.data_backed_up))
+                                    showToast(
+                                        this@BackupFragment.requireContext(),
+                                        this@BackupFragment.requireContext().getString(R.string.data_backed_up)
+                                    )
+
+                                    CoroutineScope(Dispatchers.Default).launch {
+                                        val diaryCount = viewModel.diaryDao.getDiaryCount()
+                                        driveServiceHelper.createMetadata(requireContext(), diaryCount).addOnSuccessListener {
+                                            Timber.d("Metadata file created: $it")
+                                            readAndDisplayBackupMetadata(driveServiceHelper)
+                                        }.addOnFailureListener {
+                                            Timber.e(it)
+                                        }
+                                    }
                                 } else {
-                                    showToast(requireContext(), getString(R.string.data_backup_failed))
+                                    showToast(
+                                        this@BackupFragment.requireContext(),
+                                        "${this@BackupFragment.requireContext().getString(R.string.data_backup_failed)}: $errorMessage")
                                 }
                             }
                         }
@@ -272,6 +343,7 @@ class BackupFragment: BaseFragment() {
                             cacheCurrentDatabase()
 
                             showProgressBar()
+
                             driveServiceHelper.restore(requireContext()) { result, downloadedFilePaths ->
                                 dismissProgressBar()
 
@@ -286,7 +358,10 @@ class BackupFragment: BaseFragment() {
                                 } else {
                                     restoreCurrentDatabase()
                                     downloadedFilePaths?.let { viewModel.deleteFiles(it) }
-                                    showToast(requireContext(), getString(R.string.data_restore_failed))
+                                    showToast(
+                                        requireContext(),
+                                        getString(R.string.data_restore_failed)
+                                    )
                                 }
                             }
                         }
@@ -342,8 +417,52 @@ class BackupFragment: BaseFragment() {
     }
 
     private fun setBackupInformationUI() {
-        binding.backupAccount.text = getSignedInGoogleAccount() ?: ""
+        val googleSignInAccount = GoogleSignIn.getLastSignedInAccount(activity) ?: return
+
+        val credential = GoogleAccountCredential.usingOAuth2(
+            requireActivity(), Collections.singleton(DriveScopes.DRIVE_FILE)
+        )
+
+        credential.selectedAccount = googleSignInAccount.account
+
+        val googleDriveService = Drive.Builder(
+            AndroidHttp.newCompatibleTransport(),
+            GsonFactory(),
+            credential
+        )
+            .setApplicationName("Drive API Migration")
+            .build()
+
+        driveServiceHelper = DriveServiceHelper(googleDriveService)
+        readAndDisplayBackupMetadata(driveServiceHelper)
+
+        binding.backupAccount.text = googleSignInAccount.email ?: ""
+
     }
 
-    private fun getSignedInGoogleAccount() = GoogleSignIn.getLastSignedInAccount(activity)?.email
+    private fun readAndDisplayBackupMetadata(driveServiceHelper: DriveServiceHelper) {
+        driveServiceHelper.readMetadata()?.addOnSuccessListener {
+            it?.let { metadata -> binding.backupInformation.text = metadata }
+        }?.addOnFailureListener {
+            Timber.e(it)
+        }
+    }
+
+    private fun showSnackbarOnDenied() {
+        val snackbar = Snackbar
+            .make(binding.root, getString(R.string.snackbar_on_denied_message), Snackbar.LENGTH_LONG)
+            .setAction(getString(R.string.settings)) {
+                openApplicationSettings()
+            }
+            .setActionTextColor(ContextCompat.getColor(requireContext(), R.color.colorPositiveButton))
+
+        snackbar.show()
+    }
+
+    private fun openApplicationSettings() {
+        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+        val uri = Uri.fromParts("package", requireContext().packageName, null)
+        intent.data = uri
+        startActivity(intent)
+    }
 }
