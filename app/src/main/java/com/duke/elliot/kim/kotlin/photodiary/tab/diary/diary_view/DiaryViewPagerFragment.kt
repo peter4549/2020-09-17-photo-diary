@@ -80,6 +80,7 @@ class DiaryViewPagerFragment: Fragment(),
         bottomSheetDialogFragment =
             KakaoTalkOptionBottomSheetDialogFragment().apply {
                 setKakaoTalkOptionClickListener(this@DiaryViewPagerFragment)
+                
             }
 
         mediaPicker = MediaPickerBottomSheetDialogFragment().apply {
