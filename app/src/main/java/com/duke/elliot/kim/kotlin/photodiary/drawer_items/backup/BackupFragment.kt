@@ -450,7 +450,7 @@ class BackupFragment: BaseFragment() {
 
     private fun showSnackbarOnDenied() {
         val snackbar = Snackbar
-            .make(binding.root, getString(R.string.snackbar_on_denied_message), Snackbar.LENGTH_LONG)
+            .make(binding.root, getString(R.string.snackbar_on_denied_message_storage), Snackbar.LENGTH_LONG)
             .setAction(getString(R.string.settings)) {
                 openApplicationSettings()
             }

@@ -38,6 +38,9 @@ import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.photo_editor.Ph
 import com.duke.elliot.kim.kotlin.photodiary.folder.DEFAULT_FOLDER_ID
 import com.duke.elliot.kim.kotlin.photodiary.folder.FolderModel
 import com.duke.elliot.kim.kotlin.photodiary.folder.SelectFolderDialogFragment
+import com.duke.elliot.kim.kotlin.photodiary.google_map.GoogleMapActivity
+import com.duke.elliot.kim.kotlin.photodiary.google_map.KEY_GOOGLE_MAP_PLACE
+import com.duke.elliot.kim.kotlin.photodiary.google_map.PlaceModel
 import com.duke.elliot.kim.kotlin.photodiary.utility.*
 import com.google.android.material.chip.Chip
 import com.skydoves.colorpickerview.ColorPickerDialog
@@ -52,6 +55,8 @@ import java.util.*
 const val CREATE_MODE = 0
 const val EDIT_MODE = 1
 const val DATE_OTHER_THAN_TODAY = 2
+
+const val PLACE_REQUEST_CODE = 1052
 
 class DiaryWritingFragment: Fragment() {
 
@@ -302,6 +307,8 @@ class DiaryWritingFragment: Fragment() {
         )
 
         initializeToolbar(binding.toolbar)
+        applyPrimaryThemeColor(binding.toolbar)
+        applySecondaryThemeColor(binding.container, binding.frameLayoutDropdown)
 
         progressDialogFragment = ProgressDialogFragment.instance
 
@@ -431,6 +438,7 @@ class DiaryWritingFragment: Fragment() {
         initializeOptionItems()
         initializeTextItems()
         initChipGroup()
+        initPlaceChipGroup()
 
         binding.imageFolder.setOnClickListener {
             if (layoutOptionItemsIsShown) {
@@ -645,6 +653,10 @@ class DiaryWritingFragment: Fragment() {
 
             binding.chipGroup.addView(chip)
         }
+    }
+
+    private fun initPlaceChipGroup() {
+        viewModel.place?.let { addPlaceChip(it) }
     }
 
     private fun initializeSpinners() {
@@ -908,8 +920,9 @@ class DiaryWritingFragment: Fragment() {
                 }
             }
             R.id.location -> {
-                val intent = Intent()
-                intent.putExtra("a", viewModel.originDiary!!)
+                val intent = Intent(requireContext(), GoogleMapActivity::class.java)
+                intent.putExtra(KEY_GOOGLE_MAP_PLACE, viewModel.place)
+                startActivityForResult(intent, PLACE_REQUEST_CODE)
             }
         }
         return super.onOptionsItemSelected(item)
@@ -957,7 +970,6 @@ class DiaryWritingFragment: Fragment() {
                                         uri,
                                         suffix = "_${timestamp}"
                                     )?.let { copiedUri ->
-                                        println("FILE COPIED222!!!!, $copiedUri")
                                         itemCount += 1
                                         if (itemCount >= totalItemCount)
                                             progressDialogFragment.dismiss()
@@ -1039,7 +1051,6 @@ class DiaryWritingFragment: Fragment() {
                                     }
                                 }
                             } ?: run {
-                                // TODO: Change Message Image -> VIDEO
                                 progressDialogFragment.dismiss()
                                 showToast(
                                     requireContext(),
@@ -1162,6 +1173,10 @@ class DiaryWritingFragment: Fragment() {
                         showToast(requireContext(), getString(R.string.failed_to_load_image))
                     }
                 }
+                PLACE_REQUEST_CODE -> {
+                    val place = data?.getParcelableExtra<PlaceModel>(KEY_GOOGLE_MAP_PLACE)
+                    place?.let { addPlaceChip(it) }
+                }
             }
         }
     }
@@ -1209,6 +1224,7 @@ class DiaryWritingFragment: Fragment() {
                 diary.weatherIconIndex = viewModel.weatherIconIndex
                 diary.hashTags = viewModel.selectedHashTags.toTypedArray()
                 diary.folderId = viewModel.folder?.id ?: DEFAULT_FOLDER_ID
+                diary.place = viewModel.place ?: createNoPlace()
             } ?: run {
                 showToast(requireContext(), "원본 다이어리가 손상되었습니다.") // TODO change to resource
                 saveDiary(createDiary())
@@ -1266,7 +1282,8 @@ class DiaryWritingFragment: Fragment() {
             liked = false,
             weatherIconIndex = viewModel.weatherIconIndex,
             hashTags = viewModel.selectedHashTags.toTypedArray(),
-            folderId = viewModel.folder?.id ?: DEFAULT_FOLDER_ID
+            folderId = viewModel.folder?.id ?: DEFAULT_FOLDER_ID,
+            place = viewModel.place ?: createNoPlace()
         )
     }
 
@@ -1278,6 +1295,8 @@ class DiaryWritingFragment: Fragment() {
         textStyleBold = viewModel.textStyleBold,
         textStyleItalic = viewModel.textStyleItalic
     )
+
+    private fun createNoPlace() = PlaceModel(false, "", 0.0, 0.0)
 
     private fun showOptionItems(view: View) {
         binding.layoutPhotoOptionItems.visibility = View.GONE
@@ -1535,6 +1554,45 @@ class DiaryWritingFragment: Fragment() {
             return true
 
         return false
+    }
+
+    /** Add Place Chip */
+    private fun addPlaceChip(place: PlaceModel) {
+        viewModel.place?.let { _ ->
+            val chip = binding.locationChipGroup.getChildAt(0) as? Chip
+            chip?.text = place.name
+            chip?.invalidate()
+        } ?: run {
+            val chip = Chip(requireContext())
+            chip.text = place.name
+            chip.chipIcon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_round_location_on_24)
+            chip.chipIconSize = convertDpToPx(requireContext(), 20F)
+
+            chip.setChipIconTintResource(R.color.icon_color)
+            chip.setTextAppearanceResource(R.style.ChipFontStyle)
+            chip.setOnCloseIconClickListener {
+                binding.locationChipGroup.removeView(it)
+                viewModel.place = null
+            }
+
+            binding.locationChipGroup.addView(chip)
+        }
+
+        viewModel.place = place
+    }
+
+    private fun applyPrimaryThemeColor(vararg views: View) {
+        for (view in views) {
+            view.setBackgroundColor(MainActivity.themeColorPrimary)
+            view.invalidate()
+        }
+    }
+
+    private fun applySecondaryThemeColor(vararg views: View) {
+        for (view in views) {
+            view.setBackgroundColor(MainActivity.themeColorSecondary)
+            view.invalidate()
+        }
     }
 
     companion object {

@@ -1,12 +1,14 @@
 package com.duke.elliot.kim.kotlin.photodiary.drawer_items.lock_screen
 
 import android.os.Bundle
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import com.beautycoder.pflockscreen.PFFLockScreenConfiguration
 import com.beautycoder.pflockscreen.fragments.PFLockScreenFragment
 import com.beautycoder.pflockscreen.fragments.PFLockScreenFragment.OnPFLockScreenCodeCreateListener
 import com.beautycoder.pflockscreen.security.PFSecurityManager
+import com.duke.elliot.kim.kotlin.photodiary.MainActivity
 import com.duke.elliot.kim.kotlin.photodiary.MainViewModel
 import com.duke.elliot.kim.kotlin.photodiary.R
 import com.duke.elliot.kim.kotlin.photodiary.databinding.ActivitySetLockScreenBinding
@@ -23,6 +25,10 @@ class SetLockScreenActivity: AppCompatActivity() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_set_lock_screen)
 
         binding.switchSetLockScreen.isChecked = LockScreenHelper.loadLockScreenOnState(this)
+        binding.toolbar.setBackgroundColor(MainActivity.themeColorPrimary)
+
+        setSupportActionBar(binding.toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         binding.setLockScreen.setOnClickListener {
             if (!binding.switchSetLockScreen.isChecked) {
@@ -248,6 +254,13 @@ class SetLockScreenActivity: AppCompatActivity() {
             .replace(R.id.activity_set_lock_screen_container, pfLockScreenFragment)
             .commit()
 
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId) {
+            android.R.id.home -> finish()
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     companion object {

@@ -12,6 +12,7 @@ import com.duke.elliot.kim.kotlin.photodiary.diary_writing.DiaryModel
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.media_helper.MediaHelper
 import com.duke.elliot.kim.kotlin.photodiary.folder.DEFAULT_FOLDER_ID
 import com.duke.elliot.kim.kotlin.photodiary.folder.FolderModel
+import com.duke.elliot.kim.kotlin.photodiary.google_map.PlaceModel
 import com.duke.elliot.kim.kotlin.photodiary.utility.FileUtilities
 import kotlinx.coroutines.*
 import timber.log.Timber
@@ -25,13 +26,14 @@ class MainViewModel(application: Application): AndroidViewModel(application) {
     private val coroutineScope = CoroutineScope(Dispatchers.Main + job)
     private val fileUtilities = FileUtilities.getInstance(application)
     var photosFragmentAction = Action.UNINITIALIZED
-    lateinit var database: DiaryDao
-    private lateinit var diaries: LiveData<MutableList<DiaryModel>>
+    var database: DiaryDao = DiaryDatabase.getInstance(application).diaryDao()
+    private var diaries: LiveData<MutableList<DiaryModel>> = database.getAll()
 
     lateinit var folderDao: FolderDao
     lateinit var folders: LiveData<MutableList<FolderModel>>
 
     lateinit var selectedHashTag: String
+    var selectedPlace: PlaceModel? = null
 
     var selectedFolderId = MutableLiveData<Long>().apply {
         value = DEFAULT_FOLDER_ID
@@ -40,19 +42,16 @@ class MainViewModel(application: Application): AndroidViewModel(application) {
     init {
         coroutineScope.launch {
             withContext(Dispatchers.IO) {
-                database = DiaryDatabase.getInstance(application).diaryDao()
+                // database = DiaryDatabase.getInstance(application).diaryDao()
                 folderDao = DiaryDatabase.getInstance(application).folderDao()
-                diaries = database.getAll()
+                // diaries = database.getAll()
                 folders = folderDao.getAll()
             }
         }
     }
 
     fun getDiaries(): LiveData<MutableList<DiaryModel>>? {
-        return if (::diaries.isInitialized)
-            diaries
-        else
-            null
+        return diaries
     }
 
     fun getDiaryFolders() =

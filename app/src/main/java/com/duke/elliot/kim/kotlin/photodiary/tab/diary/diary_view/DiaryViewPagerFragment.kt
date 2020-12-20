@@ -62,6 +62,8 @@ class DiaryViewPagerFragment: Fragment(),
             false
         )
 
+        binding.toolbar.setBackgroundColor(MainActivity.themeColorPrimary)
+
         val diaryViewPagerFragmentArgs by navArgs<DiaryViewPagerFragmentArgs>()
         val sortingCriteria = diaryViewPagerFragmentArgs.sortingCriteria
         val selectedDate = diaryViewPagerFragmentArgs.selectedDate

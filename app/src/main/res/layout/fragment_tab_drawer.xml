@@ -28,6 +28,7 @@
                     android:id="@+id/showFavorites"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:layout_marginTop="32dp"
                     android:background="?attr/selectableItemBackground"
                     android:text="@string/favorites"
                     android:textSize="14sp"
@@ -270,14 +271,24 @@
                         android:gravity="center"
                         android:padding="8dp"
                         android:visibility="gone"
-                        android:text="@string/no_folder"
+                        android:text="@string/no_hashtag_registered"
                         android:textColor="@color/color_text_light" />
 
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/hashTagRecyclerView"
-                        android:visibility="gone"
+                    <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="wrap_content">
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/hashTagRecyclerView"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:visibility="gone"
+                            app:layout_constraintHeight_max="160dp"
+                            app:layout_constrainedHeight="true"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
 
                     <FrameLayout
                         android:id="@+id/showAllContainerHashTag"
@@ -302,6 +313,93 @@
                             app:drawableStartCompat="@drawable/ic_hashtag_21_24"
                             app:drawableTint="@color/icon_color"/>
                     </FrameLayout>
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0.5dp"
+                    android:background="@color/icon_color"/>
+                <!-- End of Hash Tag -->
+
+                <!-- Place -->
+                <LinearLayout
+                    android:id="@+id/placesContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:id="@+id/placesHeader"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="?attr/selectableItemBackground"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_marginEnd="2dp"
+                            android:layout_marginStart="18dp"
+                            android:clickable="false"
+                            android:focusable="false"
+                            app:srcCompat="@drawable/ic_round_location_on_24"
+                            app:tint="@color/icon_color"
+                            tools:ignore="ContentDescription" />
+
+                        <ImageView
+                            android:id="@+id/showPlaces"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_marginStart="8dp"
+                            android:clickable="false"
+                            android:focusable="false"
+                            app:srcCompat="@drawable/ic_sharp_arrow_drop_down_28"
+                            app:tint="@color/icon_color"
+                            tools:ignore="ContentDescription" />
+
+                        <TextView
+                            android:id="@+id/textPlaces"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/place"
+                            android:drawablePadding="24dp"
+                            android:paddingBottom="8dp"
+                            android:paddingEnd="16dp"
+                            android:paddingStart="8dp"
+                            android:paddingTop="8dp"
+                            android:gravity="center_vertical" />
+
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/placesEmptyMessage"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:gravity="center"
+                        android:padding="8dp"
+                        android:visibility="gone"
+                        android:text="@string/no_folder"
+                        android:textColor="@color/color_text_light" />
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/placeRecyclerView"
+                        android:visibility="gone"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintHeight_max="160dp"
+                        app:layout_constrainedHeight="true"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
                 </LinearLayout>
 
                 <View

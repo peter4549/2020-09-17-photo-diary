@@ -14,6 +14,7 @@ import com.duke.elliot.kim.kotlin.photodiary.database.FolderDao
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.MediaModel
 import com.duke.elliot.kim.kotlin.photodiary.diary_writing.media.media_helper.PhotoHelper
 import com.duke.elliot.kim.kotlin.photodiary.folder.FolderModel
+import com.duke.elliot.kim.kotlin.photodiary.google_map.PlaceModel
 import com.duke.elliot.kim.kotlin.photodiary.utility.getCurrentTime
 import com.duke.elliot.kim.kotlin.photodiary.utility.getFont
 import kotlinx.coroutines.*
@@ -66,6 +67,9 @@ class DiaryWritingViewModel(application: Application, val originDiary: DiaryMode
             }
         }
     }
+
+    /** Place */
+    var place: PlaceModel? = originDiary?.place
 
     private var _mediaArrayListSize = 0
 

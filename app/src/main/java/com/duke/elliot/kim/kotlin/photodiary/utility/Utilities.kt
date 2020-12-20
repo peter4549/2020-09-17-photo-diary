@@ -424,4 +424,3 @@ fun printHashKey(context: Context) {
 }
 
 fun String.toPath() = Uri.parse(this).path
-

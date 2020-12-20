@@ -18,7 +18,6 @@ import com.duke.elliot.kim.kotlin.photodiary.drawer_items.theme.loadPrimaryTheme
 import com.duke.elliot.kim.kotlin.photodiary.drawer_items.theme.loadSecondaryThemeColor
 import com.duke.elliot.kim.kotlin.photodiary.drawer_items.lock_screen.LOCK_SCREEN_TAG
 import com.duke.elliot.kim.kotlin.photodiary.drawer_items.lock_screen.LockScreenHelper
-import com.duke.elliot.kim.kotlin.photodiary.drawer_items.reminder.ReminderFragment
 import com.duke.elliot.kim.kotlin.photodiary.export.EXPORT_REQUEST_CODE
 import com.duke.elliot.kim.kotlin.photodiary.fluid_keyboard_resize.FluidContentResize
 import com.duke.elliot.kim.kotlin.photodiary.folder.FolderModel
@@ -62,6 +61,8 @@ class MainActivity : AppCompatActivity() {
         themeColorPrimary = loadPrimaryThemeColor(this)
         themeColorSecondary = loadSecondaryThemeColor(this)
         // AppCompatDelegate.setDefaultNightMode(getNightMode(this))
+
+        window.statusBarColor = themeColorSecondary
 
         /** First Launch */
         if (isFirstLaunch()) {
@@ -199,8 +200,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun getSelectedFolderId() = viewModel.selectedFolderId
-
-    fun getContext() = this
 
     companion object {
         const val DEFAULT_FONT_ID = R.font.cookie_run_regular

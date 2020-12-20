@@ -25,6 +25,7 @@ import com.duke.elliot.kim.kotlin.photodiary.export.ExportUtilities
 import com.duke.elliot.kim.kotlin.photodiary.export.FacebookOptionBottomSheetDialogFragment
 import com.duke.elliot.kim.kotlin.photodiary.export.KakaoTalkOptionBottomSheetDialogFragment
 import com.duke.elliot.kim.kotlin.photodiary.folder.DEFAULT_FOLDER_ID
+import com.duke.elliot.kim.kotlin.photodiary.google_map.PLACE_SELECTED
 import com.duke.elliot.kim.kotlin.photodiary.hashtag.HASHTAG_SELECTED
 import com.duke.elliot.kim.kotlin.photodiary.picker.MediaPickerBottomSheetDialogFragment
 import com.duke.elliot.kim.kotlin.photodiary.picker.TypelessMediaPickerBottomSheetDialogFragment
@@ -116,6 +117,23 @@ class DiariesFragment: Fragment(), KakaoTalkOptionBottomSheetDialogFragment.Kaka
                 binding.currentFolder.text = hashTag
                 binding.currentFolder.setTextColor(ContextCompat.getColor(requireContext(), R.color.colorTextAccent))
                 binding.currentFolder.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
+            } else if (viewModel.folderId == PLACE_SELECTED) {
+                /** Place */
+                val place = (requireActivity() as MainActivity).viewModel.selectedPlace
+                viewModel.originalDiaries?.let { diaries ->
+                    for (diary in diaries) {
+                        if (diary.place == place) {
+                            filteredDiaries.add(diary)
+                        }
+                    }
+
+                    diaryAdapter.addHeaderAndSubmitList(filteredDiaries)
+                }
+
+                binding.currentFolder.text = place?.name
+                binding.currentFolder.leftDrawable(R.drawable.ic_round_location_on_24, R.dimen.dimen_24dp)
+                binding.currentFolder.setDrawableTint(MainActivity.themeColorSecondary)
+                binding.currentFolder.setTextColor(ContextCompat.getColor(requireContext(), R.color.color_text_dark))
             }
             else {
                 /** Folder */
@@ -258,7 +276,17 @@ class DiariesFragment: Fragment(), KakaoTalkOptionBottomSheetDialogFragment.Kaka
                                 filteredDiaries.add(diary)
                         }
                     }
-                } else {
+                } else if (viewModel.folderId == PLACE_SELECTED) {
+                    /** Place */
+                    diaries?.let { it ->
+                        for (diary in it) {
+                            if (diary.place == (requireActivity() as MainActivity).viewModel.selectedPlace)
+                                filteredDiaries.add(diary)
+                        }
+
+                    }
+                }
+                else {
                     /** Folder selected */
                     diaries?.let { it ->
                         for (diary in it) {

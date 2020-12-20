@@ -27,6 +27,9 @@ import com.duke.elliot.kim.kotlin.photodiary.drawer_items.lock_screen.SetLockScr
 import com.duke.elliot.kim.kotlin.photodiary.folder.DEFAULT_FOLDER_ID
 import com.duke.elliot.kim.kotlin.photodiary.folder.EditFolderDialogFragment
 import com.duke.elliot.kim.kotlin.photodiary.folder.FolderAdapter
+import com.duke.elliot.kim.kotlin.photodiary.google_map.PLACE_SELECTED
+import com.duke.elliot.kim.kotlin.photodiary.google_map.PlaceAdapter
+import com.duke.elliot.kim.kotlin.photodiary.google_map.PlaceModel
 import com.duke.elliot.kim.kotlin.photodiary.hashtag.HASHTAG_SELECTED
 import com.duke.elliot.kim.kotlin.photodiary.hashtag.HashTagAdapter
 import com.duke.elliot.kim.kotlin.photodiary.tab.diary.DiariesFragment
@@ -46,6 +49,7 @@ class TabFragment: BaseFragment() {
     private lateinit var folderAdapter: FolderAdapter
     private lateinit var folderDao: FolderDao
     private lateinit var hashTagAdapter: HashTagAdapter
+    private lateinit var placeAdapter: PlaceAdapter
 
     private val job = Job()
     private val coroutineScope = CoroutineScope(Dispatchers.Default + job)
@@ -248,16 +252,25 @@ class TabFragment: BaseFragment() {
             (requireActivity() as MainActivity).setFolderId(DEFAULT_FOLDER_ID)
         }
 
-        /** Hash Tags */
+        /** Hash Tags and Place */
         var hashTagsInitialized = false
+        var placesInitialized = false
 
         DiaryDatabase.getInstance(requireContext()).diaryDao().getAll().observe(viewLifecycleOwner) { diaries ->
             val hashTags = diaries.map { it.hashTags }.flatMap { it.toList() }
             val hashTagMap = mutableMapOf<String, Int>()
 
+            val places = diaries.map { it.place }
+            val placeMap = mutableMapOf<PlaceModel, Int>()
+
             for (hashTag in hashTags) {
                 if (!hashTagMap.keys.contains(hashTag))
                     hashTagMap[hashTag] = Collections.frequency(hashTags, hashTag)
+            }
+
+            for (place in places) {
+                if (!placeMap.keys.contains(place))
+                    placeMap[place] = Collections.frequency(places, place)
             }
 
             if (!hashTagsInitialized) {
@@ -273,6 +286,18 @@ class TabFragment: BaseFragment() {
                 hashTagsInitialized = true
             } else
                 hashTagAdapter.submitList(hashTagMap.toList())
+
+            if (!placesInitialized) {
+                placeAdapter = PlaceAdapter { place ->
+                    (requireActivity() as MainActivity).viewModel.selectedPlace = place
+                    (requireActivity() as MainActivity).setFolderId(PLACE_SELECTED)
+                }
+
+                binding.placeRecyclerView.layoutManager = GridLayoutManagerWrapper(requireContext(), 1)
+                binding.placeRecyclerView.adapter = placeAdapter
+                placeAdapter.submitList(placeMap.toList())
+            } else
+                placeAdapter.submitList(placeMap.toList())
         }
 
         /** Hash Tag Views */
@@ -312,6 +337,41 @@ class TabFragment: BaseFragment() {
             (requireActivity() as MainActivity).setFolderId(DEFAULT_FOLDER_ID)
         }
 
+        /** Places View */
+        binding.showPlaces.rotate(180F, 0)
+        binding.placesHeader.setOnClickListener {
+            val isVisible = binding.placeRecyclerView.visibility == View.VISIBLE ||
+                    binding.placesEmptyMessage.visibility == View.VISIBLE
+            val itemCount = placeAdapter.itemCount
+
+            if (isVisible) {
+                if (itemCount == 0) {
+                    if (binding.placesEmptyMessage.visibility == View.VISIBLE)
+                        binding.placesEmptyMessage.crossFadeOut(200)
+                    binding.placeRecyclerView.visibility = View.GONE
+                } else {
+                    binding.placesEmptyMessage.visibility = View.GONE
+                    binding.placeRecyclerView.crossFadeOut(200)
+                }
+
+                binding.showPlaces.rotate(180F, 200)
+            } else {
+                if (itemCount == 0) {
+                    binding.placesEmptyMessage.crossFadeIn(200)
+                    binding.placeRecyclerView.visibility = View.GONE
+                } else {
+                    binding.placesEmptyMessage.visibility = View.GONE
+                    binding.placeRecyclerView.crossFadeIn(200)
+                }
+
+                binding.showPlaces.rotate(0F, 200)
+            }
+        }
+
+        binding.showAllContainerHashTag.setOnClickListener {
+            (requireActivity() as MainActivity).setFolderId(DEFAULT_FOLDER_ID)
+        }
+
         return binding.root
     }
 
@@ -338,6 +398,7 @@ class TabFragment: BaseFragment() {
     private fun initializeTabLayoutViewPager(tabLayout: TabLayout, viewPager: ViewPager2) {
         viewPager.adapter = FragmentStateAdapter(requireActivity())
         viewPager.isUserInputEnabled = true
+        tabLayout.setSelectedTabIndicatorColor(MainActivity.themeColorPrimary)
 
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             tab.tag = position
@@ -348,7 +409,7 @@ class TabFragment: BaseFragment() {
 
     class FragmentStateAdapter(fragmentActivity: FragmentActivity):
         androidx.viewpager2.adapter.FragmentStateAdapter(fragmentActivity) {
-        private val pageCount = 3
+        private val pageCount = 2
 
         override fun getItemCount(): Int = pageCount
 
@@ -356,8 +417,8 @@ class TabFragment: BaseFragment() {
             return when (position) {
                 0 -> DiariesFragment()
                 1 -> CalendarFragment()
-                2 -> PhotosFragment()
-                else -> throw IllegalArgumentException("Invalid position")
+                // 2 -> PhotosFragment()
+                else -> throw IllegalArgumentException("Invalid position.")
             }
         }
     }
