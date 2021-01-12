@@ -3,7 +3,7 @@
 
 Day Story
 
-funtions
+Features
 1. write a diary
 2. add media (photo, video, audio)
 3. edit photo
